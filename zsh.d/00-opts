@@ -1,0 +1,20 @@
+# -*- sh -*-
+
+typeset -a preexec_functions
+typeset -a precmd_functions
+typeset -a chpwd_functions
+
+ulimit -n 1024
+
+setopt AUTO_CD
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt EXTENDED_HISTORY
+setopt SHARE_HISTORY
+unsetopt TRANSIENT_RPROMPT
+setopt PROMPT_SUBST
+
+[ -w $zsh_cache ] && HISTFILE=$zsh_cache/history
+HISTSIZE=1000
+SAVEHIST=1000
+HISTFILE=~/.history

@@ -1,0 +1,8 @@
+# -*- sh -*-
+
+update_screen_title() {
+  #echo run: chpwd_update_screen_title
+  screen -X title $PWD
+}
+chpwd_functions+=update_screen_title
+

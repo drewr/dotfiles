@@ -1,0 +1,4 @@
+PROMPT='%n@%m/%!/%?:%B%3~%b($GIT_BRANCH)%# '; export PROMPT
+#PROMPT='%n@%m/%!/%?:%B%3~%b%# '; export PROMPT
+#RPROMPT='[%T]'
+

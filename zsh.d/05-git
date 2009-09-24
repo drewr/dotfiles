@@ -1,0 +1,43 @@
+#!/bin/zsh
+
+autoload colors
+colors
+
+export GIT_AUTHOR_NAME="${FULLNAME}"
+export GIT_AUTHOR_EMAIL="${EMAIL}"
+export GIT_COMMITTER_NAME="${FULLNAME}"
+export GIT_COMMITTER_EMAIL="${EMAIL}"
+
+export GIT_BRANCH
+
+gitize() {
+  if [[ ! -d .git ]]; then
+    git init
+    touch .gitignore
+    git add .
+    git commit -a -m "Create repo."
+    git gc
+  else
+    echo $PWD is already a git repo
+  fi
+}
+
+git_branch() {
+  git branch --no-color 2>/dev/null | grep '^*' | colrm 1 2
+  # $pipestatus[1] for the git exit code
+}
+
+update_git_vars_hist() {
+  case $(fc -lrn | head -1) in 
+  *git*)
+    GIT_BRANCH="$(git_branch)"
+    ;;
+  esac
+}
+precmd_functions+=update_git_vars_hist
+
+update_git_vars() {
+  GIT_BRANCH="$(git_branch)"
+}
+chpwd_functions+=update_git_vars
+
