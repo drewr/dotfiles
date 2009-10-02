@@ -14,7 +14,7 @@ gitize() {
   if [[ ! -d .git ]]; then
     git init
     touch .gitignore
-    git add .
+    git add .gitignore
     git commit -a -m "Create repo."
     git gc
   else
