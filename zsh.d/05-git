@@ -23,9 +23,9 @@ gitize() {
 }
 
 versionize() {
-  file=$1
-  ver=$(git log --pretty=format:"%ai %h" -1 | perl -p -e 's,(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d) [^ ]+ ([a-z0-9]+),\1\2\3\4\5\6+\7,')
-  versionedfile=$(echo $file | perl -pe "s,(.*)\.([^.]+)\$,\$1-${ver}.\$2,")
+  local file=$1
+  local ver=$(git log --pretty=format:"%ai %h" -1 | perl -p -e 's,(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d) [^ ]+ ([a-z0-9]+),\1\2\3\4\5\6+\7,')
+  local versionedfile=$(echo $file | perl -pe "s,(.*)\.([^.]+)\$,\$1-${ver}.\$2,")
   cp $file $versionedfile
 }
 
