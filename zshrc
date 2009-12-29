@@ -21,3 +21,5 @@ for zshrc in ~/.zsh.d/[0-9][0-9]*[^~] ; do
   source $zshrc
 done
 unsetopt EXTENDED_GLOB
+
+[[ -f ~/.zsh.d/zsh.${OS} ]] && source ~/.zsh.d/zsh.${OS}
