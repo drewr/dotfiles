@@ -4,3 +4,6 @@ psg () {
   eval $ps | grep -i $1 | grep -v grep
 }
 
+screen_running () {
+  [[ -n $STY ]]
+}
