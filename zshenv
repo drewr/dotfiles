@@ -8,10 +8,10 @@ MANPATH=/opt/local/man:/usr/local/man:$MANPATH
 WORDCHARS='*?_[]~=&;!#$%^(){}'
 WORDCHARS=${WORDCHARS:s,/,,}
 LEDGER_FILE=$HOME/.ledger; export LEDGER_FILE
-JARHOME=$HOME/tmp/src/jar; export JARHOME
 EMAIL="aaraines@gmail.com"; export EMAIL
 FULLNAME="Drew Raines"; export FULLNAME
 
 export JAVA_HOME
-[[ $OS == "Darwin" ]] && JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home
+[[ $OS == "Darwin" ]] && \
+   JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ '
