@@ -3,7 +3,7 @@
 update_screen_title() {
   #echo run: chpwd_update_screen_title
   if screen_running; then
-    screen -X title $PWD
+    screen -X title $(print -D $PWD)
   fi
 }
 chpwd_functions+=update_screen_title
