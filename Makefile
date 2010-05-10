@@ -5,3 +5,4 @@ install:
 	( cd zsh.d; tar cf - . ) | ( cd ${HOME}/.zsh.d; tar xf - )
 
 	cp gitconfig ${HOME}/.gitconfig
+	cp tmux.conf ${HOME}/.tmux.conf
