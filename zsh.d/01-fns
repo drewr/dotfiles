@@ -7,3 +7,12 @@ psg () {
 screen_running () {
   [[ -n $STY ]]
 }
+
+tun () {
+  ssh -NCf -R 10000:localhost:22 valve
+}
+
+killtun () {
+  psg 'ssh.*:22 valve' | awk '{print $2}' | xargs kill
+}
+
