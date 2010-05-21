@@ -16,3 +16,11 @@ killtun () {
   psg 'ssh.*:22 valve' | awk '{print $2}' | xargs kill
 }
 
+snapdir () {
+  dirname="`basename \"\`pwd\`\"`"
+  snapdir="../${dirname}-`date +%Y%m%d%H%M%S`"
+
+  mkdir "$snapdir"
+  tar cf - . | ( cd ${snapdir}; tar xf - )
+}
+
