@@ -24,3 +24,8 @@ snapdir () {
   tar cf - . | ( cd ${snapdir}; tar xf - )
 }
 
+sshs () {
+  h=$1
+  screen -t $h ssh $h
+}
+
