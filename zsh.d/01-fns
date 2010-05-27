@@ -29,3 +29,7 @@ sshs () {
   screen -t $h ssh $h
 }
 
+gitcb () {
+  b=$1
+  git checkout -b $(basename $b) $b
+}
