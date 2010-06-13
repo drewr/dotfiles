@@ -33,3 +33,14 @@ gitcb () {
   b=$1
   git checkout -b $(basename $b) $b
 }
+
+update_auth_sock () {
+  if [[ -n $TMUX ]]; then
+    TMUX_SOCK=$(echo $TMUX|cut -d , -f 1)
+    NEW_SSH_AUTH_SOCK=$(tmux -S $TMUX_SOCK showenv|grep ^SSH_AUTH_SOCK|cut -d = -f 2)
+    if [[ -n $NEW_SSH_AUTH_SOCK ]] && [[ -S $NEW_SSH_AUTH_SOCK ]]; then
+      SSH_AUTH_SOCK=$NEW_SSH_AUTH_SOCK
+    fi
+  fi
+}
+preexec_functions+=update_auth_sock
