@@ -10,7 +10,8 @@ chpwd_functions+=update_screen_title
 
 update_tmux_title() {
   if tmux_running; then
-    tmux rename-window $(print -D $PWD)
+    SOCK=$(echo $TMUX|cut -d , -f 1)
+    tmux -S $SOCK rename-window $(print -D $PWD)
   fi
 }
 chpwd_functions+=update_tmux_title
