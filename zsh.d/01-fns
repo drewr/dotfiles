@@ -8,6 +8,10 @@ screen_running () {
   [[ -n $STY ]]
 }
 
+tmux_running () {
+  [[ -n $TMUX ]]
+}
+
 tun () {
   ssh -NCf -R 10000:localhost:22 valve
 }

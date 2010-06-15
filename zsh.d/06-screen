@@ -8,3 +8,9 @@ update_screen_title() {
 }
 chpwd_functions+=update_screen_title
 
+update_tmux_title() {
+  if tmux_running; then
+    tmux rename-window $(print -D $PWD)
+  fi
+}
+chpwd_functions+=update_tmux_title
