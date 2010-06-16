@@ -23,3 +23,8 @@ done
 unsetopt EXTENDED_GLOB
 
 [[ -f ~/.zsh.d/zsh.${OS} ]] && source ~/.zsh.d/zsh.${OS}
+
+# Move these from zshenv because /etc/zprofile will overwrite.
+PATH=/opt/local/bin:/opt/local/sbin:$PATH
+PATH=/usr/local/bin:/usr/local/sbin:$PATH
+PATH=$HOME/bin:$PATH
