@@ -3,7 +3,7 @@
 OS=$(uname -s); export OS
 PATH=/opt/local/bin:/opt/local/sbin:$PATH
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
-PATH=~/bin:$PATH
+PATH=$HOME/bin:$PATH
 MANPATH=/opt/local/man:/usr/local/man:$MANPATH
 WORDCHARS='*?_[]~=&;!#$%^(){}'
 WORDCHARS=${WORDCHARS:s,/,,}
