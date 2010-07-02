@@ -4,5 +4,10 @@ install:
 	if [ ! -d ${HOME}/.zsh.d ]; then mkdir ${HOME}/.zsh.d; fi
 	( cd zsh.d; tar cf - . ) | ( cd ${HOME}/.zsh.d; tar xf - )
 
-	cp gitconfig ${HOME}/.gitconfig
-	cp tmux.conf ${HOME}/.tmux.conf
+	for i in \
+	  gitconfig \
+	  tmux.conf \
+	  cmd-key-happy.lua \
+	; do \
+	cp $$i ${HOME}/.$$i; \
+	done
