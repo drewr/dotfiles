@@ -21,13 +21,8 @@ global_excludes = Set{ "cmd-tab" }
 -- have to use "alt-w" to close a terminal window.
 
 apps = {
-   Terminal = { exclude = Set{ "cmd-`",
-                               "cmd-escape",
-			 } },
-   iTerm = { exclude = Set{ "cmd-`",
-                            "cmd-escape",
-                            "shift-cmd-0",
-                            "shift-cmd-9"} },
+   Terminal = { exclude = Set{ "cmd-escape" } },
+   iTerm = { exclude = Set{ "cmd-escape" } },
    Eclipse  = { exclude = {} },
    Xcode    = { exclude = {} },
    TextMate = { exclude = Set { "cmd-1",
