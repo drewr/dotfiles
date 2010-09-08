@@ -12,6 +12,10 @@ tmux_running () {
   [[ -n $TMUX ]]
 }
 
+not_in_emacs () {
+  [[ ! -n $EMACS ]]
+}
+
 tun () {
   ssh -NCf -R 10000:localhost:22 valve
 }
