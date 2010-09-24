@@ -21,7 +21,7 @@ tun () {
 }
 
 killtun () {
-  psg 'ssh.*:22 valve' | awk '{print $2}' | xargs kill
+  pkill -f '10000:localhost:22'
 }
 
 snapdir () {
