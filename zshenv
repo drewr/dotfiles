@@ -1,4 +1,5 @@
-[[ -o interactive ]] && echo "+++Reading .zshenv (for interactive use)."
+echo "+++Reading .zshenv."
+[[ -o interactive ]] && echo "+++  (for interactive use)."
 
 OS=$(uname -s); export OS
 MANPATH=/opt/local/man:/usr/local/man:$MANPATH

@@ -1,3 +1,6 @@
+echo "+++Reading .zshrc."
+[[ -o interactive ]] && echo "+++  (for interactive use)."
+
 autoload -U compinit zrecompile
 
 zsh_cache=${HOME}/.zsh-cache
