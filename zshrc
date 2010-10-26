@@ -1,5 +1,6 @@
-echo "+++Reading .zshrc."
-[[ -o interactive ]] && echo "+++  (for interactive use)."
+echo -n "+++Reading .zshrc"
+[[ -o interactive ]] && echo -n " (for interactive use)"
+echo .
 
 autoload -U compinit zrecompile
 
