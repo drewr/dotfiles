@@ -63,7 +63,7 @@ enumerate_huh () {
 }
 
 enumerate_ssh () {
-  awk -v pat="host $1%02d.$2\n  hostname %s\n\n" \
+  sort | awk -v pat="host $1%02d.$2\n  hostname %s\n\n" \
     'BEGIN{c=1};{printf(pat, c++, $1)}'
 }
 
