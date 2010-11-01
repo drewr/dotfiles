@@ -67,3 +67,8 @@ enumerate_ssh () {
     'BEGIN{c=1};{printf(pat, c++, $1)}'
 }
 
+s3cfg () {
+  [[ -e ~/.s3cfg ]] && rm ~/.s3cfg
+  ln -s .s3cfg-$1 ~/.s3cfg
+}
+
