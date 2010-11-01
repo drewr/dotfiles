@@ -54,3 +54,16 @@ update_auth_sock () {
   fi
 }
 preexec_functions+=update_auth_sock
+
+enumerate_huh () {
+  # This *should* be the same as the following function.  But it
+  # doesn't work right.
+  awk -v a=$1 -v b=$2 \
+    'BEGIN{c=1};{printf("host %s%02d.%s\n  hostname %s\n\n", $a, c++, $b, $1)}'
+}
+
+enumerate_ssh () {
+  awk -v pat="host $1%02d.$2\n  hostname %s\n\n" \
+    'BEGIN{c=1};{printf(pat, c++, $1)}'
+}
+
