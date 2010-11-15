@@ -68,7 +68,13 @@ enumerate_ssh () {
 }
 
 s3cfg () {
-  [[ -e ~/.s3cfg ]] && rm ~/.s3cfg
-  ln -s .s3cfg-$1 ~/.s3cfg
+  l=~/.s3cfg
+  targ=~/.s3cfg-$1
+  if [[ -e $targ ]]; then
+    [[ -e $l ]] && rm $l
+    ln -s $targ $l
+  else
+    echo set to `readlink ~/.s3cfg`
+  fi
 }
 
