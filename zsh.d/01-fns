@@ -74,7 +74,7 @@ s3cfg () {
     [[ -e $l ]] && rm $l
     ln -s $targ $l
   else
-    echo set to `readlink ~/.s3cfg`
+    basename `readlink ~/.s3cfg` | sed 's/.s3cfg-\(.*\)/\1/'
   fi
 }
 
