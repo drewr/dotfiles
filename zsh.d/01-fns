@@ -78,3 +78,7 @@ s3cfg () {
   fi
 }
 
+chef-me () {
+  export OPSCODE_USER=sonian_developer
+  . ~/.rvm/scripts/rvm && rvm use 1.9.2
+}
