@@ -1,4 +1,3 @@
-alias l=ledger
 alias gb="git branch"
 alias gs="git status"
 alias gco="git checkout"

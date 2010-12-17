@@ -92,3 +92,11 @@ lset () {
   fi
 }
 
+l () {
+  if [[ $TERM == "dumb" ]]; then
+    ledger $* | cat
+  else
+    ledger $*
+  fi
+}
+
