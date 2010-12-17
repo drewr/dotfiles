@@ -86,10 +86,9 @@ chef-me () {
 lset () {
   profile=$1
   if [[ -z $profile ]]; then
-    basename `readlink ~/.ledger`
+    echo $LEDGER_FILE
   else
-    rm ~/.ledger
-    ln -s etc/ledger/${profile}.dat ~/.ledger
+    LEDGER_FILE=~/etc/ledger/${profile}.dat
   fi
 }
 
