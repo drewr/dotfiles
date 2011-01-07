@@ -75,6 +75,12 @@ chef-me () {
   . ~/.rvm/scripts/rvm && rvm use 1.9.2
 }
 
+knife-delete () {
+  knife node delete $*
+  knife client delete $*
+  knife ec2 server delete $*
+}
+
 lset () {
   profile=$1
   if [[ -z $profile ]]; then
