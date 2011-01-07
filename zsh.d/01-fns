@@ -26,14 +26,6 @@ killtun () {
   pkill -f '10000:localhost:22'
 }
 
-snapdir () {
-  dirname="`basename \"\`pwd\`\"`"
-  snapdir="../${dirname}-`date +%Y%m%d%H%M%S`"
-
-  mkdir "$snapdir"
-  tar cf - . | ( cd ${snapdir}; tar xf - )
-}
-
 sshs () {
   h=$1
   screen -t $h ssh $h
@@ -98,5 +90,13 @@ l () {
   else
     ledger $*
   fi
+}
+
+snapdir () {
+  dirname="`basename \"\`pwd\`\"`"
+  snapdir="../${dirname}-`date +%Y%m%d%H%M%S`"
+
+  mkdir "$snapdir"
+  tar cf - . | ( cd ${snapdir}; tar xf - )
 }
 
