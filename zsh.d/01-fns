@@ -29,7 +29,7 @@ killtun () {
 sshs () {
   h=$1
   if tmux_running; then
-    tmux -n $h "ssh $h"
+    tmux neww -n $h "ssh $h"
   elif screen_running; then
     screen -t $h ssh $h
   else
