@@ -28,7 +28,13 @@ killtun () {
 
 sshs () {
   h=$1
-  screen -t $h ssh $h
+  if tmux_running; then
+    tmux -n $h "ssh $h"
+  elif screen_running; then
+    screen -t $h ssh $h
+  else
+    ssh $h
+  fi
 }
 
 gitcb () {
