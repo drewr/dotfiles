@@ -29,9 +29,9 @@ killtun () {
 sshs () {
   h=$1
   if tmux_running; then
-    tmux neww -n $h "ssh -A $h"
+    tmux neww -n $h "exec ssh $h"
   elif screen_running; then
-    screen -t $h ssh -A $h
+    screen -t $h exec ssh $h
   else
     ssh $h
   fi
