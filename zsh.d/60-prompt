@@ -1,4 +1,6 @@
-PROMPT='%n@%m/%!/%?:%B%3~%b($GIT_BRANCH)%# '; export PROMPT
-#PROMPT='%n@%m/%!/%?:%B%3~%b%# '; export PROMPT
-#RPROMPT='[%T]'
+setopt prompt_subst
 
+### PROMPT='%n@%m/%!/%?:%B%3~%b%# '; export PROMPT
+### RPROMPT='[%T]'
+
+PROMPT='%n@%m/%!/%?:%B%3~%b(${vcs_info_msg_0_})%# '; export PROMPT

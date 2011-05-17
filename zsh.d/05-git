@@ -8,8 +8,6 @@ export GIT_AUTHOR_EMAIL="${EMAIL}"
 export GIT_COMMITTER_NAME="${FULLNAME}"
 export GIT_COMMITTER_EMAIL="${EMAIL}"
 
-export GIT_BRANCH
-
 gitize() {
   if [[ ! -d .git ]]; then
     git init
@@ -34,36 +32,18 @@ git_branch() {
   # $pipestatus[1] for the git exit code
 }
 
-update_git_vars_hist() {
-  case $(fc -lrn | head -1) in
-  *git*)
-    GIT_BRANCH="$(git_branch)"
-    ;;
-  esac
-}
-### precmd_functions+=update_git_vars_hist
-
-update_git_vars() {
-  GIT_BRANCH="$(git_branch)"
-}
-### chpwd_functions+=update_git_vars
-
 autoload -Uz vcs_info
 
 zstyle ":vcs_info:*" stagedstr "%F{28}●"
-zstyle ":vcs_info:*" unstagedstr "%F{11}●"
+zstyle ":vcs_info:*" unstagedstr "%F{23}●"
 zstyle ":vcs_info:*" check-for-changes true
 zstyle ":vcs_info:(sv[nk]|bzr):*" branchformat "%b%F{1}:%F{11}%r"
 zstyle ":vcs_info:*" enable git svn bzr hg
 precmd () {
   if [[ -z $(git ls-files --other --exclude-standard 2> /dev/null) ]] {
-    zstyle ":vcs_info:*" formats " [%F{green}%b%c%u%F{blue}]"
+    zstyle ":vcs_info:*" formats "%b%c%u%{$reset_color%}"
   } else {
-    zstyle ":vcs_info:*" formats " [%F{green}%b%c%u%F{red}●%F{blue}]"
+    zstyle ":vcs_info:*" formats "%b%c%u%F{red}●%{$reset_color%}"
   }
   vcs_info
 }
-
-setopt prompt_subst
-PROMPT="%F{blue}%n@%m %c${vcs_info_msg_0_}%F{blue} %(?/%F{blue}/%F{red})"
-PROMPT=${PROMPT}"%% %{$reset_color%}"
