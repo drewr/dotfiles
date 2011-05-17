@@ -16,3 +16,5 @@ export JAVA_HOME
 ## With Emacs 23, I've found this needs to go in ~root/.zshrc too to
 ## help with Tramp hangs.
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ '
+
+TERM=xterm-256color
