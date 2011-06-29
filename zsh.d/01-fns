@@ -112,3 +112,7 @@ snapdir () {
   tar cf - . | ( cd ${snapdir}; tar xf - )
 }
 
+localip () {
+  ssh -n $1 fgrep local_ip /etc/motd | awk '{print $2}'
+}
+
