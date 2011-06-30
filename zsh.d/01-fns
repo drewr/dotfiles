@@ -116,3 +116,7 @@ localip () {
   ssh -n $1 fgrep local_ip /etc/motd | awk '{print $2}'
 }
 
+count () {
+  curl -s localhost:9200/$1/_count\?q=\*:\*; echo
+}
+
