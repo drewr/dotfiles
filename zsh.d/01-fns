@@ -48,6 +48,14 @@ esmon () {
   tmux rename-window $name
 }
 
+esmaster () {
+  local clus=$1
+  local q=$2
+  ENV=$clus knife ssh $q -x drew -a ec2.public_ipv4 \
+   "curl -s p.draines.com/cluster.sh | zsh | fgrep \*" \
+   | sort -uk12
+}
+
 gitcb () {
   b=$1
   git checkout -b $(basename $b) $b
