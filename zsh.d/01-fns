@@ -37,6 +37,17 @@ sshs () {
   fi
 }
 
+esmon () {                               
+  local name=$1
+  local host=$2
+  tmux neww \
+    "exec ssh $host fgrep role /etc/motd\; curl -s p.draines.com/health.sh \| zsh"
+  tmux split-window -h \
+    "exec ssh $host fgrep role /etc/motd\; curl -s p.draines.com/heap.sh \| zsh"
+  tmux resize-pane -L 10
+  tmux rename-window $name
+}
+
 gitcb () {
   b=$1
   git checkout -b $(basename $b) $b
