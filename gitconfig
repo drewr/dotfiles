@@ -16,6 +16,9 @@ whitespace = strip
 color = auto
 rename = copy 
 
+[push]
+default = tracking
+
 [pager]
 color = true 
 
