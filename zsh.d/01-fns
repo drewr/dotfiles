@@ -175,3 +175,6 @@ indices15 () {
   curl -s p.draines.com/indices.sh | zsh -s 15
 }
 
+health () {
+  curl -s p.draines.com/health.py | python -
+}
