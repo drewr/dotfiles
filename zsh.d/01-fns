@@ -155,3 +155,23 @@ gib () {
   printf "%0.2f\n" $((s/(1024*1024*1024.0)))
 }
 
+draines () {
+  curl -s p.draines.com/$1 | zsh
+}
+
+cluster () {
+  draines cluster.sh
+}
+
+shards () {
+  draines shards.sh
+}
+
+indices () {
+  draines indices.sh
+}
+
+indices15 () {
+  curl -s p.draines.com/indices.sh | zsh -s 15
+}
+
