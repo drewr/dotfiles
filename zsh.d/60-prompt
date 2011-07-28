@@ -3,4 +3,4 @@ setopt prompt_subst
 ### PROMPT='%n@%m/%!/%?:%B%3~%b%# '; export PROMPT
 ### RPROMPT='[%T]'
 
-PROMPT='%n@%m %! %? %* %B%3~%b(${vcs_info_msg_0_})%# '; export PROMPT
+PROMPT='%n@%m %w %* %! %? %B%3~%b(${vcs_info_msg_0_})%# '; export PROMPT
