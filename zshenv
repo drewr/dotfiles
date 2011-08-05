@@ -7,7 +7,7 @@ WORDCHARS=${WORDCHARS:s,/,,}
 LEDGER_FILE=$HOME/.ledger; export LEDGER_FILE
 EMAIL="aaraines@gmail.com"; export EMAIL
 FULLNAME="Drew Raines"; export FULLNAME
-OPSCODE_USER=sonian_developer; export OPSCODE_USER
+OPSCODE_USER=sonian_devs; export OPSCODE_USER
 
 export JAVA_HOME
 [[ $OS == "Darwin" ]] && \
