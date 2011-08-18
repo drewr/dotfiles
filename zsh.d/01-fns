@@ -178,3 +178,7 @@ indices15 () {
 health () {
   curl -s p.draines.com/health.py | python -
 }
+
+localip () {
+  ssh $1 fgrep local_ip /etc/motd
+}
