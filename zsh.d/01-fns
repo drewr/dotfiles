@@ -168,11 +168,7 @@ shards () {
 }
 
 indices () {
-  draines indices.sh
-}
-
-indices15 () {
-  curl -s p.draines.com/indices.sh | zsh -s 15
+  curl -s p.draines.com/indices.sh | zsh -s $*
 }
 
 health () {
