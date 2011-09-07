@@ -178,3 +178,8 @@ health () {
 localip () {
   ssh $1 fgrep local_ip /etc/motd
 }
+
+publicip () {
+  ssh $1 fgrep public_ip /etc/motd
+}
+
