@@ -124,7 +124,7 @@ l () {
 }
 
 snapdir () {
-  dirname="`basename \"\`pwd\`\"`"
+  dirname="$(basename $(pwd))"
   snapdir="../${dirname}-`date +%Y%m%d%H%M%S`"
 
   mkdir "$snapdir"
