@@ -49,7 +49,7 @@ esmon () {
   tmux split-window -h \
     "exec ssh $host fgrep role /etc/motd\; curl -s p.draines.com/heap.sh \| zsh"
   tmux resize-pane -L 10
-  tmux rename-window $name
+  tmux rename-window $name-$host
 }
 
 esmaster () {
