@@ -18,6 +18,10 @@ not_in_emacs () {
   [[ ! -n $EMACS ]]
 }
 
+not_in_cloud () {
+  ! fgrep -q ami_id /etc/motd 2>/dev/null
+}
+
 tun () {
   ssh -NCf -R 10000:localhost:22 valve
 }
