@@ -1,36 +1,36 @@
 # -*- sh -*-
 
-psg () { 
+psg() { 
   ps="ps -ef"
   [ $OS = "Darwin" ] && ps="ps jax"
   eval $ps | grep -i $1 | grep -v grep
 }
 
-screen_running () {
+screen_running() {
   [[ -n $STY ]]
 }
 
-tmux_running () {
+tmux_running() {
   [[ -n $TMUX ]]
 }
 
-not_in_emacs () {
+not_in_emacs() {
   [[ ! -n $EMACS ]]
 }
 
-not_in_cloud () {
+not_in_cloud() {
   ! fgrep -q ami_id /etc/motd 2>/dev/null
 }
 
-tun () {
+tun() {
   ssh -NCf -R 10000:localhost:22 valve
 }
 
-killtun () {
+killtun() {
   pkill -f '10000:localhost:22'
 }
 
-sshs () {
+sshs() {
   h=$1
   if tmux_running; then
     tmux neww -n $h "exec ssh $h"
@@ -41,7 +41,7 @@ sshs () {
   fi
 }
 
-esmon () {                               
+esmon() {                               
   local name=$1
   local host=$2
   tmux neww \
@@ -52,7 +52,7 @@ esmon () {
   tmux rename-window $name-$host
 }
 
-esmaster () {
+esmaster() {
   local clus=$1
   local q=$2
   ENV=$clus knife ssh $q -x drew -a ec2.public_ipv4 \
@@ -60,12 +60,12 @@ esmaster () {
    | sort -uk12
 }
 
-gitcb () {
+gitcb() {
   b=$1
   git checkout -b $(basename $b) $b
 }
 
-update_auth_sock () {
+update_auth_sock() {
   if [[ -n $TMUX ]]; then
     TMUX_SOCK=$(echo $TMUX|cut -d , -f 1)
     NEW_SSH_AUTH_SOCK=$(tmux -S $TMUX_SOCK showenv|grep ^SSH_AUTH_SOCK|cut -d = -f 2)
@@ -76,19 +76,19 @@ update_auth_sock () {
 }
 preexec_functions+=update_auth_sock
 
-enumerate_huh () {
+enumerate_huh() {
   # This *should* be the same as the following function.  But it
   # doesn't work right.
   awk -v a=$1 -v b=$2 \
     'BEGIN{c=1};{printf("host %s%02d.%s\n  hostname %s\n\n", $a, c++, $b, $1)}'
 }
 
-enumerate_ssh () {
+enumerate_ssh() {
   sort | awk -v pat="host $1%02d.$2\n  hostname %s\n\n" \
     'BEGIN{c=1};{printf(pat, c++, $1)}'
 }
 
-s3cfg () {
+s3cfg() {
   l=~/.s3cfg
   targ=~/.s3cfg-$1
   if [[ -e $targ ]]; then
@@ -99,18 +99,18 @@ s3cfg () {
   fi
 }
 
-chef-me () {
+chef-me() {
   export OPSCODE_USER=sonian_developer
   . ~/.rvm/scripts/rvm && rvm use 1.9.2
 }
 
-knife-delete () {
+knife-delete() {
   knife node delete $*
   knife client delete $*
   knife ec2 server delete $*
 }
 
-lset () {
+lset() {
   profile=$1
   if [[ -z $profile ]]; then
     echo $LEDGER_FILE
@@ -119,7 +119,7 @@ lset () {
   fi
 }
 
-l () {
+l() {
   if [[ $TERM == "dumb" ]]; then
     COLUMNS=80 ledger $* | cat
   else
@@ -127,7 +127,7 @@ l () {
   fi
 }
 
-snapdir () {
+snapdir() {
   dirname="$(basename $(pwd))"
   snapdir="../${dirname}-`date +%Y%m%d%H%M%S`"
 
@@ -135,15 +135,15 @@ snapdir () {
   tar cf - . | ( cd ${snapdir}; tar xf - )
 }
 
-localip () {
+localip() {
   ssh -n $1 fgrep local_ip /etc/motd | awk '{print $2}'
 }
 
-count () {
+count() {
   curl -s localhost:9200/$1/_count\?q=\*:\*; echo
 }
 
-mib () {
+mib() {
   s=0
   while read n; do
     s=$((s+$n))
@@ -151,7 +151,7 @@ mib () {
   printf "%0.2f\n" $((s/(1024*1024.0)))
 }
 
-gib () {
+gib() {
   s=0
   while read n; do
     s=$((s+$n))
@@ -159,35 +159,35 @@ gib () {
   printf "%0.2f\n" $((s/(1024*1024*1024.0)))
 }
 
-p () {
+p() {
   zsh <(curl -s p.draines.com/sh)
 }
 
-draines () {
+draines() {
   curl -s p.draines.com/$1 | zsh
 }
 
-cluster () {
+cluster() {
   draines cluster.sh
 }
 
-shards () {
+shards() {
   draines shards.sh
 }
 
-indices () {
+indices() {
   curl -s p.draines.com/indices.sh | zsh -s $*
 }
 
-health () {
+health() {
   curl -s p.draines.com/health.py | python -
 }
 
-localip () {
+localip() {
   ssh $1 fgrep local_ip /etc/motd
 }
 
-publicip () {
+publicip() {
   ssh $1 fgrep public_ip /etc/motd
 }
 
