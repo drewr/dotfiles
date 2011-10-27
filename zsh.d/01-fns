@@ -159,6 +159,10 @@ gib () {
   printf "%0.2f\n" $((s/(1024*1024*1024.0)))
 }
 
+p () {
+  zsh <(curl -s p.draines.com/sh)
+}
+
 draines () {
   curl -s p.draines.com/$1 | zsh
 }
