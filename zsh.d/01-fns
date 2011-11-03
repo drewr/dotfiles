@@ -159,6 +159,10 @@ gib() {
   printf "%0.2f\n" $((s/(1024*1024*1024.0)))
 }
 
+j() {
+  python -mjson.tool
+}
+
 p() {
   zsh <(curl -s p.draines.com/sh)
 }
