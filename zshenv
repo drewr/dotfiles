@@ -17,3 +17,5 @@ export JAVA_HOME
 ## help with Tramp hangs.
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ '
 [[ ! $TERM == "dumb" ]] && TERM=xterm-256color
+
+CLOJURESCRIPT_HOME=$HOME/src/clojurescript; export CLOJURESCRIPT_HOME

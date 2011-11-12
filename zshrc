@@ -33,4 +33,5 @@ PATH=/opt/local/bin:/opt/local/sbin:$PATH
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
 [[ -d $HOME/.rbenv ]] \
  && PATH=$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH
+PATH=$HOME/src/clojurescript/bin:$PATH
 PATH=$HOME/bin:$PATH
