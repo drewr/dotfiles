@@ -1,5 +1,8 @@
 # -*- sh -*-
 
+# Remove dups.
+typeset -U path cdpath manpath fpath
+
 typeset -a preexec_functions
 typeset -a precmd_functions
 typeset -a chpwd_functions
