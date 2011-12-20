@@ -31,6 +31,11 @@ unsetopt EXTENDED_GLOB
 # Move these from zshenv because /etc/zprofile will overwrite.
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
 [[ -d $HOME/.rbenv ]] && PATH=$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH
+
 CLOJURESCRIPT_HOME=$HOME/src/clojurescript; export CLOJURESCRIPT_HOME
 [[ -d $CLOJURESCRIPT_HOME ]] && PATH=$CLOJURESCRIPT_HOME/bin:$PATH
+
+GOROOT=$HOME/src/go; export GOROOT
+[[ -d $GOROOT ]] && PATH=$GOROOT/bin:$PATH
+
 PATH=$HOME/bin:$PATH
