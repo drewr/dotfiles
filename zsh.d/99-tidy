@@ -1,0 +1,3 @@
+# Remove dups.
+typeset -U path cdpath manpath fpath
+

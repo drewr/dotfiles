@@ -17,17 +17,6 @@ else
   done
 fi
 
-setopt EXTENDED_GLOB
-for zshrc in ~/.zsh.d/[0-9][0-9]*[^~] ; do
-  if [[ ! -z $ZSHDEBUG ]]; then
-    echo +++ $(basename $zshrc)
-  fi
-  source $zshrc
-done
-unsetopt EXTENDED_GLOB
-
-[[ -f ~/.zsh.d/zsh.${OS} ]] && source ~/.zsh.d/zsh.${OS}
-
 # Move these from zshenv because /etc/zprofile will overwrite.
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
 [[ -d $HOME/.rbenv ]] && PATH=$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH
@@ -39,3 +28,14 @@ GOROOT=$HOME/src/go; export GOROOT
 [[ -d $GOROOT ]] && PATH=$GOROOT/bin:$PATH
 
 PATH=$HOME/bin:$PATH
+
+setopt EXTENDED_GLOB
+for zshrc in ~/.zsh.d/[0-9][0-9]*[^~] ; do
+  if [[ ! -z $ZSHDEBUG ]]; then
+    echo +++ $(basename $zshrc)
+  fi
+  source $zshrc
+done
+unsetopt EXTENDED_GLOB
+
+[[ -f ~/.zsh.d/zsh.${OS} ]] && source ~/.zsh.d/zsh.${OS}
