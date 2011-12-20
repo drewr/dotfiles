@@ -1,1 +1,2 @@
 alias ls="ls -G"
+PATH=/opt/local/bin:/opt/local/sbin:$PATH
