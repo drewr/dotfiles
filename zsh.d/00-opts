@@ -15,6 +15,6 @@ unsetopt TRANSIENT_RPROMPT
 setopt PROMPT_SUBST
 
 [ -w $zsh_cache ] && HISTFILE=$zsh_cache/history
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=10000
+SAVEHIST=10000
 HISTFILE=~/.history
