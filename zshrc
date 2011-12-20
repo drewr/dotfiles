@@ -39,3 +39,6 @@ done
 unsetopt EXTENDED_GLOB
 
 [[ -f ~/.zsh.d/zsh.${OS} ]] && source ~/.zsh.d/zsh.${OS}
+
+typeset -U path cdpath manpath fpath
+
