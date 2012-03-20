@@ -6,6 +6,7 @@ install:
 
 	for i in \
 	  gitconfig \
+	  screenrc \
 	  tmux.conf \
 	  cmd-key-happy.lua \
 	; do \
