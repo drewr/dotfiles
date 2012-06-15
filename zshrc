@@ -30,7 +30,10 @@ unsetopt EXTENDED_GLOB
 
 # Move these from zshenv because /etc/zprofile will overwrite.
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
-[[ -d $HOME/.rbenv ]] && PATH=$HOME/.rbenv/bin:$PATH
+if [[ -d $HOME/.rbenv ]]; then
+  PATH=$HOME/.rbenv/bin:$PATH
+  rbenv init - >/tmp/rbenvinit.zsh; source /tmp/rbenvinit.zsh
+fi
 
 CLOJURESCRIPT_HOME=$HOME/src/clojurescript; export CLOJURESCRIPT_HOME
 [[ -d $CLOJURESCRIPT_HOME ]] && PATH=$CLOJURESCRIPT_HOME/bin:$PATH
