@@ -1,5 +1,17 @@
 # -*- sh -*-
 
+e() {
+    local d
+
+    if [[ -z $1 ]]; then
+        d=../$(basename $PWD)
+    else
+        d=$1
+    fi
+
+    emacs -nw $d
+}
+
 psg() { 
   ps="ps -ef"
   [ $OS = "Darwin" ] && ps="ps jax"
