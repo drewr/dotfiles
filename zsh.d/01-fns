@@ -124,11 +124,18 @@ knife-delete() {
 }
 
 lset() {
-  profile=$1
+  local profile=$1
   if [[ -z $profile ]]; then
     echo $LEDGER_FILE
   else
-    LEDGER_FILE=~/etc/ledger/${profile}.dat
+    case $profile in
+      (trinity)
+        LEDGER_FILE=~/etc/trinity/trinity.dat
+        ;;
+      (*)
+        LEDGER_FILE=~/etc/ledger/${profile}.dat
+        ;;
+    esac
   fi
 }
 
