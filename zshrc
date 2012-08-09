@@ -35,6 +35,8 @@ if [[ -d $HOME/.rbenv ]]; then
   rbenv init - >/tmp/rbenvinit.zsh; source /tmp/rbenvinit.zsh
 fi
 
+[[ -d $HOME/.cabal ]] && PATH=$HOME/.cabal/bin:$PATH
+
 CLOJURESCRIPT_HOME=$HOME/src/clojurescript; export CLOJURESCRIPT_HOME
 [[ -d $CLOJURESCRIPT_HOME ]] && PATH=$CLOJURESCRIPT_HOME/bin:$PATH
 
