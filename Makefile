@@ -9,6 +9,7 @@ install:
 	  screenrc \
 	  tmux.conf \
 	  cmd-key-happy.lua \
+	  Xresources \
 	; do \
 	cp $$i ${HOME}/.$$i; \
 	done
