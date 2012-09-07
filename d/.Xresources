@@ -1,2 +1,2 @@
 URxvt.scrollBar: off
-URxvt.font: xft:terminus:size=10
+URxvt.font: xft:inconsolata:size=12
