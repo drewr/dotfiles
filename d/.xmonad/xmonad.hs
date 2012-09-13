@@ -1,7 +1,14 @@
 import XMonad
-import XMonad.Config.Xfce
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.EwmhDesktops
+import XMonad.Util.Run(spawnPipe)
+import XMonad.Util.EZConfig(additionalKeys)
+import System.IO
 
-main = xmonad xfceConfig
-            { modMask = mod4Mask }
-
+main = xmonad defaultConfig
+              { manageHook = manageDocks <+> manageHook defaultConfig
+              , layoutHook = avoidStruts $ layoutHook defaultConfig
+              , modMask    = mod4Mask
+              }
 
