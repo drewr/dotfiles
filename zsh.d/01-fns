@@ -26,6 +26,12 @@ tmux_running() {
   [[ -n $TMUX ]]
 }
 
+es_running() {
+  if tmux_running; then
+    tmux list-windows | fgrep -q ' esrun ['
+  fi
+}
+
 not_in_emacs() {
   [[ ! -n $EMACS ]]
 }
@@ -51,6 +57,18 @@ sshs() {
     screen -t $t exec ssh $h
   else
     ssh $h
+  fi
+}
+
+start-es() {
+  if tmux_running; then
+    if es_running; then
+      echo elasticsearch already running
+    else
+      tmux neww -n "esrun" "cd ~/tmp/es-3; bin/elasticsearch -f"
+      tmux splitw -d "cd ~/tmp/es-1; bin/elasticsearch -f"
+      tmux splitw -d "cd ~/tmp/es-2; bin/elasticsearch -f"
+    fi
   fi
 }
 
