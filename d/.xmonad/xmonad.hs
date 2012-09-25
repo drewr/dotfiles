@@ -7,9 +7,11 @@ import XMonad.Util.EZConfig(additionalKeys)
 import XMonad.Hooks.SetWMName
 import System.IO
 
-main = xmonad defaultConfig
+main = xmonad $ defaultConfig
               { manageHook = manageDocks <+> manageHook defaultConfig
               , layoutHook = avoidStruts $ layoutHook defaultConfig
               , modMask    = mod4Mask
               , startupHook = setWMName "LG3D"
-              }
+              } `additionalKeys`
+              [ ((mod4Mask, xK_m ), spawn "mute")
+              ]
