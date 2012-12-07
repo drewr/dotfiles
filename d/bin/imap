@@ -1,0 +1,13 @@
+#!/bin/zsh
+
+while true; do
+  if online; then 
+    offlineimap
+    echo \* finished at $(date)
+    sleep 900
+  else
+    echo \* no imap available at $(date)
+    sleep 60
+  fi
+done
+

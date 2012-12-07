@@ -1,0 +1,3 @@
+#!/bin/sh
+
+amixer sset 'Capture',0 toggle | egrep -o '\[(off|on)\]'

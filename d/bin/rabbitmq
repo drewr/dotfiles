@@ -1,0 +1,14 @@
+#!/bin/sh
+
+RMQHOME=$HOME/tmp/rabbitmq
+cd $HOME/tmp/src/rabbitmq_server-2.8.6
+
+env \
+  RABBITMQ_MNESIA_BASE=$RMQHOME/mnesia \
+  RABBITMQ_LOG_BASE=$RMQHOME/log \
+  RABBITMQ_NODENAME=rabbit \
+  RABBITMQ_NODE_IP_ADDRESS=127.0.0.1 \
+  RABBITMQ_NODE_PORT=5672 \
+  RABBITMQ_CLUSTER_CONFIG_FILE= \
+  sbin/rabbitmq-server
+
