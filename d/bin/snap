@@ -2,5 +2,5 @@
 
 scrot -s \
   -q 90 \
-  -e "mv $f ~/tmp" \
-  "%Y-%m-%d_$wx$h.png"
+  -e 'mv $f ~/tmp' \
+  '%Y-%m-%d_$wx$h.png'
