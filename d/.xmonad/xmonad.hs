@@ -22,5 +22,6 @@ main = xmonad $ defaultConfig
               , startupHook = setWMName "LG3D"
               } `additionalKeys`
               [ ((mod4Mask, xK_m ), spawn "mute")
-              , ((mod4Mask, xK_s ), spawn "snap")
+              , ((controlMask, xK_Print), spawn "sleep 0.2; /home/aar/bin/snap")
+              , ((0, xK_Print), spawn "/home/aar/bin/snapall")
               ]

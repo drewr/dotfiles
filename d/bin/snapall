@@ -1,6 +1,6 @@
 #!/bin/sh
 
-scrot -s \
+scrot \
   -q 90 \
   -e 'mv $f ~/src/pics' \
   '%Y-%m-%d_$wx$h.png'
