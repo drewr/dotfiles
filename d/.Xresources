@@ -1,2 +1,3 @@
 URxvt.scrollBar: off
 URxvt.font: xft:inconsolata:size=12
+xterm*faceName: terminus:bold:pixelsize=12
