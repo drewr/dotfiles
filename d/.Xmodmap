@@ -1,7 +1,7 @@
 keycode 66 = Control_L
 clear Lock
 add Control = Control_L
-keycode 117 = Caps_Lock
-add Lock = Caps_Lock
+keycode 117 = Control_L
+# add Lock = Caps_Lock
 
 pointer = 1 2 3 5 4 7 6 8 9 10 11 12
