@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# Filter stdin while executing embedded perl.
+
 use Modern::Perl;
 use Text::Template;
 use File::Spec::Functions;
