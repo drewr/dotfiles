@@ -5,7 +5,8 @@ Host imap.gmail.com
 User aaraines@gmail.com
 Pass {readrc '.auth.aaraines@gmail.com'}
 UseIMAPS yes
-CertificateFile ~/tmp/Equifax_Secure_Certificate_Authority.pem
+## aptitude install ca-certificate ---v
+CertificateFile /usr/share/ca-certificates/mozilla/Equifax_Secure_CA.crt
 
 IMAPStore gmail-aaraines
 Account gmail-aaraines
@@ -38,7 +39,7 @@ Host imap.gmail.com
 User testdroid1000@gmail.com
 Pass {readrc '.auth.testdroid1000@gmail.com'}
 UseIMAPS yes
-CertificateFile ~/tmp/Equifax_Secure_Certificate_Authority.pem
+CertificateFile /usr/share/ca-certificates/mozilla/Equifax_Secure_CA.crt
 
 IMAPStore gmail-test
 Account gmail-test
