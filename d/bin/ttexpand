@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use Text::Template;
+use File::Spec::Functions;
+
+sub readrc {
+  my $file = shift;
+  my $s = 
+   Text::Template::_load_text(catfile($ENV{"HOME"}, $file));
+  chomp $s;
+  return $s;
+}
+
+my $tmpl =
+  Text::Template->new(
+     TYPE => 'FILEHANDLE', SOURCE => \*STDIN);
+
+say $tmpl->fill_in();
+
+
