@@ -1,8 +1,10 @@
 #!/bin/zsh
 
+source ~/perl5/perlbrew/etc/bashrc
+
 while true; do
   if online; then 
-    offlineimap
+    mbsync -c <(ttexpand <~/.mbsyncrc) aaraines
     echo \* finished at $(date)
     sleep 900
   else
@@ -10,4 +12,3 @@ while true; do
     sleep 60
   fi
 done
-
