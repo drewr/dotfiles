@@ -1,0 +1,64 @@
+##### Personal #####
+
+IMAPAccount gmail-aaraines
+Host imap.gmail.com
+User aaraines@gmail.com
+Pass {readrc '.auth.aaraines@gmail.com'}
+UseIMAPS yes
+CertificateFile ~/tmp/Equifax_Secure_Certificate_Authority.pem
+
+IMAPStore gmail-aaraines
+Account gmail-aaraines
+
+IMAPAccount local-aaraines
+Host localhost
+User aaraines
+Pass imap
+UseIMAPS no
+RequireSSL no
+UseTLSv1 no
+
+IMAPStore local-aaraines
+Account local-aaraines
+
+Channel aaraines
+Master :gmail-aaraines:
+Slave :local-aaraines:
+Patterns !* list.*
+Create Slave
+Expunge Slave
+Sync Pull
+
+
+
+###### Test ######
+
+IMAPAccount gmail-test
+Host imap.gmail.com
+User testdroid1000@gmail.com
+Pass {readrc '.auth.testdroid1000@gmail.com'}
+UseIMAPS yes
+CertificateFile ~/tmp/Equifax_Secure_Certificate_Authority.pem
+
+IMAPStore gmail-test
+Account gmail-test
+
+IMAPAccount local-test
+Host localhost
+User testdroid1000
+Pass imap
+UseIMAPS no
+RequireSSL no
+UseTLSv1 no
+
+IMAPStore local-test
+Account local-test
+
+Channel testdroid1000
+Master :gmail-test:
+Slave :local-test:
+Patterns *
+Create Slave
+Expunge Slave
+Sync Pull
+
