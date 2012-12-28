@@ -4,7 +4,7 @@ source ~/perl5/perlbrew/etc/bashrc
 
 while true; do
   if online; then 
-    mbsync -c <(ttexpand <~/.mbsyncrc) aaraines
+    mbsync -a -qq -c <(ttexpand <~/.mbsyncrc) 
     echo \* finished at $(date)
     sleep 900
   else
