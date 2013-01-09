@@ -1,0 +1,13 @@
+#!/bin/sh
+
+JAVA=$1
+
+sudo update-alternatives \
+  --install /usr/bin/java      java      /usr/lib/jvm/$JAVA/bin/java 200 \
+    --slave /usr/bin/jar       jar       /usr/lib/jvm/$JAVA/bin/jar \
+    --slave /usr/bin/jarsigner jarsigner /usr/lib/jvm/$JAVA/bin/jarsigner \
+    --slave /usr/bin/javac     javac     /usr/lib/jvm/$JAVA/bin/javac \
+    --slave /usr/bin/javadoc   javadoc   /usr/lib/jvm/$JAVA/bin/javadoc \
+    --slave /usr/bin/javah     javah     /usr/lib/jvm/$JAVA/bin/javah \
+    --slave /usr/bin/javap     javap     /usr/lib/jvm/$JAVA/bin/javap \
+    --slave /usr/bin/javaws    javaws    /usr/lib/jvm/$JAVA/bin/javaws
