@@ -1,0 +1,5 @@
+#!/bin/sh
+
+/sbin/rmmod iwlwifi
+/bin/sleep 3
+/sbin/modprobe iwlwifi
