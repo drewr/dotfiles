@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd hs
+for i in *.hs; do
+  bin=`echo $i | perl -pe 's,\.hs$,,'`
+  ghc -O2 $i
+  cp $bin ~/bin
+done
