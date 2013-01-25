@@ -4,11 +4,12 @@ import System.Cmd
 import System.Environment
 import Data.String.Utils (join)
 
+main :: IO ()
 main = do
   let outFile = "/etc/perp/dnscache/root/servers/@"
-  ips <- getEnv "new_domain_name_servers"
+  args <- getArgs
   let out = join "\n" $
-              filter (\ip -> ip /= "127.0.0.1") $
-              words ips
+              filter (\ip -> ip /= "127.0.0.1") args
   writeFile outFile (out ++ "\n")
-  rawSystem "perpctl" ["-b", "/etc/perp", "t", "dnscache"]
+  exit <- rawSystem "perpctl" ["-b", "/etc/perp", "t", "dnscache"]
+  return ()
