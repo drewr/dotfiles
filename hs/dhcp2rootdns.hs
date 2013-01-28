@@ -9,7 +9,8 @@ main = do
   let outFile = "/etc/perp/dnscache/root/servers/@"
   args <- getArgs
   let out = join "\n" $
-              filter (\ip -> ip /= "127.0.0.1") args
+              filter (\ip -> (ip /= "127.0.0.1" &&
+                              ip /= "192.168.5.10")) args
   writeFile outFile (out ++ "\n")
   exit <- rawSystem "perpctl" ["-b", "/etc/perp", "t", "dnscache"]
   return ()
