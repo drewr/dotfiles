@@ -7,6 +7,6 @@ main :: IO ()
 main = do
   inputs <- getContents
   avoid <- getArgs
-  putStrLn $ (unlines . filter (`notElem` avoid) . words) inputs
+  putStr $ (unlines . filter (`notElem` avoid) . words) inputs
 
 
