@@ -28,7 +28,7 @@ Slave :local-aaraines:
 Patterns !* list.*
 Create Slave
 Expunge Slave
-Sync Pull
+Sync All
 
 
 
@@ -61,5 +61,5 @@ Slave :local-test:
 Patterns *
 Create Slave
 Expunge Slave
-Sync Pull
+Sync All
 
