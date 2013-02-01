@@ -1,0 +1,26 @@
+#!/bin/zsh
+
+VERSION=$(git log --pretty=format:"%ai %h" -1 | perl -p -e 's,(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d) [^ ]+ ([a-z0-9]+),\1\2\3-\4\5\6-\7,')
+###VERSION=$(bzr log -l 1 | grep revno | awk '{print $2}')
+BRANCH=$(git branch | grep \^\* | cut -c 3- | sed 's,(no branch),nohead,')
+emacs=emacs-${BRANCH}-${VERSION}
+
+autogen() {
+  sh autogen.sh
+}
+
+configure() {
+  ./configure \
+      --prefix=/usr/local/p/$emacs \
+      --with-x-toolkit=gtk3 \
+      --with-jpeg \
+      --with-xpm \
+      --with-png \
+      --with-gif
+}
+
+echo cleaning...
+git clean -fd
+echo building ${emacs}...
+autogen && configure && make -j3 bootstrap && make
+

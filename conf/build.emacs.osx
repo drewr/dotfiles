@@ -1,0 +1,60 @@
+#!/bin/zsh
+#
+# Building Emacs/Gnus/ERC apps on OS X 10.6 Snow Leopard
+#
+
+PATH=/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+
+VERSION=$(git log --pretty=format:"%ai %h" -1 | perl -p -e 's,(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d) [^ ]+ ([a-z0-9]+),\1\2\3-\4\5\6-\7,')
+###VERSION=$(bzr log -l 1 | grep revno | awk '{print $2}')
+BRANCH=$(git branch | grep \^\* | cut -c 3- | sed 's,(no branch),nohead,')
+TMP=$(mktemp -d -t emacs-$VERSION)
+DMG_PRE=~/Downloads/emacs-builds/Emacs-$BRANCH-$VERSION
+DMG=${DMG_PRE}.dmg
+
+autogen() {
+  sh autogen.sh
+}
+
+configure() {
+  CPPFLAGS=-I/opt/local/include; export CPPFLAGS
+  LDFLAGS=-L/opt/local/lib; export LDFLAGS
+  
+  ./configure \
+      --with-ns \
+      --without-x \
+      --with-jpeg \
+      --with-xpm \
+      --with-png
+}
+
+stage() {
+  app=${1}.app
+  tmpapp=${2}/$app
+  echo staging $app into $tmpapp
+  mkdir $tmpapp
+  ( cd nextstep/Emacs.app; tar cf - . ) | ( cd $tmpapp; tar xf - )
+}
+
+release() {
+  stage ERC $TMP
+  stage Gnus $TMP
+  stage Emacs $TMP
+  if [[ -e $DMG ]]; then
+    echo removing existing $DMG
+    rm $DMG
+  fi
+  echo creating DMG
+  hdiutil create -volname "Emacs $BRANCH $VERSION" -srcfolder $TMP $DMG_PRE
+  echo cleaning $TMP
+  rm -rf $TMP
+}
+
+echo cleaning...
+git clean -fd
+#[[ -f Makefile ]] && make distclean
+#echo cleaning elc...
+#find . -name \*.elc | xargs rm  # distclean does NOT remove elc!
+echo building...
+autogen && configure && make bootstrap && make install && release
+
