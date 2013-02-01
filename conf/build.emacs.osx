@@ -9,7 +9,8 @@ VERSION=$(git log --pretty=format:"%ai %h" -1 | perl -p -e 's,(\d\d\d\d)-(\d\d)-
 ###VERSION=$(bzr log -l 1 | grep revno | awk '{print $2}')
 BRANCH=$(git branch | grep \^\* | cut -c 3- | sed 's,(no branch),nohead,')
 TMP=$(mktemp -d -t emacs-$VERSION)
-DMG_PRE=~/Downloads/emacs-builds/Emacs-$BRANCH-$VERSION
+DMG_HOME=~/Downloads/emacs-builds
+DMG_PRE=$DMG_HOME/Emacs-$BRANCH-$VERSION
 DMG=${DMG_PRE}.dmg
 
 autogen() {
@@ -45,9 +46,10 @@ release() {
     rm $DMG
   fi
   echo creating DMG
-  hdiutil create -volname "Emacs $BRANCH $VERSION" -srcfolder $TMP $DMG_PRE
-  echo cleaning $TMP
-  rm -rf $TMP
+  mkdir -p $DMG_HOME
+  hdiutil create -volname "Emacs $BRANCH $VERSION" -srcfolder $TMP $DMG_PRE && \
+    echo cleaning $TMP && \
+    rm -rf $TMP
 }
 
 echo cleaning...
