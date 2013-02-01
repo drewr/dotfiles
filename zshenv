@@ -12,7 +12,7 @@ SONIAN_USER=drew; export SONIAN_USER
 
 export JAVA_HOME
 [[ $OS == "Darwin" ]] && \
-   JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
+   JAVA_HOME=$(/usr/libexec/java_home -v 1.7)
 
 ## With Emacs 23, I've found this needs to go in ~root/.zshrc too to
 ## help with Tramp hangs.
