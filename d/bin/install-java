@@ -2,12 +2,37 @@
 
 JAVA=$1
 
-sudo update-alternatives \
-  --install /usr/bin/java      java      /usr/lib/jvm/$JAVA/bin/java 200 \
-    --slave /usr/bin/jar       jar       /usr/lib/jvm/$JAVA/bin/jar \
-    --slave /usr/bin/jarsigner jarsigner /usr/lib/jvm/$JAVA/bin/jarsigner \
-    --slave /usr/bin/javac     javac     /usr/lib/jvm/$JAVA/bin/javac \
-    --slave /usr/bin/javadoc   javadoc   /usr/lib/jvm/$JAVA/bin/javadoc \
-    --slave /usr/bin/javah     javah     /usr/lib/jvm/$JAVA/bin/javah \
-    --slave /usr/bin/javap     javap     /usr/lib/jvm/$JAVA/bin/javap \
-    --slave /usr/bin/javaws    javaws    /usr/lib/jvm/$JAVA/bin/javaws
+for i in \
+ appletviewer \
+ extcheck \
+ idlj \
+ jar \
+ jarsigner \
+ java \
+ javac \
+ javadoc \
+ javah \
+ javap \
+ jconsole \
+ jdb \
+ jhat \
+ jinfo \
+ jmap \
+ jps \
+ jrunscript \
+ jsadebugd \
+ jstack \
+ jstat \
+ jstatd \
+ native2ascii \
+ rmic \
+ schemagen \
+ serialver \
+ wsgen \
+ wsimport \
+ xjc
+do
+  oldpath=`update-alternatives --query $i | grep ^Best | awk '{print $2}'`
+  sudo update-alternatives --remove $i $oldpath
+  sudo update-alternatives --install /usr/bin/$i $i /usr/lib/jvm/$JAVA/bin/$i 1
+done
