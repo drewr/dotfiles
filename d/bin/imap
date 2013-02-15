@@ -6,7 +6,7 @@ while true; do
   if online; then 
     mbsync -a -qq -c <(ttexpand <~/.mbsyncrc) 
     echo \* finished at $(date)
-    sleep 900
+    sleep 300
   else
     echo \* no imap available at $(date)
     sleep 60
