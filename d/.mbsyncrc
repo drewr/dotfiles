@@ -26,8 +26,8 @@ Channel aaraines
 Master :gmail-aaraines:
 Slave :local-aaraines:
 Patterns !* INBOX list.*
-Create Slave
-Expunge Slave
+Create Both
+Expunge Both
 Sync All
 
 
