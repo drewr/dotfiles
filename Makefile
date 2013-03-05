@@ -5,3 +5,4 @@ install:
 	( cd zsh.d; tar cf - . ) | ( cd ${HOME}/.zsh.d; tar xf - )
 	( cd d; tar cf - . ) | ( cd $(HOME); tar xf - )
 
+
