@@ -1,7 +1,3 @@
-[user]
-name = Drew Raines
-email = aaraines@gmail.com
-
 [alias]
 ci = commit
 co = checkout
