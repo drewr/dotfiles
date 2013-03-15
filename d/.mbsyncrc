@@ -33,7 +33,7 @@ Sync All
 
 ##### Elasticsearch #####
 
-IMAPAccount gmail-elasticsearch
+IMAPAccount gmail-drewres
 Host imap.gmail.com
 User drew.raines@elasticsearch.com
 Pass {readrc '.auth.drew.raines@elasticsearch.com'}
@@ -41,23 +41,23 @@ UseIMAPS yes
 ## aptitude install ca-certificate ---v
 CertificateFile /usr/share/ca-certificates/mozilla/Equifax_Secure_CA.crt
 
-IMAPStore gmail-elasticsearch
-Account gmail-elasticsearch
+IMAPStore gmail-drewres
+Account gmail-drewres
 
-IMAPAccount local-elasticsearch
+IMAPAccount local-drewres
 Host localhost
-User drew.raines
+User drewres
 Pass imap
 UseIMAPS no
 RequireSSL no
 UseTLSv1 no
 
-IMAPStore local-elasticsearch
-Account local-elasticsearch
+IMAPStore local-drewres
+Account local-drewres
 
-Channel aaraines-es
-Master :gmail-elasticsearch:
-Slave :local-elasticsearch:
+Channel drewres
+Master :gmail-drewres:
+Slave :local-drewres:
 Patterns !* INBOX
 Create Both
 Expunge Both
