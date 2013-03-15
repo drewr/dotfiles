@@ -31,6 +31,39 @@ Expunge Both
 Sync All
 
 
+##### Elasticsearch #####
+
+IMAPAccount gmail-elasticsearch
+Host imap.gmail.com
+User drew.raines@elasticsearch.com
+Pass {readrc '.auth.drew.raines@elasticsearch.com'}
+UseIMAPS yes
+## aptitude install ca-certificate ---v
+CertificateFile /usr/share/ca-certificates/mozilla/Equifax_Secure_CA.crt
+
+IMAPStore gmail-elasticsearch
+Account gmail-elasticsearch
+
+IMAPAccount local-elasticsearch
+Host localhost
+User drew.raines
+Pass imap
+UseIMAPS no
+RequireSSL no
+UseTLSv1 no
+
+IMAPStore local-elasticsearch
+Account local-elasticsearch
+
+Channel aaraines-es
+Master :gmail-elasticsearch:
+Slave :local-elasticsearch:
+Patterns !* INBOX
+Create Both
+Expunge Both
+Sync All
+
+
 
 ###### Test ######
 
