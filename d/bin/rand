@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+
+use Math::Random::Secure qw(irand);
+use Modern::Perl;
+
+our $n = shift @ARGV || 100;
+our $m = shift @ARGV || 1;
+
+our @rands = ();
+
+for (my $i = 0; $i < $m; $i++) {
+  push @rands, irand($n);
+}
+
+say join(' ', @rands);
