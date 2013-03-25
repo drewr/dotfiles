@@ -3,4 +3,12 @@
 unset GNOME_KEYRING_CONTROL
 unset GNOME_KEYRING_PID
 
-exec /usr/bin/msmtp "$@"
+msmtp=/usr/bin/msmtp
+tmp=$(mktemp)
+cat >$tmp
+
+if egrep -q "^From:.*drew.raines@elas" $tmp; then
+  msmtp="$msmtp -a drewres"
+fi
+
+$msmtp "$@" <$tmp && rm $tmp
