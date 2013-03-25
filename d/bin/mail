@@ -13,5 +13,4 @@ if [ $? -eq 0 ]; then
   msmtp="$msmtp -a $acct"
 fi
 
-echo "$msmtp \"$@\" <$tmp && rm $tmp"
 $msmtp "$@" <$tmp && rm $tmp
