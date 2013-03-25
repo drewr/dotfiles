@@ -10,7 +10,7 @@ x=$(egrep -o "^X-MSMTP: .*" $tmp)
 
 if [ $? -eq 0 ]; then
   acct=$(echo $x | cut -d: -f2)
-  msmtp="$msmtp -a $acct"
+  msmtp="$msmtp -a$acct"
 fi
 
 $msmtp "$@" <$tmp && rm $tmp
