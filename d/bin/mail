@@ -6,9 +6,12 @@ unset GNOME_KEYRING_PID
 msmtp=/usr/bin/msmtp
 tmp=$(mktemp)
 cat >$tmp
+x=$(egrep -o "^X-MSMTP: .*" $tmp)
 
-if egrep -q "^From:.*drew.raines@elas" $tmp; then
-  msmtp="$msmtp -a drewres"
+if [ $? -eq 0 ]; then
+  acct=$(echo $x | cut -d: -f2)
+  msmtp="$msmtp -a $acct"
 fi
 
+echo "$msmtp \"$@\" <$tmp && rm $tmp"
 $msmtp "$@" <$tmp && rm $tmp
