@@ -1,0 +1,8 @@
+#!/bin/bash
+
+creds=$1
+creds_file=$HOME/.s3cfg.$creds.gpg
+shift
+
+# dear s3cmd: plaintext credentials on disk? really?
+gpg --batch -q -d $creds_file | s3cmd -c /dev/stdin $*
