@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+DATA=${DATA:-/d/data}
+CLUSTER=${CLUSTER:-kluster90}
+HEAP=${ES_HEAP_SIZE:-1g}
+MLOCK=5000000
+FD=500000
+
+perl -pi -e 's/rootLogger: \w+/rootLogger: TRACE/' config/logging.yml
+sudo sh -c "
+  ulimit -n $FD
+  ulimit -l $MLOCK
+  exec setuidgid $USER env ES_HEAP_SIZE=$HEAP \
+    bin/elasticsearch \
+        -Des.cluster.name=$CLUSTER \
+        -Des.path.data=$DATA \
+        -Des.bootstrap.mlockall=true \
+        -Des.network.host=localhost \
+        -Des.index.search.slowlog.threshold.query.info=0s \
+        -Dindex.search.slowlog.threshold.fetch.info=0s -f
+"
