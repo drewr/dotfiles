@@ -5,8 +5,9 @@ CLUSTER=${CLUSTER:-kluster90}
 HEAP=${ES_HEAP_SIZE:-1g}
 MLOCK=5000000
 FD=500000
+LOG=${LOG:-DEBUG}
 
-perl -pi -e 's/rootLogger: \w+/rootLogger: TRACE/' config/logging.yml
+perl -pi -e "s/rootLogger: \w+/rootLogger: $LOG/" config/logging.yml
 sudo sh -c "
   ulimit -n $FD
   ulimit -l $MLOCK
