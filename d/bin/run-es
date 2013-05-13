@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
-DATA=${DATA:-/d/data}
-CLUSTER=${CLUSTER:-kluster90}
+DATA=$1
+CLUSTER=$2
+
+if [[ -z $DATA || -z $CLUSTER ]]; then
+  echo usage: $0 DATA CLUSTER
+  exit 1
+fi
+
 HEAP=${ES_HEAP_SIZE:-1g}
 MLOCK=5000000
 FD=500000
