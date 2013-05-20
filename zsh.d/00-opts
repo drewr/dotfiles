@@ -13,6 +13,7 @@ setopt EXTENDED_HISTORY
 setopt SHARE_HISTORY
 unsetopt TRANSIENT_RPROMPT
 setopt PROMPT_SUBST
+setopt AUTO_PUSHD
 
 [ -w $zsh_cache ] && HISTFILE=$zsh_cache/history
 HISTSIZE=10000
