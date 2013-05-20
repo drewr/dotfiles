@@ -1,11 +1,12 @@
 #!/bin/zsh
 
 source ~/perl5/perlbrew/etc/bashrc
+log=/tmp/mbsync.log
 
 while true; do
   if online; then 
-    mbsync -a -c <(ttexpand <~/.mbsyncrc) >>/tmp/mbsync.log 2>&1
-    echo \* finished at $(date)
+    mbsync -a -c <(ttexpand <~/.mbsyncrc) >>$log 2>&1
+    echo \* finished at $(date) | tee -a $log
     sleep 300
   else
     echo \* no imap available at $(date)
