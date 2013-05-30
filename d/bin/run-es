@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-DATA=$1
-CLUSTER=$2
+DATA=$1; shift
+CLUSTER=$1; shift
 
 if [[ -z $DATA || -z $CLUSTER ]]; then
   echo usage: $0 DATA CLUSTER
