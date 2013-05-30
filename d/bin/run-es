@@ -12,6 +12,7 @@ HEAP=${ES_HEAP_SIZE:-1g}
 MLOCK=5000000
 FD=500000
 LOG=${LOG:-DEBUG}
+HOST=${HOST:-localhost}
 
 perl -pi -e "s/rootLogger: \w+/rootLogger: $LOG/" config/logging.yml
 sudo sh -c "
@@ -24,7 +25,7 @@ sudo sh -c "
         -Des.cluster.name=$CLUSTER \
         -Des.path.data=$DATA \
         -Des.bootstrap.mlockall=true \
-        -Des.network.host=localhost \
+        -Des.network.host=$HOST \
         -Des.index.search.slowlog.threshold.query.info=0s \
         -Dindex.search.slowlog.threshold.fetch.info=0s -f
 "
