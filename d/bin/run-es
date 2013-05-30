@@ -27,5 +27,7 @@ sudo sh -c "
         -Des.bootstrap.mlockall=true \
         -Des.network.host=$HOST \
         -Des.index.search.slowlog.threshold.query.info=0s \
-        -Des.index.search.slowlog.threshold.fetch.info=0s -f
+        -Des.index.search.slowlog.threshold.fetch.info=0s \
+        -f \
+        $*
 "
