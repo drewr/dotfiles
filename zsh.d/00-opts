@@ -14,6 +14,7 @@ setopt SHARE_HISTORY
 unsetopt TRANSIENT_RPROMPT
 setopt PROMPT_SUBST
 setopt AUTO_PUSHD
+setopt ZLE emacs
 
 [ -w $zsh_cache ] && HISTFILE=$zsh_cache/history
 HISTSIZE=10000
