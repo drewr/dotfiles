@@ -5,6 +5,7 @@ MANPATH=/opt/local/man:/usr/local/man:$MANPATH
 WORDCHARS='*?_[]~=&;!#$%^(){}'
 WORDCHARS=${WORDCHARS:s,/,,}
 LEDGER_FILE=$HOME/.ledger; export LEDGER_FILE
+EDITOR=vi; export EDITOR
 EMAIL="andrew@raines.me"; export EMAIL
 FULLNAME="Andrew Raines"; export FULLNAME
 OPSCODE_USER=sonian_devs; export OPSCODE_USER
