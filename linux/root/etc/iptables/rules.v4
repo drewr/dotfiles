@@ -8,6 +8,7 @@
 -A INPUT -d 127.0.0.0/8 ! -i lo -j REJECT --reject-with icmp-port-unreachable
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 -A INPUT -s 192.168.20.0/24 -m state --state NEW -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 9399 -j ACCEPT
 -A INPUT -p tcp -m tcp --dport 10000:65535 -j ACCEPT
 -A INPUT -p udp -m udp --dport 10000:65535 -j ACCEPT
 -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
