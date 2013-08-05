@@ -5,12 +5,13 @@ iface lo inet loopback
 iface lo:1 inet static
   address 127.0.92.1
   network 127.0.92.0
-  netmask 127.0.0.0
+  netmask 255.255.255.0
 
 iface lo:2 inet static
   address 127.0.92.2
   network 127.0.92.0
-  netmask 127.0.0.0
+  netmask 255.255.255.0
+
 
 # The primary network interface
 # auto eth0
