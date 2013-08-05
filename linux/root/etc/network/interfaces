@@ -1,0 +1,26 @@
+auto lo lo:1 lo:2
+
+iface lo inet loopback
+
+iface lo:1 inet static
+  address 127.0.92.1
+  network 127.0.92.0
+  netmask 127.0.0.0
+
+iface lo:2 inet static
+  address 127.0.92.2
+  network 127.0.92.0
+  netmask 127.0.0.0
+
+# The primary network interface
+# auto eth0
+# allow-hotplug eth0
+# iface eth0 inet static
+#    address 10.10.10.9
+#    broadcast 10.10.10.255
+#    netmask 255.255.255.0
+#    post-up ip route add 10.10.10.0/24 dev eth0 src 10.10.10.9 table elasticnet
+#    post-up ip rule add from 10.10.10.9 table elasticnet
+#    post-up ip rule add to 10.10.10.9 table elasticnet
+#    post-down ip rule del from 10.10.10.9 table elasticnet
+
