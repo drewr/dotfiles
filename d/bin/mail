@@ -3,8 +3,16 @@
 unset GNOME_KEYRING_CONTROL
 unset GNOME_KEYRING_PID
 
-msmtp=/usr/bin/msmtp
-tmp=$(mktemp)
+mktmp () {
+  if [[ $OS == "Darwin" ]]; then
+    mktemp -t /tmp
+  else
+    mktemp
+  fi
+}
+
+msmtp=msmtp
+tmp=$(mktmp)
 cat >$tmp
 x=$(egrep -o "^X-MSMTP: .*" $tmp)
 
