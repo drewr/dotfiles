@@ -1,10 +1,12 @@
 #!/bin/bash
 
+env | sort >/tmp/mail.env.txt
+
 unset GNOME_KEYRING_CONTROL
 unset GNOME_KEYRING_PID
 
 mktmp () {
-  if [[ $OS == "Darwin" ]]; then
+  if [[ $TMPDIR == */var/folders* ]]; then
     mktemp -t /tmp
   else
     mktemp
