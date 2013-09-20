@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
 
-( cd ~/etc/org
+( cd ~/.org && \
 git add . && git commit -m "Save!" && git push )
 cd .
