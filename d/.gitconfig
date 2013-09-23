@@ -24,3 +24,6 @@ color = auto
 
 [github]
 user = drewr
+
+[rerere]
+enabled = true
