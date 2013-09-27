@@ -1,7 +1,7 @@
 {:user
  {:plugins [
             [cljs-template "0.1.5"]
-            [com.palletops/pallet-lein "0.6.0-beta.4"]
+            [com.palletops/pallet-lein "0.8.0-alpha.1"]
             [lein-clojars "0.9.0"]
             [lein-difftest "2.0.0"]
             [lein-localrepo "0.4.0"]
