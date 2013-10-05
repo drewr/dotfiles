@@ -1,0 +1,16 @@
+# -*- mode: ruby -*-
+
+Vagrant.configure("2") do |config|
+  config.vm.provision "shell", inline: "echo Hello"
+
+  boxes = {:es1 => "192.168.56.10",
+           :es2 => "192.168.56.20"}
+
+  boxes.each do |n, ip|
+    config.vm.define n do |box1|
+      box1.vm.box = "raring64"
+      box1.vm.hostname = n.to_s
+      box1.vm.network :private_network, ip: ip
+    end
+  end
+end
