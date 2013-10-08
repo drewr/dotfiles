@@ -1,0 +1,14 @@
+#!/bin/bash
+
+PATH=~/tmp/python/bin:$PATH
+
+if [[ -x $1 ]]; then
+  creds_file=$HOME/.aws.gpg
+else
+  creds=$1
+  creds_file=$HOME/.aws.$creds.gpg
+  shift
+fi
+
+echo "gpg --batch -q -d $creds_file | env AWS_CONFIG_FILE=/dev/stdin aws $*"
+gpg --batch -q -d $creds_file | env AWS_CONFIG_FILE=/dev/stdin aws $*
