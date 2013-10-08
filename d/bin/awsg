@@ -10,5 +10,8 @@ else
   shift
 fi
 
-echo "gpg --batch -q -d $creds_file | env AWS_CONFIG_FILE=/dev/stdin aws $*"
-gpg --batch -q -d $creds_file | env AWS_CONFIG_FILE=/dev/stdin aws $*
+tmp=$(mktemp -t awsg)
+gpg --batch -q -d $creds_file >$tmp
+echo "AWS_CONFIG_FILE=$tmp aws $*"
+AWS_CONFIG_FILE=$tmp aws $*
+rm $tmp
