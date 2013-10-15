@@ -26,3 +26,4 @@ sudo aptitude update
 echo INSTALLING remaining packages
 sudo aptitude install -y puppet facter lxc-docker
 sudo puppet module install --force puppetlabs/stdlib
+sudo puppet module install --force puppetlabs/vcsrepo
