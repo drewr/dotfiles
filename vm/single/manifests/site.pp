@@ -30,6 +30,7 @@ package { "djbdns": ensure => "present" }
 package { "htop": ensure => "present" }
 package { "zsh": ensure => "present" }
 package { "tmux": ensure => "present" }
+package { "emacs24-nox": ensure => "present" }
 
 # class { "elasticsearch":
 #   java_install => true,
@@ -80,6 +81,6 @@ exec { "dotfiles":
   command => "make install",
   user => $user,
   refreshonly => true,
-#  logoutput => true,
+  # logoutput => true,
   subscribe => Vcsrepo["/home/${user}/src/dotfiles"]
 }
