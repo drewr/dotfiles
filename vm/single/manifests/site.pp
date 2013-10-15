@@ -28,3 +28,20 @@ ssh_authorized_key { "drewr":
 package { "djbdns": ensure => "present" }
 package { "htop": ensure => "present" }
 package { "zsh": ensure => "present" }
+
+class { "elasticsearch":
+  java_install => true,
+  version => "0.90.5",
+  config     => {
+    "cluster"   => {
+      "name" => "foo"
+    },
+    "index"                => {
+      "number_of_replicas" => "0",
+      "number_of_shards"   => "1"
+    },
+    "network" => {
+      "host"  => "0.0.0.0"
+    }
+  }
+}

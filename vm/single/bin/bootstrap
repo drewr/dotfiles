@@ -1,0 +1,26 @@
+#!/bin/bash
+
+release=$1
+
+echo INSTALLING CURL
+sudo aptitude install -y curl
+
+echo INSTALLING puppetlabs-release-${release}
+curl -sO http://apt.puppetlabs.com/puppetlabs-release-${release}.deb
+sudo dpkg -i puppetlabs-release-${release}.deb
+
+echo INSTALLING /etc/apt/sources.list.d/elasticsearch.list
+sudo sh -c "cat <<EOF >/etc/apt/sources.list.d/elasticsearch.list
+deb http://packages.elasticsearch.org/elasticsearch/0.90/debian stable main
+EOF"
+
+echo INSTALLING apt-key
+sudo apt-key add <(curl -s http://packages.elasticsearch.org/GPG-KEY-elasticsearch)
+
+echo UPDATING
+sudo aptitude update
+
+echo INSTALLING puppet
+sudo aptitude install -y puppet facter
+sudo puppet module install --force puppetlabs/stdlib
+
