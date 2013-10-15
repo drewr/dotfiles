@@ -15,7 +15,7 @@ user { $user:
   groups => ["admin"],
   password => "$6$LdYk4jGj$U1vJrG40QZEDsbWsQLvomNe2EU/Cl7wWFPfBuS3KrwAE1dbbzIcwgMYlmpKFkTDekjIZBYCKnn.o0WGQaBl/e/",
   comment => "Drew Raines",
-  shell => "/bin/bash",
+  shell => "/usr/bin/zsh",
   managehome => "true"
 }
 
