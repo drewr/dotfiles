@@ -10,7 +10,7 @@ File { owner => 0, group => 0, mode => 0644 }
 file { '/etc/motd':
   content => "Built ${timestamp}"
 }
-  
+
 user { $user:
   groups => ["admin", "docker"],
   password => "$6$LdYk4jGj$U1vJrG40QZEDsbWsQLvomNe2EU/Cl7wWFPfBuS3KrwAE1dbbzIcwgMYlmpKFkTDekjIZBYCKnn.o0WGQaBl/e/",
@@ -61,7 +61,7 @@ class git::clone ($repo, $username=$user) {
   package { "git":
     ensure => installed,
   }
-  
+
   vcsrepo { "/home/${username}/src/${repo}":
     ensure   => latest,
     owner    => $user,
