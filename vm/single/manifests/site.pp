@@ -12,7 +12,7 @@ file { '/etc/motd':
 }
   
 user { $user:
-  groups => ["admin"],
+  groups => ["admin", "docker"],
   password => "$6$LdYk4jGj$U1vJrG40QZEDsbWsQLvomNe2EU/Cl7wWFPfBuS3KrwAE1dbbzIcwgMYlmpKFkTDekjIZBYCKnn.o0WGQaBl/e/",
   comment => "Drew Raines",
   shell => "/usr/bin/zsh",
