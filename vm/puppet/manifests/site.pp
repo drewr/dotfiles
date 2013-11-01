@@ -85,10 +85,12 @@ class { "elasticsearch":
       "number_of_replicas" => "0",
       "number_of_shards"   => "1"
     },
-    "network" => {
-      "host"  => "0.0.0.0"
-    },
-    "discovery.zen.ping.unicast.hosts" => ["192.168.56.10", "192.168.56.20", "192.168.56.30"]
+    "network.bind_host" => "0.0.0.0",
+    "network.publish_host" => "_eth1:ipv4_",
+    "discovery.zen.ping.unicast.hosts" => ["192.168.56.10", "192.168.56.20", "192.168.56.30"],
+    "discovery.zen.multicast.enabled" => false,
+    "bootstrap.mlockall" => true,
+    "logger.level" => "DEBUG",
   },
   restart_on_change => true,
 }
