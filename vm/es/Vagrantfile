@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 
 Vagrant.configure("2") do |config|
+  config.cache.auto_detect = true
+
   boxes = {:es1 => "192.168.56.10",
            :es2 => "192.168.56.20",
            :es3 => "192.168.56.30"}
