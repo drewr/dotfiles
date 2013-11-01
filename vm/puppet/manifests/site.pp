@@ -91,3 +91,7 @@ class { "elasticsearch":
   restart_on_change => true,
 }
 
+exec { "kill the oom_killer":
+  require => Service["elasticsearch"],
+  command => "/bin/sleep 1; /vagrant/bin/kill-oom-killer",
+}
