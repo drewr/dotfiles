@@ -25,10 +25,9 @@ Vagrant.configure("2") do |config|
     puppet.manifests_path = "../puppet/manifests"
     puppet.module_path    = "../puppet/modules"
     puppet.manifest_file  = "site.pp"
+    puppet.options = "--fileserverconfig=/vagrant/fileserver.conf"
     puppet.facter = {
-      "fqdn" => "bootstrap",
-      "options" => "--fileserverconfig=/vagrant/fileserver.conf"
+      "fqdn" => "bootstrap.local",
     }
   end
-
 end
