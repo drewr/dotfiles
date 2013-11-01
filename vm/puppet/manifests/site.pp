@@ -78,13 +78,9 @@ class { "elasticsearch":
   },
   pkg_source => "puppet:///files/elasticsearch-1.0.0.Beta1-SNAPSHOT.deb",
   config     => {
-    "cluster"   => {
-      "name" => "foo"
-    },
-    "index"                => {
-      "number_of_replicas" => "0",
-      "number_of_shards"   => "1"
-    },
+    "cluster.name" => "foo",
+    "index.number_of_replicas" => "0",
+    "index.number_of_shards" => "1",
     "network.bind_host" => "0.0.0.0",
     "network.publish_host" => "_eth1:ipv4_",
     "discovery.zen.ping.unicast.hosts" => ["192.168.56.10", "192.168.56.20", "192.168.56.30"],
