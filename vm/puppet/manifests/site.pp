@@ -74,7 +74,7 @@ class { "elasticsearch":
   service_settings => {
     "ES_USER" => "elasticsearch",
     "ES_GROUP" => "elasticsearch",
-    "ES_HEAP_SIZE" => "96m",
+    "ES_HEAP_SIZE" => "48m",
   },
   pkg_source => "puppet:///files/elasticsearch-1.0.0.Beta2-SNAPSHOT.deb",
   config     => {
