@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ "x" == "x$1" ]; then
+  echo need key name
+  exit 99
+fi
+
+tmp=$(mktemp -t s3cat)
+cat >$tmp
+s3c es.drewr put -P $tmp s3://users.elasticsearch.org/drewr/$1
+rm $tmp
+echo http://users.elasticsearch.org/drewr/$1
