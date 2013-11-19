@@ -12,6 +12,6 @@ fi
 
 tmp=$(mktemp -t awsg)
 gpg --batch -q -d $creds_file >$tmp
-echo "AWS_CONFIG_FILE=$tmp aws $*"
+#echo "AWS_CONFIG_FILE=$tmp aws $*"
 AWS_CONFIG_FILE=$tmp aws $*
 rm $tmp
