@@ -7,6 +7,8 @@ fi
 
 tmp=$(mktemp -t s3cat)
 cat >$tmp
-s3c es.drewr put -P $tmp s3://users.elasticsearch.org/drewr/$1
+s3c es.drewr put -P \
+   --mime-type text/plain \
+   $tmp s3://users.elasticsearch.org/drewr/$1
 rm $tmp
 echo http://users.elasticsearch.org/drewr/$1
