@@ -1,0 +1,15 @@
+# -*- mode: ruby -*-
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos63_64"
+  config.vm.hostname = "base"
+  config.vm.network :private_network, ip: "192.168.56.9"
+  config.ssh.forward_agent = true
+  config.cache.auto_detect = true
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "512"]
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+  end
+
+  config.vm.provision :shell, :path => "bin/bootstrap", :args => "raring"
+end

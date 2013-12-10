@@ -1,0 +1,6 @@
+#!/bin/bash
+
+release=$1
+
+echo INSTALLING CURL
+sudo yum -y install curl
