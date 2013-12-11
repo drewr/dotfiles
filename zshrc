@@ -31,7 +31,7 @@ unsetopt EXTENDED_GLOB
 # Move these from zshenv because /etc/zprofile will overwrite.
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
 if [[ -d $HOME/.rbenv ]]; then
-  PATH=$HOME/.rbenv/bin:$PATH
+  PATH=$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH
   rbenv init - >/tmp/rbenvinit.zsh; source /tmp/rbenvinit.zsh
 fi
 
