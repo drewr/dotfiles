@@ -27,3 +27,5 @@ echo INSTALLING remaining packages
 sudo aptitude install -y puppet facter lxc-docker
 sudo puppet module install --force puppetlabs/stdlib
 sudo puppet module install --force puppetlabs/vcsrepo
+
+sudo sh -c "echo 192.168.56.1 puppet.local.raines.me puppet >>/etc/hosts"
