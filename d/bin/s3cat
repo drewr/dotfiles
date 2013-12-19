@@ -1,5 +1,7 @@
 #!/bin/sh
 
+PRE=${PRE:-drewr}
+
 if [ "x" == "x$1" ]; then
   echo need key name
   exit 99
@@ -7,9 +9,9 @@ fi
 
 tmp=$(mktemp -t s3cat)
 cat >$tmp
-s3c es.drewr put -P \
+s3c es.${PRE} put -P \
    --mime-type="text/plain; charset=utf-8" \
    --encoding=utf-8 \
-   $tmp s3://users.elasticsearch.org/drewr/$1
+   $tmp s3://users.elasticsearch.org/${PRE}/$1
 rm $tmp
-echo http://users.elasticsearch.org/drewr/$1
+echo http://users.elasticsearch.org/${PRE}/$1
