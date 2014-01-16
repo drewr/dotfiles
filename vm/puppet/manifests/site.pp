@@ -91,6 +91,10 @@ class { "elasticsearch":
   restart_on_change => true,
 }
 
+host { $hostname:
+  ip => $ipaddress_eth1,
+}
+
 exec { "kill the oom_killer":
   require => Service["elasticsearch"],
   command => "/bin/sleep 1; /vagrant/bin/kill-oom-killer",
