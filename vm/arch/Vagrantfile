@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "arch-2013-11"
+  config.vm.hostname = "archie"
+  config.vm.network :private_network, ip: "192.168.56.8"
+  config.ssh.forward_agent = true
+  config.cache.auto_detect = true
+  config.vm.synced_folder "#{ENV['HOME']}/src/elasticsearch/target/releases", "/etc/puppet/files"
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "512"]
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+  end
+
+#  config.vm.provision :shell, :path => "bin/bootstrap", :args => "raring"
+
+#  config.vm.provision :puppet do |puppet|
+#    puppet.manifests_path = "../puppet/manifests"
+#    puppet.module_path    = "../puppet/modules"
+#    puppet.manifest_file  = "site.pp"
+#    puppet.options = "--fileserverconfig=/vagrant/fileserver.conf"
+#    puppet.facter = {
+#      "fqdn" => "archie.local",
+#    }
+#  end
+
+end
