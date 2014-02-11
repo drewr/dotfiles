@@ -31,7 +31,7 @@ package { "djbdns": ensure => "present" }
 package { "htop": ensure => "present" }
 package { "zsh": ensure => "present" }
 package { "tmux": ensure => "present" }
-package { "emacs24-nox": ensure => "present" }
+package { "emacs23-nox": ensure => "present" }
 
 $repo = "dotfiles"
 class git::clone ($repo, $username=$user) {
