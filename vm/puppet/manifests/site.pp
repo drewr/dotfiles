@@ -57,6 +57,11 @@ class git::clone ($repo, $username=$user) {
   }
 }
 
+# exec { "apt-update":
+#   command => "/usr/bin/apt-get update"
+# }
+# Exec["apt-update"] -> Package <| |>
+
 class { git::clone: repo => "dotfiles" }
 
 exec { "dotfiles":
