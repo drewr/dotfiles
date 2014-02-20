@@ -1,0 +1,11 @@
+#!/bin/sh
+
+exec 2>&1
+echo starting
+exec env JAVA_OPTS="-Xms<%= @heap -%> -Xmx<%= @heap -%>" \
+ setuidgid <%= @user -%> \
+   java -jar <%= @stream2es -%> queue \
+     --broker <%= @broker -%> \
+     --exchange <%= @exchange -%> \
+     --queue <%= @queue -%> \
+     --target <%= @target -%>
