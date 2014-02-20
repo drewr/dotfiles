@@ -91,10 +91,10 @@ file { "/tmp/elasticsearch-1.0.0.deb":
   owner   => "root",
   group   => "root",
   require => Exec["wget-elasticsearch"],
-}
-
-package {"openjdk-7-jdk": ensure => "present" }
-
+} ->
+package { "openjdk-7-jdk":
+  ensure => "present"
+} ->
 class { "elasticsearch":
   pkg_source => "/tmp/elasticsearch-1.0.0.deb",
   service_settings => {
@@ -118,5 +118,3 @@ exec { "kill the oom_killer":
   require => Service["elasticsearch"],
   command => "/bin/sleep 1; /vagrant/bin/kill-oom-killer",
 }
-
-File["/tmp/elasticsearch-1.0.0.deb"] -> Service["elasticsearch"]
