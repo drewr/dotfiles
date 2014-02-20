@@ -8,7 +8,7 @@ group { "puppet":
 File { owner => 0, group => 0, mode => 0644 }
 
 file { '/etc/motd':
-  content => "Built ${timestamp}"
+  content => "Built ${timestamp} ${ipaddress}"
 }
 
 user { $user:
@@ -25,6 +25,12 @@ ssh_authorized_key { $user:
   type => "ssh-dss",
   key => "AAAAB3NzaC1kc3MAAACBAJKqbq7Ycql2sxAyA/XbuP3OOXZIpc9ttmaK7hmdVTweM+17K+FbPLE5eEeeNcmlWcCbNL1TbG8wRr5NfgxSe0lWOTyIhHp8S0jOHFAL8DFbcHD5d3YeuV8C/8Oa3Z54kcWgvQoeE6ZEuIi1HD3iX7xwSdF8X4ECKhObbk+a/M2jAAAAFQC+QBmBV8DBqtwpQt0D8awjc1ISRQAAAIAicoPYfvrSJMm1r8L9aluy7DwUbE8j4L7fyDzMqyFlHtEGSVHVuSGd4wIjej0XK+BXGbrgTpPmIR0yUSTLNUIPwAVdAuultkHTrEonxjmFV7xhZkjTJLCLFWv3/S3rcSIsTwTzI27mxR/bqlsXEjAddxmw7WCIftcFv9f8kuTjXQAAAIBXidiAyoHJIkovyvkKdZT6sXLraq6TiZu0L7ZQDHjCjrzZm4FHY/HNpEJkdPWQl/djgdWmMVgNXzr6QsrKvQzcgkM1M4zjrPrgJM/UNLD1UTbJqV3li5nkRuzkfSqndJmu4AYvRpLOzHCayaU8qlf59t3HOHK5d26cY9hdVN5zIQ==",
   user => $user
+}
+
+class { 'sudo': }
+sudo::conf { $user:
+  priority => 10,
+  content  => "${user} ALL=(ALL) NOPASSWD: ALL",
 }
 
 package { "djbdns": ensure => "present" }
@@ -57,11 +63,6 @@ class git::clone ($repo, $username=$user) {
   }
 }
 
-# exec { "apt-update":
-#   command => "/usr/bin/apt-get update"
-# }
-# Exec["apt-update"] -> Package <| |>
-
 class { git::clone: repo => "dotfiles" }
 
 exec { "dotfiles":
@@ -74,30 +75,25 @@ exec { "dotfiles":
   subscribe => Vcsrepo["/home/${user}/src/dotfiles"]
 }
 
+package {"openjdk-7-jdk": ensure => "present" }
+
 class { "elasticsearch":
-  java_install => true,
+  version => "1.0.0",
   service_settings => {
     "ES_USER" => "elasticsearch",
     "ES_GROUP" => "elasticsearch",
-    "ES_HEAP_SIZE" => "48m",
+    "ES_HEAP_SIZE" => "384m",
   },
-  pkg_source => "puppet:///files/elasticsearch-1.0.0-SNAPSHOT.deb",
   config     => {
-    "cluster.name" => "foo",
+    "cluster.name" => "drewr",
     "index.number_of_replicas" => "0",
-    "index.number_of_shards" => "1",
+    "index.number_of_shards" => "10",
     "network.bind_host" => "0.0.0.0",
-    "network.publish_host" => "_eth1:ipv4_",
-    "discovery.zen.ping.unicast.hosts" => ["192.168.56.10", "192.168.56.20", "192.168.56.30"],
-    "discovery.zen.multicast.enabled" => false,
+    "discovery.zen.multicast.enabled" => true,
     "bootstrap.mlockall" => true,
     "logger.level" => "DEBUG",
   },
   restart_on_change => true,
-}
-
-host { $hostname:
-  ip => $ipaddress_eth1,
 }
 
 exec { "kill the oom_killer":
