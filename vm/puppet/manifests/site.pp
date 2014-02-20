@@ -43,42 +43,6 @@ package { "zsh": ensure => "present" }
 package { "tmux": ensure => "present" }
 package { "emacs23-nox": ensure => "present" }
 
-$repo = "dotfiles"
-class git::clone ($repo, $username=$user) {
-  file { "/home/${username}/src":
-    ensure  => directory,
-    group   => $user,
-    owner   => $username,
-    mode    => 0700,
-  }
-
-  package { "git":
-    ensure => installed,
-  }
-
-  vcsrepo { "/home/${username}/src/${repo}":
-    ensure   => latest,
-    owner    => $user,
-    group    => $user,
-    provider => git,
-    require  => [ Package["git"] ],
-    source   => "https://github.com/drewr/${repo}.git",
-    revision => "master",
-  }
-}
-
-class { git::clone: repo => "dotfiles" }
-
-exec { "dotfiles":
-  cwd => "/home/${user}/src/dotfiles",
-  path => ["/bin", "/usr/bin", "/usr/sbin", "/usr/local/bin"],
-  command => "make install",
-  user => $user,
-  refreshonly => true,
-  # logoutput => true,
-  subscribe => Vcsrepo["/home/${user}/src/dotfiles"]
-}
-
 package { "openjdk-7-jdk":
   ensure => "present"
 } ->
