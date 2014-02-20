@@ -79,21 +79,14 @@ exec { "dotfiles":
   subscribe => Vcsrepo["/home/${user}/src/dotfiles"]
 }
 
-wget::fetch { "elasticsearch":
-  source      => "http://users.elasticsearch.org/drewr/elasticsearch-1.0.0.deb",
-  destination => "/tmp",
-  timeout     => 0,
-  verbose     => false,
-}
-
-file { "/tmp/elasticsearch-1.0.0.deb":
-  mode => 0755,
-  owner   => "root",
-  group   => "root",
-  require => Exec["wget-elasticsearch"],
-} ->
 package { "openjdk-7-jdk":
   ensure => "present"
+} ->
+wget::fetch { "elasticsearch":
+  source      => "http://users.elasticsearch.org/drewr/elasticsearch-1.0.0.deb",
+  destination => "/tmp/elasticsearch-1.0.0.deb",
+  timeout     => 0,
+  verbose     => false,
 } ->
 class { "elasticsearch":
   pkg_source => "/tmp/elasticsearch-1.0.0.deb",
