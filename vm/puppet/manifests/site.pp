@@ -47,14 +47,8 @@ package { "emacs23-nox": ensure => "present" }
 package { "openjdk-7-jdk":
   ensure => "present"
 } ->
-wget::fetch { "elasticsearch":
-  source      => "http://users.elasticsearch.org/drewr/elasticsearch-1.0.0.deb",
-  destination => "/tmp/elasticsearch-1.0.0.deb",
-  timeout     => 0,
-  verbose     => false,
-} ->
 class { "elasticsearch":
-  pkg_source => "/tmp/elasticsearch-1.0.0.deb",
+  pkg_source => "http://users.elasticsearch.org/drewr/elasticsearch-1.0.0.deb",
   service_settings => {
     "ES_USER" => "elasticsearch",
     "ES_GROUP" => "elasticsearch",
@@ -70,6 +64,9 @@ class { "elasticsearch":
     "logger.level" => "DEBUG",
   },
   restart_on_change => true,
+} ->
+class { "stream2es":
+  target => "http://localhost:9200/foo/t",
 }
 
 exec { "kill the oom_killer":
@@ -81,6 +78,3 @@ host { $hostname:
   ip => $ipaddress_eth0,
 }
 
-class { "stream2es":
-  target => "http://localhost:9200/foo/t",
-}
