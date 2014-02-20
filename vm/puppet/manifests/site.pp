@@ -56,7 +56,7 @@ package { "openjdk-7-jdk":
   ensure => "present"
 } ->
 class { "elasticsearch":
-  pkg_source => "http://users.elasticsearch.org/drewr/elasticsearch-1.0.0.deb",
+  package_url => "http://users.elasticsearch.org/drewr/elasticsearch-1.0.0.deb",
   service_settings => {
     "ES_USER" => "elasticsearch",
     "ES_GROUP" => "elasticsearch",
