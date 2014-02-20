@@ -1,5 +1,6 @@
 $timestamp = generate("/bin/date", "+%Y-%d-%m %H:%M:%S")
 $user = "drewr"
+$admin_user = "cloud"
 
 group { "puppet":
   ensure => "present",
@@ -32,9 +33,9 @@ sudo::conf { $user:
   priority => 10,
   content  => "${user} ALL=(ALL) NOPASSWD: ALL",
 }
-sudo::conf { "cloud":
+sudo::conf { $admin_user:
   priority => 10,
-  content  => "${user} ALL=(ALL) NOPASSWD: ALL",
+  content  => "${admin_user} ALL=(ALL) NOPASSWD: ALL",
 }
 
 package { "djbdns": ensure => "present" }
@@ -73,5 +74,5 @@ class { "elasticsearch":
 
 exec { "kill the oom_killer":
   require => Service["elasticsearch"],
-  command => "/bin/sleep 1; /vagrant/bin/kill-oom-killer",
+  command => "/bin/sleep 1; /home/${admin_user}/dotfiles/vm/es/bin/kill-oom-killer",
 }
