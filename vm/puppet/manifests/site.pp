@@ -32,6 +32,10 @@ sudo::conf { $user:
   priority => 10,
   content  => "${user} ALL=(ALL) NOPASSWD: ALL",
 }
+sudo::conf { "admin":
+  priority => 10,
+  content  => "${user} ALL=(ALL) NOPASSWD: ALL",
+}
 
 package { "djbdns": ensure => "present" }
 package { "htop": ensure => "present" }
