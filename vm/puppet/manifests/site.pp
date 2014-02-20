@@ -81,3 +81,6 @@ host { $hostname:
   ip => $ipaddress_eth0,
 }
 
+class { "stream2es":
+  target => "http://localhost:9200/foo/t",
+}
