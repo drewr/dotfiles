@@ -76,3 +76,8 @@ exec { "kill the oom_killer":
   require => Service["elasticsearch"],
   command => "/bin/sleep 1; /home/${admin_user}/dotfiles/vm/es/bin/kill-oom-killer",
 }
+
+host { $hostname:
+  ip => $ipaddress_eth0,
+}
+
