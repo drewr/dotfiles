@@ -69,36 +69,38 @@ exec { "dotfiles":
   subscribe => Vcsrepo["/home/${user}/src/dotfiles"]
 }
 
-# class { "elasticsearch":
-#   java_install => true,
-#   java_package => "openjdk-7-jdk",
-#   service_settings => {
-#     "ES_USER" => "elasticsearch",
-#     "ES_GROUP" => "elasticsearch",
-#     "ES_HEAP_SIZE" => "48m",
-#   },
-#   pkg_source => "puppet:///files/elasticsearch-1.0.0-SNAPSHOT.deb",
-#   config     => {
-#     "cluster.name" => "foo",
-#     "index.number_of_replicas" => "0",
-#     "index.number_of_shards" => "1",
-#     "network.bind_host" => "0.0.0.0",
-#     "network.publish_host" => "_eth1:ipv4_",
-#     "discovery.zen.ping.unicast.hosts" => ["192.168.56.10", "192.168.56.20", "192.168.56.30"],
-#     "discovery.zen.multicast.enabled" => false,
-#     "bootstrap.mlockall" => true,
-#     "logger.level" => "DEBUG",
-#   },
-#   restart_on_change => true,
-# }
+package {"openjdk-7-jdk": ensure => "present" }
 
-# exec { "kill the oom_killer":
-#   require => Service["elasticsearch"],
-#   command => "/bin/sleep 1; /vagrant/bin/kill-oom-killer",
-# }
+class { "elasticsearch":
+  service_settings => {
+    "ES_USER" => "elasticsearch",
+    "ES_GROUP" => "elasticsearch",
+    "ES_HEAP_SIZE" => "48m",
+  },
+  pkg_source => "puppet:///files/elasticsearch-1.0.0-SNAPSHOT.deb",
+  config     => {
+    "cluster.name" => "foo",
+    "index.number_of_replicas" => "0",
+    "index.number_of_shards" => "1",
+    "network.bind_host" => "0.0.0.0",
+    "network.publish_host" => "_eth1:ipv4_",
+    "discovery.zen.ping.unicast.hosts" => ["192.168.56.10", "192.168.56.20", "192.168.56.30"],
+    "discovery.zen.multicast.enabled" => false,
+    "bootstrap.mlockall" => true,
+    "logger.level" => "DEBUG",
+  },
+  restart_on_change => true,
+}
+
+exec { "kill the oom_killer":
+  require => Service["elasticsearch"],
+  command => "/bin/sleep 1; /vagrant/bin/kill-oom-killer",
+}
 
 host { $hostname:
   ip => $ipaddress_eth1,
 }
 
-class { "stream2es": }
+class { "stream2es":
+  target => "http://localhost:9200/bar/sometype",
+}

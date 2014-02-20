@@ -16,8 +16,6 @@ class stream2es(
   package {"daemontools": ensure => "present" }
   package {"daemontools-run": ensure => "present" }
 
-  package {"openjdk-7-jdk": ensure => "present" }
-
   service { "svscan":
     ensure => running,
     provider => "upstart",
