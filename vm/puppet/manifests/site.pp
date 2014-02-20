@@ -32,7 +32,7 @@ sudo::conf { $user:
   priority => 10,
   content  => "${user} ALL=(ALL) NOPASSWD: ALL",
 }
-sudo::conf { "admin":
+sudo::conf { "cloud":
   priority => 10,
   content  => "${user} ALL=(ALL) NOPASSWD: ALL",
 }
