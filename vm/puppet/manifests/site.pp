@@ -28,6 +28,14 @@ ssh_authorized_key { $user:
   user => $user
 }
 
+file { "/home/${user}/.ssh/config":
+  owner   => $user,
+  group   => $user,
+  mode    => 0600,
+  require => User[$user],
+  content => "host github.com\n   stricthostkeychecking no\n",
+}
+
 class { 'sudo': }
 sudo::conf { $user:
   priority => 10,
