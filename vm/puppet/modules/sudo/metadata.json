@@ -1,0 +1,52 @@
+{
+  "name": "saz-sudo",
+  "version": "3.0.1",
+  "summary": "UNKNOWN",
+  "author": "saz",
+  "description": "Manage sudo configuration via Puppet",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": "\u003e\u003d 2.3.0"
+    }
+  ],
+  "types": [],
+  "checksums": {
+    ".bundle/config": "7f1c988748783d2a8d455376eed1470c",
+    ".bundle/install.log": "fa1236c91e34ddb1d64dc2d41170df79",
+    ".fixtures.yml": "4d73ad2134f687842565b9bf6406ab72",
+    ".gemfile": "14bd1a18be3e43568e7825c12a3dc0aa",
+    ".gemfile.lock": "d771b58a2d76e713faa307a9b955ef1d",
+    ".travis.yml": "5df7e090f1137cd317578d3b95b90b79",
+    "LICENSE": "c43ad7837d4770c3823fdab29a78f0e3",
+    "Modulefile": "7bc7e6c2a79dc53a7064b1edd03ce139",
+    "README.md": "91e577216275c2097eba66e9112ad994",
+    "Rakefile": "0254db5d3fc38c67a2c160d7296a24f8",
+    "files/sudoers.aix": "cd782a48b45d845b34262063e4c8c0b1",
+    "files/sudoers.archlinux": "5256992be7eb0edb09564f08f01e92c6",
+    "files/sudoers.deb": "ebd77e09715c4da6be84d56233139fff",
+    "files/sudoers.freebsd": "4e2d60b0bdc7c3d77ceae7fd9224f47f",
+    "files/sudoers.omnios": "cd782a48b45d845b34262063e4c8c0b1",
+    "files/sudoers.rhel5": "68ba7e0c1d117579112e5ef95464aac5",
+    "files/sudoers.rhel6": "4093e52552d97099d003c645f15f9372",
+    "files/sudoers.solaris": "2d2d9d5be3b5905e42466556f6f1d5ad",
+    "files/sudoers.suse": "40468b19c03962cf383caf5ababed6d0",
+    "files/sudoers.ubuntu": "e8e73f16ed73309df7574c12fbcc0af7",
+    "files/sudoers.wheezy": "730c932c78e53458817e742050edb089",
+    "manifests/allow.pp": "888e9ed1f5e4c6ec4d7309b7dc390296",
+    "manifests/conf.pp": "4faa2945f8bd96c74a56c8ca15dcec12",
+    "manifests/init.pp": "0a6d9884f51752192f8f333cf041d7a5",
+    "manifests/package.pp": "6527c890d10c069af70f6f567e6df8b5",
+    "manifests/package/aix.pp": "d307058ec65d2761a152932f8506ab35",
+    "manifests/params.pp": "6dce86a18fccd3388e0992b4e8d37bca",
+    "spec/classes/sudo_spec.rb": "8c1784760efd56b549fc4a4e78b046da",
+    "spec/defines/sudo_spec.rb": "b7abb219ab26f544c3ad10ab1aa56c4b",
+    "spec/spec.opts": "a600ded995d948e393fbe2320ba8e51c",
+    "spec/spec_helper.rb": "0db89c9a486df193c0e40095422e19dc",
+    "templates/users_groups.erb": "93854eda68a164a05d3c2aed3efbea6e",
+    "tests/init.pp": "63f528ee1d1698fadd336da35dd4ec7a"
+  },
+  "source": "UNKNOWN",
+  "project_page": "https://github.com/saz/puppet-sudo",
+  "license": "Apache License, Version 2.0"
+}

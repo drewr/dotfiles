@@ -1,0 +1,16 @@
+# Logfile created on Wed Feb 05 21:16:53 +0000 2014 by logger.rb/1.2.6
+I, [2014-02-05T21:16:53.144979 #1547]  INFO -- : 0:  rake (10.1.1) from /home/travis/.rvm/gems/ruby-1.8.7-p374@global/specifications/rake-10.1.1.gemspec
+I, [2014-02-05T21:16:54.113799 #1547]  INFO -- : 0:  diff-lcs (1.2.5) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/diff-lcs-1.2.5.gemspec
+I, [2014-02-05T21:16:55.538220 #1547]  INFO -- : 0:  facter (1.6.18) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/facter-1.6.18.gemspec
+I, [2014-02-05T21:16:56.057633 #1547]  INFO -- : 0:  hiera (1.0.0) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/hiera-1.0.0.gemspec
+I, [2014-02-05T21:16:56.467438 #1547]  INFO -- : 0:  metaclass (0.0.2) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/metaclass-0.0.2.gemspec
+I, [2014-02-05T21:16:57.184717 #1547]  INFO -- : 0:  mocha (1.0.0) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/mocha-1.0.0.gemspec
+I, [2014-02-05T21:16:59.540680 #1547]  INFO -- : 0:  puppet (3.0.2) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/puppet-3.0.2.gemspec
+I, [2014-02-05T21:17:00.475535 #1547]  INFO -- : 0:  puppet-lint (0.3.2) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/puppet-lint-0.3.2.gemspec
+I, [2014-02-05T21:17:01.908516 #1547]  INFO -- : 0:  rspec-core (2.14.7) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/rspec-core-2.14.7.gemspec
+I, [2014-02-05T21:17:02.950646 #1547]  INFO -- : 0:  rspec-expectations (2.14.5) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/rspec-expectations-2.14.5.gemspec
+I, [2014-02-05T21:17:04.055928 #1547]  INFO -- : 0:  rspec-mocks (2.14.5) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/rspec-mocks-2.14.5.gemspec
+I, [2014-02-05T21:17:04.471311 #1547]  INFO -- : 0:  rspec (2.14.1) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/rspec-2.14.1.gemspec
+I, [2014-02-05T21:17:04.864386 #1547]  INFO -- : 0:  rspec-puppet (1.0.1) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/rspec-puppet-1.0.1.gemspec
+I, [2014-02-05T21:17:05.709085 #1547]  INFO -- : 0:  puppetlabs_spec_helper (0.4.1) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/puppetlabs_spec_helper-0.4.1.gemspec
+I, [2014-02-05T21:17:05.757497 #1547]  INFO -- : 0:  bundler (1.5.1) from /home/travis/.rvm/gems/ruby-1.8.7-p374/specifications/bundler-1.5.1.gemspec
