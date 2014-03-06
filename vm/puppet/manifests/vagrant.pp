@@ -86,7 +86,7 @@ class { "elasticsearch":
   init_defaults => {
     "ES_HEAP_SIZE" => "48m",
   },
-  pkg_source => "puppet:///files/elasticsearch-1.0.0-SNAPSHOT.deb",
+  package_url => "puppet:///files/elasticsearch-1.0.0-SNAPSHOT.deb",
   config     => {
     "cluster.name" => "foo",
     "index.number_of_replicas" => "0",
