@@ -83,9 +83,7 @@ exec { "dotfiles":
 package {"openjdk-7-jdk": ensure => "present" }
 
 class { "elasticsearch":
-  service_settings => {
-    "ES_USER" => "elasticsearch",
-    "ES_GROUP" => "elasticsearch",
+  init_defaults => {
     "ES_HEAP_SIZE" => "48m",
   },
   pkg_source => "puppet:///files/elasticsearch-1.0.0-SNAPSHOT.deb",
