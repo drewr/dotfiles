@@ -57,12 +57,10 @@ package { "openjdk-7-jdk":
 } ->
 class { "elasticsearch":
   package_url => "http://users.elasticsearch.org/drewr/elasticsearch-1.0.0.deb",
-  service_settings => {
-    "ES_USER" => "elasticsearch",
-    "ES_GROUP" => "elasticsearch",
+  init_defaults => {
     "ES_HEAP_SIZE" => "384m",
   },
-  config     => {
+  config => {
     "cluster.name" => "drewr",
     "index.number_of_replicas" => "0",
     "index.number_of_shards" => "10",
