@@ -1,3 +1,3 @@
 #!/bin/sh
 
-env setuidgid nobody multilog t ./main
+exec setuidgid nobody multilog t ./main s10000000 n100

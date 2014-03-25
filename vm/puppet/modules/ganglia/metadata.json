@@ -1,0 +1,56 @@
+{
+  "name": "jhoblitt-ganglia",
+  "version": "1.2.2",
+  "source": "https://github.com/jhoblitt/puppet-ganglia.git",
+  "author": "Joshua Hoblitt <jhoblitt@cpan.org>",
+  "license": "Apache",
+  "summary": "Manages ganglia gmond & gmetad daemons + web front end",
+  "description": "Manages ganglia gmond & gmetad daemons + web front end",
+  "project_page": "https://github.com/jhoblitt/puppet-ganglia",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 3.0.0"
+    }
+  ],
+  "types": [
+
+  ],
+  "checksums": {
+    "CHANGELOG.md": "86a9e1851e3ba766e9585f9407093d87",
+    "Gemfile": "c427cbec0e004fbd762cb297e583f8bc",
+    "Gemfile.lock": "7861c34d689e91cb90862f5e252d5de6",
+    "LICENSE": "9247efe426cbee11eb63f85001ee5377",
+    "Modulefile": "a6b8185a0bd45234382a50677d3f6d78",
+    "README.md": "beaf93e82a4ad00c2e5e48b9d7bb517f",
+    "Rakefile": "5ec6ecc754d196eeea28584b53a0f93a",
+    "manifests/gmetad/config.pp": "62b54073479bee3e5e92f5af5fede189",
+    "manifests/gmetad/install.pp": "7d0ae0864fde58c413911ffe108f8df4",
+    "manifests/gmetad/service.pp": "9bc509dbf0d31b53ad7251635b514954",
+    "manifests/gmetad.pp": "690b6ba7044dab222cde828e8da9fd1b",
+    "manifests/gmond/config.pp": "38ad0d5f2a78c5aa4d9281bba4aeff07",
+    "manifests/gmond/install.pp": "6ac4b654bd815a81fc7f169a2f1e7812",
+    "manifests/gmond/service.pp": "03e3c19335c65b6d48495e54f3cd2960",
+    "manifests/gmond.pp": "596fb7e2c4bf5ff4ad0174644460974e",
+    "manifests/params.pp": "754960682596c357272cd1a010df3e64",
+    "manifests/web/config.pp": "e54d4a168891e47df99d0c2bff6bb147",
+    "manifests/web/install.pp": "c101690165d423cdada182b87ede9a14",
+    "manifests/web.pp": "d31fe3d2c77f6e7d8f8c7b38e8d8f2a2",
+    "spec/classes/gmetad_spec.rb": "b3994478b44666efc7a42aeafa43c222",
+    "spec/classes/gmond_spec.rb": "860577326be74a35020c948e2802c4ca",
+    "spec/classes/params_spec.rb": "4b37a16b853b62b1c4cd13f65640b89d",
+    "spec/classes/web_spec.rb": "0ed8fe0ce13915da03ed5f117c45cd05",
+    "spec/spec_helper.rb": "0db89c9a486df193c0e40095422e19dc",
+    "spec/spec_helper_system.rb": "b017ac93acc595552fedd2d0c61204b1",
+    "spec/system/basic_spec.rb": "7bbde926adef2dff2b99ba2d08d1d380",
+    "spec/system/gmetad_spec.rb": "c3b8cafe17085c4b3ce2bde3acb8e70c",
+    "spec/system/gmond_spec.rb": "37bfb7f03cf6f2f1d7eaa5ebbbf188af",
+    "spec/system/web_spec.rb": "46f470fb96eb7f036230169120eca4a7",
+    "templates/conf.php.el6.erb": "ccae71cf33c5a1ff609413ca665fc0d5",
+    "templates/gmetad.conf.el6.erb": "93a295bb034fb1c6325907fd54d8ee4e",
+    "templates/gmond.conf.debian.erb": "c522a830b1c010baaef177cd61a5c858",
+    "templates/gmond.conf.el5.erb": "f6ebde8e91720e346e5984d0abc75e0f",
+    "templates/gmond.conf.el6.erb": "1c1f5a29313817533069f33802dae42e",
+    "tests/init.pp": "c7527cca05d58d15804d9cf097aca29d"
+  }
+}

@@ -1,0 +1,1 @@
+echo '-17' | sudo tee /proc/$(cat /var/run/elasticsearch.pid)/oom_adj

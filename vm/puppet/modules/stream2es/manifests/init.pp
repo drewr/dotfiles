@@ -1,17 +1,7 @@
 include wget
 
-class stream2es(
-  $user="nobody",
-  $group="nogroup",
-  $heap="256m",
-  $broker="http://localhost:9200",
-  $exchange="queue",
-  $queue="s2e.default",
-  $target="http://localhost:9200/foo/t",
-) {
+class stream2es {
   $stream2es = "/usr/local/bin/stream2es"
-  $stream2es_svc_path = "/etc/svc/stream2es"
-  $stream2es_service = "/etc/service/stream2es"
 
   package {"daemontools": ensure => "present" }
   package {"daemontools-run": ensure => "present" }
@@ -35,8 +25,31 @@ class stream2es(
     require => Exec["wget-stream2es"],
   }
 
-  file { ["/etc/svc",
-          "${stream2es_svc_path}",
+  file { "/etc/svc":
+    ensure  => directory,
+    owner   => "root",
+    group   => "root",
+    mode    => 0755,
+  }
+}
+
+define stream2es::service (
+  $svc=$title,
+  $user="nobody",
+  $group="nogroup",
+  $heap="256m",
+  $broker="http://localhost:9200",
+  $exchange="queue",
+  $queue="s2e.default",
+  $target="http://localhost:9200/foo/t",
+  $workers=1,
+  $settings="{\\\"number_of_shards\\\":5}",
+  $error_path="/mnt/${title}-errors",
+) {
+  $stream2es_svc_path = "/etc/svc/${svc}"
+  $stream2es_service = "/etc/service/${svc}"
+
+  file { ["${stream2es_svc_path}",
           "${stream2es_svc_path}/log"]:
     ensure  => directory,
     owner   => "root",
@@ -46,8 +59,8 @@ class stream2es(
 
   file { "${stream2es_svc_path}/log/main":
     ensure  => directory,
-    owner   => "nobody",
-    group   => "nogroup",
+    owner   => $user,
+    group   => $group,
     mode    => 0755,
   }
 
@@ -71,11 +84,19 @@ class stream2es(
     ensure => "link",
     target => "${stream2es_svc_path}",
     require => File["${stream2es_svc_path}/run",
-                    "${stream2es_svc_path}/log/run"],
+                    "${stream2es_svc_path}/log/run"]
   }
 
   exec { "/usr/bin/svc -t ${stream2es_service}":
     subscribe => File["${stream2es_svc_path}/run"],
     refreshonly => true
+  }
+
+  file { "${error_path}":
+    ensure => directory,
+    owner => $user,
+    group => $group,
+    mode => 0755,
+    before => File[$stream2es_service],
   }
 }

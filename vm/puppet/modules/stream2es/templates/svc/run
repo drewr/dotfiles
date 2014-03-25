@@ -2,10 +2,14 @@
 
 exec 2>&1
 echo starting
+cd <%= @error_path %>
 exec env JAVA_OPTS="-Xms<%= @heap -%> -Xmx<%= @heap -%>" \
  setuidgid <%= @user -%> \
-   java -jar <%= @stream2es -%> queue \
+   java -jar <%= scope.lookupvar("stream2es::stream2es") -%> queue \
      --broker <%= @broker -%> \
      --exchange <%= @exchange -%> \
      --queue <%= @queue -%> \
-     --target <%= @target -%>
+     --target <%= @target -%> \
+     --settings "<%= @settings -%>" \
+     --workers <%= @workers -%>
+
