@@ -1,7 +1,10 @@
 [alias]
 ci = commit
 co = checkout
-st = status
+s = status -su
+st = status -su
+lg = log --graph --decorate --oneline --all
+ll = log --date=local
 b = branch
 ver = "!git log --pretty=format:'%ai %h' -1 | perl -pe 's,(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d) (\\d\\d):(\\d\\d):(\\d\\d) [^ ]+ ([a-z0-9]+),\\1\\2\\3\\7,'"
 pr = "!f() { git fetch origin pull/$1/head:pull/$1; }; f"
