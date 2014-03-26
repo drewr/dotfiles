@@ -2,6 +2,10 @@
 
 release=$1
 
+if [[ -f $HOME/.bootstrapped ]]; then
+  exit 0
+fi
+
 echo INSTALLING CURL
 sudo aptitude install -y curl linux-image-extra-`uname -r`
 
@@ -25,7 +29,9 @@ sudo aptitude update
 
 echo INSTALLING remaining packages
 sudo aptitude install -y puppet facter lxc-docker
-sudo puppet module install --force puppetlabs/stdlib
-sudo puppet module install --force puppetlabs/vcsrepo
+#sudo puppet module install --force puppetlabs/stdlib
+#sudo puppet module install --force puppetlabs/vcsrepo
 
 sudo sh -c "echo 192.168.56.1 puppet.local.raines.me puppet >>/etc/hosts"
+
+touch $HOME/bootstrapped
