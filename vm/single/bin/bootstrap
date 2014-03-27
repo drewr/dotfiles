@@ -34,4 +34,4 @@ sudo aptitude install -y puppet facter lxc-docker
 
 sudo sh -c "echo 192.168.56.1 puppet.local.raines.me puppet >>/etc/hosts"
 
-touch $HOME/bootstrapped
+touch $HOME/.bootstrapped
