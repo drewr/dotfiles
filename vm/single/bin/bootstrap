@@ -2,8 +2,8 @@
 
 function boot {
   local release=$1
-  local ip=$2
-  local host=$3
+  local puppet_ip=$2
+  local puppet_host=$3
 
   echo INSTALLING CURL
   sudo aptitude install -y curl linux-image-extra-`uname -r`
@@ -18,7 +18,7 @@ function boot {
   echo INSTALLING remaining packages
   sudo aptitude install -y puppet facter
   
-  sudo sh -c "echo 192.168.56.1 puppet.local.raines.me puppet >>/etc/hosts"
+  sudo sh -c "echo $puppet_ip $puppet_host puppet >>/etc/hosts"
   sudo touch /etc/puppet/hiera.yaml
 }
 
