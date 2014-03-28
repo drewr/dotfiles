@@ -20,6 +20,7 @@ Vagrant.configure("2") do |config|
     puppet.module_path    = "#{ENV['HOME']}/src/hula/puppet/modules"
     puppet.manifest_file  = "vagrant.pp"
     puppet.options = ["--node_terminus=exec",
-                      "--external_nodes=/usr/local/bin/nodes"]
+                      "--external_nodes=/usr/local/bin/nodes",
+                      "--environment=dev"]
   end
 end
