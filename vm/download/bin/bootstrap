@@ -1,0 +1,46 @@
+#!/bin/bash
+
+function boot {
+  local release=$1
+  local puppet_ip=$2
+  local puppet_host=$3
+
+  echo INSTALLING CURL
+  sudo aptitude install -y curl linux-image-extra-`uname -r`
+  
+  echo INSTALLING puppetlabs-release-${release}
+  curl -sO http://apt.puppetlabs.com/puppetlabs-release-${release}.deb
+  sudo dpkg -i puppetlabs-release-${release}.deb
+  
+  echo UPDATING
+  sudo aptitude update
+  
+  echo INSTALLING remaining packages
+  sudo aptitude install -y puppet facter
+  
+  sudo sh -c "echo $puppet_ip $puppet_host puppet >>/etc/hosts"
+  sudo touch /etc/puppet/hiera.yaml
+}
+
+if [[ ! -f $HOME/.bootstrapped ]]; then
+  boot $1 $2 $3
+  touch $HOME/.bootstrapped
+fi
+
+cat <<OUTER >/usr/local/bin/nodes
+#!/bin/sh
+cat <<EOF
+parameters:
+  hosts:
+    download001:
+      ip: '192.168.56.11'
+    download002:
+      ip: '192.168.56.12'
+  ganglia_nodes:
+  - download001:8649
+  cluster: clustername
+  aws_access_key: from-enc!
+  aws_secret_key: indeed!
+EOF
+OUTER
+chmod +x /usr/local/bin/nodes

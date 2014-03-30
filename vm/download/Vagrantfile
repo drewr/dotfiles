@@ -1,0 +1,36 @@
+# -*- mode: ruby -*-
+Vagrant.configure("2") do |config|
+  config.cache.auto_detect = true
+  config.ssh.forward_agent = true
+
+  boxes = {"download001.local" => "192.168.56.11",
+           "download002.local" => "192.168.56.12"}
+
+  boxes.each do |n, ip|
+    config.vm.define n do |box|
+      box.vm.box = "ubuntu_12_04"
+      box.vm.hostname = n
+      box.vm.network :private_network, ip: ip
+      box.vm.provider :virtualbox do |vb|
+        vb.customize ["modifyvm", :id, "--memory", "512"]
+        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      end
+    end
+  end
+
+  config.vm.provision :shell,
+      :path => "bin/bootstrap",
+      :args => "precise 192.168.56.1 puppet.local"
+
+  config.vm.provision :puppet do |puppet|
+    puppet.manifests_path = "#{ENV['HOME']}/src/hula/puppet/manifests"
+    puppet.module_path    = "#{ENV['HOME']}/src/hula/puppet/modules"
+    puppet.manifest_file  = "vagrant.pp"
+    puppet.options = ["--node_terminus=exec",
+                      "--external_nodes=/usr/local/bin/nodes",
+                      "--environment=dev"]
+    puppet.facter = {
+      "fqdn" => "bootstrap.local",
+    }
+  end
+end
