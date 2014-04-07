@@ -13,15 +13,17 @@ sub bulk {
   my @docs;
   my $bulksize = 0;
   my $field = "foo";
-  my $docsize = 150; # bytes estimation of a doc with single long field
+  ## my $docsize = 150; # bytes estimation of a doc with single long field
+  my $doc = encode_json({$field => irand(1000000)});
+  my $docsize = length $doc;
   while ($bulksize <= $maxbytes) {
-    push @docs, {$field => irand(1000000)};
+    push @docs, $doc;
     $bulksize += $docsize;
   }
 
   my $buf = "";
   for my $doc (@docs) {
-    $buf .= encode_json($meta) . "\n" . encode_json($doc) . "\n";
+    $buf .= encode_json($meta) . "\n" . $doc . "\n";
   }
 
   return $buf;
