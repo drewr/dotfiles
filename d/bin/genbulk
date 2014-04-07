@@ -1,0 +1,30 @@
+#!/usr/bin/env perl -w
+
+use Modern::Perl;
+use Math::Random::Secure qw(irand);
+use JSON::XS;
+
+our $bytes = shift || 1048576;
+
+sub bulk {
+  my $maxbytes = shift;
+  my $meta = shift || {"index" => {}};
+
+  my @docs;
+  my $bulksize = 0;
+  my $field = "foo";
+  my $docsize = 150; # bytes estimation of a doc with single long field
+  while ($bulksize <= $maxbytes) {
+    push @docs, {$field => irand(1000000)};
+    $bulksize += $docsize;
+  }
+
+  my $buf = "";
+  for my $doc (@docs) {
+    $buf .= encode_json($meta) . "\n" . encode_json($doc) . "\n";
+  }
+
+  return $buf;
+}
+
+print bulk($bytes)
