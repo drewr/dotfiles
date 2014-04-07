@@ -1,4 +1,4 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/env perl
 
 use Modern::Perl;
 use Math::Random::Secure qw(irand);
