@@ -3,7 +3,7 @@
 use Math::Random::Secure qw(irand);
 use Modern::Perl;
 
-our $a = shift @ARGV || 1;
-our $b = shift @ARGV || 10;
+our $count = shift @ARGV || 0;
+our $offset = shift @ARGV || 10;
 
-say irand($b-$a)+$a
+say irand($offset)+$count
