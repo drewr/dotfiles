@@ -1,9 +1,0 @@
-#!/usr/bin/env perl
-
-use Math::Random::Secure qw(irand);
-use Modern::Perl;
-
-our $count = shift @ARGV || 0;
-our $offset = shift @ARGV || 10;
-
-say irand($offset)+$count
