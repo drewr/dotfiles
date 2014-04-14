@@ -23,8 +23,8 @@ Vagrant.configure("2") do |config|
       :args => "precise 192.168.56.1 puppet.local"
 
   config.vm.provision :puppet do |puppet|
-    puppet.manifests_path = "#{ENV['HOME']}/src/hula/puppet/manifests"
-    puppet.module_path    = "#{ENV['HOME']}/src/hula/puppet/modules"
+    puppet.manifests_path = "#{ENV['HOME']}/src/infra/puppet/manifests"
+    puppet.module_path    = "#{ENV['HOME']}/src/infra/puppet/modules"
     puppet.manifest_file  = "vagrant.pp"
     puppet.options = ["--node_terminus=exec",
                       "--external_nodes=/usr/local/bin/nodes",
