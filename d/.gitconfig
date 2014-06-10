@@ -30,3 +30,6 @@ user = drewr
 
 [rerere]
 enabled = true
+
+[credential]
+helper = osxkeychain
