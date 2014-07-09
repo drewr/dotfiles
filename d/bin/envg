@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -e
+set -u
+set -o pipefail
+
+CRED=${1:-drewr}; shift
+credf=$HOME/.env.${CRED}.gpg
+if [[ ! -f $credf ]]; then
+  echo $credf does not exist
+  exit 99
+fi
+
+tmp=$(mktemp -t envg)
+gpg -d $credf >$tmp
+
+set -a
+. $tmp
+set +a
+
+clean() {
+  [[ -f $tmp ]] && rm $tmp
+}
+
+trap clean EXIT INT TERM
+
+$*
+res=$?
+
+trap - EXIT INT TERM
+clean
+exit $res
