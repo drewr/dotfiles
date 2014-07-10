@@ -12,7 +12,13 @@ if [[ ! -f $credf ]]; then
 fi
 
 tmp=$(mktemp -t envg)
-gpg -d $credf >$tmp
+err=${tmp}.error
+
+gpg --batch -d $credf >$tmp 2>$err
+
+if [[ $? != 0 ]]; then
+  cat $err
+fi
 
 set -a
 . $tmp
@@ -20,6 +26,7 @@ set +a
 
 clean() {
   [[ -f $tmp ]] && rm $tmp
+  [[ -f $err ]] && rm $err
 }
 
 trap clean EXIT INT TERM
