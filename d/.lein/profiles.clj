@@ -9,4 +9,5 @@
             [lein-pprint "1.1.1"]
             [lein-swank "1.4.5"]
             [lein-tar "1.0.2"]
+            [cider/cider-nrepl "0.7.0-SNAPSHOT"]
             ]}}
