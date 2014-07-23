@@ -11,7 +11,12 @@ if [[ ! -f $credf ]]; then
   exit 99
 fi
 
-tmp=$(mktemp -t envg)
+if [[ "Linux" == `uname -s` ]]; then
+  tmp=$(mktemp envg.XXXX)
+else
+  tmp=$(mktemp -t envg)
+fi
+
 err=${tmp}.error
 
 gpg --batch -d $credf >$tmp 2>$err
