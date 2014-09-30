@@ -10,7 +10,12 @@ else
   shift
 fi
 
-tmp=$(mktemp -t awsg)
+if [[ "Linux" == `uname -s` ]]; then
+  tmp=$(mktemp awsg.XXXX)
+else
+  tmp=$(mktemp -t awsg)
+fi
+
 gpg --batch -q -d $creds_file >$tmp
 #echo "AWS_CONFIG_FILE=$tmp aws $*"
 AWS_CONFIG_FILE=$tmp aws $*
