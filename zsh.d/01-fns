@@ -264,7 +264,5 @@ publicip() {
 }
 
 fix-agent() {
-  disable -a ls
-  export SSH_AUTH_SOCK=`ls -t1 $(find /tmp/ -uid $UID -path \\*ssh\\* -type s 2> /dev/null) | head -1`
-  enable -a ls
+  export SSH_AUTH_SOCK=`/bin/ls -t1 $(find /tmp/ -uid $UID -path \\*ssh\\* -type s 2> /dev/null) | head -1`
 }
