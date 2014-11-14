@@ -265,5 +265,5 @@ publicip() {
 
 fix-agent() {
   export SSH_AUTH_SOCK=`/bin/ls -t1 $(find /tmp/ -uid $UID -path \\*ssh\\* -type s 2> /dev/null) | head -1`
-  export GPG_AGENT_INFO=`/bin/ls -t1 $(find /tmp -uid $UID -name S.gpg-agent -type s 2>/dev/null) | head -1`
+  export GPG_AGENT_INFO=`/bin/ls -t1 $(find /tmp -uid $UID -name S.gpg-agent -type s 2>/dev/null) | head -1`:1:1
 }
