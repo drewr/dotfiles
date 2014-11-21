@@ -3,6 +3,7 @@
 os=$(uname -s)
 
 echo install: user
+cp zprofile $HOME/.zprofile
 cp zshrc $HOME/.zshrc
 cp zshenv $HOME/.zshenv
 if [ ! -d $HOME/.zsh.d ]; then mkdir $HOME/.zsh.d; fi
