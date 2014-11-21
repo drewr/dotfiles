@@ -1,5 +1,8 @@
 #!/usr/bin/env zsh
-
-( cd ~/.org && \
-git add --ignore-removal --all && git commit -m "Save!" && git push )
+set -e
+set -x
+cd ~/.org
+git add --ignore-removal --all && git commit -m "Save!"
+git pull --rebase
+git push
 cd .
