@@ -2,7 +2,7 @@
 set -e
 set -x
 cd ~/.org
-git add --ignore-removal --all && git commit -m "Save!"
+git add --ignore-removal --all && git commit -m "Save!" || echo continuing
 git pull --rebase
 git push
 cd .
