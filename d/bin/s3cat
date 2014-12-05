@@ -7,7 +7,12 @@ if [ "x" == "x$1" ]; then
   exit 99
 fi
 
-tmp=$(mktemp -t s3cat)
+if [[ "Linux" == `uname -s` ]]; then
+  tmp=$(mktemp s3cat.XXXX)
+else
+  tmp=$(mktemp -t s3cat)
+fi
+
 cat >$tmp
 s3c es.${KEY} put -P \
    --mime-type="text/plain; charset=utf-8" \
