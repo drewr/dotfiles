@@ -37,6 +37,7 @@ fi
 
 [[ -d $HOME/.cabal ]] && PATH=$HOME/.cabal/bin:$PATH
 [[ -d $HOME/.nix-profile ]] && . $HOME/.nix-profile/etc/profile.d/nix.sh
+[[ -d $HOME/.nvm ]] && . $HOME/.nvm/nvm.sh
 
 CLOJURESCRIPT_HOME=$HOME/src/clojurescript; export CLOJURESCRIPT_HOME
 [[ -d $CLOJURESCRIPT_HOME ]] && PATH=$CLOJURESCRIPT_HOME/bin:$PATH
