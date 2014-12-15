@@ -3,10 +3,10 @@
 autoload colors
 colors
 
-export GIT_AUTHOR_NAME="${FULLNAME}"
-export GIT_AUTHOR_EMAIL="${EMAIL}"
-export GIT_COMMITTER_NAME="${FULLNAME}"
-export GIT_COMMITTER_EMAIL="${EMAIL}"
+## export GIT_AUTHOR_NAME="${FULLNAME}"
+## export GIT_AUTHOR_EMAIL="${EMAIL}"
+## export GIT_COMMITTER_NAME="${FULLNAME}"
+## export GIT_COMMITTER_EMAIL="${EMAIL}"
 
 gitize() {
   if [[ ! -d .git ]]; then
