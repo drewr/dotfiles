@@ -1,3 +1,7 @@
+[user]
+name = Drew Raines
+email = drew@raines.me
+
 [alias]
 ci = commit
 co = checkout
