@@ -1,6 +1,3 @@
-[include]
-path = .gitconfig.secret
-
 [alias]
 ci = commit
 co = checkout
@@ -28,11 +25,8 @@ color = true
 [status]
 color = auto
 
-[github]
-user = drewr
-
 [rerere]
 enabled = true
 
 [credential]
-helper = osxkeychain
+helper = store
