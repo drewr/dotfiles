@@ -11,7 +11,3 @@ alias e256="TERM=xterm-256color emacs"
 alias kssh="knife sq ssh"
 alias kst="knife sq status"
 alias kex="knife sq exec"
-
-if [[ $TERM = "dumb" ]]; then
-  alias git="git --no-pager"
-fi
