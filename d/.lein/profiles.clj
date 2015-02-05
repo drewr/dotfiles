@@ -1,6 +1,7 @@
 {:user
  {:plugins [
             [cider/cider-nrepl "0.9.0-SNAPSHOT"]
+            [lein-typed "0.3.5"]
             [cljs-template "0.1.5"]
             [com.palletops/pallet-lein "0.8.0-alpha.1"]
             [lein-clojars "0.9.0"]
