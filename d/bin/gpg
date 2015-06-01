@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+S=$HOME/.gnupg/S.gpg-agent
+if [[ -S $S ]]; then
+  export GPG_AGENT_INFO=${S}:0:1
+fi
+
+gpg $*
