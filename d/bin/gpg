@@ -1,8 +1,21 @@
 #!/usr/bin/env zsh
 
-S=$HOME/.gnupg/S.gpg-agent
-if [[ -S $S ]]; then
-  export GPG_AGENT_INFO=${S}:0:1
-fi
+set -x
+set -v
+set -o shwordsplit
+
+SOCKS="
+/run/user/1000/keyring/gpg
+$HOME/.gnupg/S.gpg-agent
+"
+
+try_gpg () {
+  local s=$1
+  GPG_AGENT_INFO=${s}:0:1 /usr/bin/gpg --batch -n -a --sign /etc/hosts
+}
+
+for SOCK in $SOCKS; do
+  if try_gpg $SOCK; then export GPG_AGENT_INFO=${SOCK}:0:1; fi
+done
 
 /usr/bin/gpg $*
