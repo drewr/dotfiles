@@ -5,4 +5,4 @@ if [[ -S $S ]]; then
   export GPG_AGENT_INFO=${S}:0:1
 fi
 
-gpg $*
+/usr/bin/gpg $*
