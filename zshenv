@@ -11,7 +11,7 @@ FULLNAME="Andrew Raines"; export FULLNAME
 
 export JAVA_HOME
 [[ $OS == "Darwin" ]] && \
-   JAVA_HOME=$(/usr/libexec/java_home -v 1.7)
+   JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 
 ## With Emacs 23, I've found this needs to go in ~root/.zshrc too to
 ## help with Tramp hangs.
