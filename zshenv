@@ -8,8 +8,6 @@ LEDGER_FILE=$HOME/.ledger; export LEDGER_FILE
 EDITOR=vi; export EDITOR
 EMAIL="andrew@raines.me"; export EMAIL
 FULLNAME="Andrew Raines"; export FULLNAME
-OPSCODE_USER=sonian_devs; export OPSCODE_USER
-SONIAN_USER=drew; export SONIAN_USER
 
 export JAVA_HOME
 [[ $OS == "Darwin" ]] && \
