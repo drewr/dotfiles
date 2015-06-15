@@ -1,21 +1,32 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env perl -w
 
-#set -x
-#set -v
-set -o shwordsplit
+use Data::Dumper;
 
-SOCKS="
-/run/user/1000/keyring/gpg
-$HOME/.gnupg/S.gpg-agent
-"
-
-try_gpg () {
-  local s=$1
-  GPG_AGENT_INFO=${s}:0:1 /usr/bin/gpg --batch -n -a --sign /etc/hosts
+sub trygpg {
+  my $agent = shift;
+  if ($agent ne "") {
+    $ENV{GPG_AGENT_INFO} = $agent;
+  }
+  my $args = ["--batch", "-n", "-a", "--sign", "/etc/hosts"];
+  if (0 == system("/usr/bin/gpg", @$args)) {
+    return $agent;
+  } else {
+    return "1";
+  }
 }
 
-for SOCK in $SOCKS; do
-  if try_gpg $SOCK; then export GPG_AGENT_INFO=${SOCK}:0:1; fi
-done
+my $agents = ["",
+              "/run/user/1000/keyring/gpg:0:1",
+              "$ENV{HOME}/.gnupg/S.gpg-agent:0:1"
+             ];
 
-/usr/bin/gpg $*
+foreach my $agent (@$agents) {
+  my $res = trygpg($agent);
+  if ("1" ne $res) {
+    $ENV{GPG_AGENT_INFO} = $res;
+    exec "/usr/bin/gpg", @ARGV;
+  }
+}
+
+die "no valid gpg agents available";
+
