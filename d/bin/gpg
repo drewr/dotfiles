@@ -15,9 +15,9 @@ sub trygpg {
   }
 }
 
-my $agents = ["",
-              "/run/user/1000/keyring/gpg:0:1",
-              "$ENV{HOME}/.gnupg/S.gpg-agent:0:1"
+my $agents = ["/run/user/1000/keyring/gpg:0:1",
+              "$ENV{HOME}/.gnupg/S.gpg-agent:0:1",
+              ""
              ];
 
 foreach my $agent (@$agents) {
