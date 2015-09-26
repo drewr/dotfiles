@@ -47,6 +47,7 @@ CLOJURESCRIPT_HOME=$HOME/src/clojurescript; export CLOJURESCRIPT_HOME
 GOROOT=$HOME/src/go; export GOROOT
 [[ -d $GOROOT ]] && PATH=$GOROOT/bin:$PATH
 GOPATH=$HOME/src/golib; export GOPATH
+[[ -d $GOPATH ]] && PATH=$GOPATH/bin:$PATH
 
 PATH=$HOME/bin:$PATH
 
