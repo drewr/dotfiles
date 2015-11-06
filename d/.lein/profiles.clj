@@ -1,6 +1,6 @@
 {:user
  {:plugins [
-            [cider/cider-nrepl "0.10.0-20150910.083528-24"]
+            [cider/cider-nrepl "0.10.0-SNAPSHOT"]
             [com.palletops/pallet-lein "0.8.0-alpha.1"]
             [lein-localrepo "0.5.3"]
             [lein-marginalia "0.8.0"]
