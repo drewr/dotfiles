@@ -4,8 +4,6 @@ echo .
 
 autoload -U compinit zrecompile
 
-[[ -n $INSIDE_EMACS ]] && unset zle_bracketed_paste
-
 zsh_cache=${HOME}/.zsh-cache
 mkdir -p $zsh_cache
 
