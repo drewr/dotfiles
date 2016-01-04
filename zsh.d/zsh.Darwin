@@ -1,2 +1,4 @@
 alias ls="ls -G"
 PATH=/opt/local/bin:/opt/local/sbin:$PATH
+JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+

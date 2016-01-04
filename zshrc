@@ -27,28 +27,3 @@ done
 unsetopt EXTENDED_GLOB
 
 [[ -f ~/.zsh.d/zsh.${OS} ]] && source ~/.zsh.d/zsh.${OS}
-
-# Move these from zshenv because /etc/zprofile will overwrite.
-PATH=/usr/local/bin:/usr/local/sbin:$PATH
-if [[ -d $HOME/.rbenv ]]; then
-  PATH=$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH
-  rbenv init - >/tmp/rbenvinit.zsh; source /tmp/rbenvinit.zsh
-fi
-
-[[ -d $HOME/.cabal ]] && PATH=$HOME/.cabal/bin:$PATH
-[[ -d $HOME/.local ]] && PATH=$HOME/.local/bin:$PATH
-[[ -d $HOME/.nix-profile ]] && . $HOME/.nix-profile/etc/profile.d/nix.sh
-[[ -d $HOME/.nvm ]] && . $HOME/.nvm/nvm.sh
-[[ -d $HOME/perl5 ]] && . $HOME/perl5/perlbrew/etc/bashrc
-
-CLOJURESCRIPT_HOME=$HOME/src/clojurescript; export CLOJURESCRIPT_HOME
-[[ -d $CLOJURESCRIPT_HOME ]] && PATH=$CLOJURESCRIPT_HOME/bin:$PATH
-
-GOROOT=$HOME/src/go; export GOROOT
-[[ -d $GOROOT ]] && PATH=$GOROOT/bin:$PATH
-GOPATH=$HOME/src/golib; export GOPATH
-[[ -d $GOPATH ]] && PATH=$GOPATH/bin:$PATH
-
-PATH=$HOME/bin:$PATH
-
-typeset -U path cdpath manpath fpath
