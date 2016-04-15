@@ -8,7 +8,7 @@
             [lein-tar "3.3.0"]
             [lein-typed "0.3.5"]
             ]
-  :dependencies [[pjstadig/humane-test-output "0.6.0"]
+  :dependencies [[pjstadig/humane-test-output "0.7.1"]
                  [org.clojure/tools.nrepl "0.2.12"]]
   :injections [(require 'pjstadig.humane-test-output)
                (pjstadig.humane-test-output/activate!)]}}
