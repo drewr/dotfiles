@@ -19,7 +19,7 @@ fi
 
 err=${tmp}.error
 
-gpg --batch -d $credf >$tmp 2>$err
+gpg2 --batch -d $credf >$tmp 2>$err
 
 if [[ $? != 0 ]]; then
   cat $err
