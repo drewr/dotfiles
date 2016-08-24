@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Run a process with ephemeral env sourced from encrypted file.
+#
+# Example:
+#
+# echo SECRET=shhhh | gpg2 -e -r me@doma.in - >~/.env.secret.gpg
+# envg secret ls
+
 set -e
 set -u
 set -o pipefail
