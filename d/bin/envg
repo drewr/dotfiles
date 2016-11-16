@@ -43,7 +43,7 @@ clean() {
 
 trap clean EXIT INT TERM
 
-$*
+eval "$*"
 res=$?
 
 trap - EXIT INT TERM
