@@ -9,6 +9,7 @@ fi
 [[ -d ${HOME_}/.local ]] && PATH=${HOME_}/.local/bin:$PATH
 [[ -d ${HOME_}/.cargo ]] && PATH=${HOME_}/.cargo/bin:$PATH
 [[ -d ${HOME_}/.nix-profile ]] && . ${HOME_}/.nix-profile/etc/profile.d/nix.sh
+[[ -s ${HOME_}/.gvm/scripts/gvm ]] && . ${HOME_}/.gvm/scripts/gvm
 
 NVM_DIR=${HOME_}/.nvm
 [[ -d ${HOME_}/.nvm ]] && source ${HOME_}/.nvm/nvm.sh
@@ -16,11 +17,6 @@ NVM_DIR=${HOME_}/.nvm
 
 CLOJURESCRIPT_HOME=${HOME_}/src/clojurescript; export CLOJURESCRIPT_HOME
 [[ -d $CLOJURESCRIPT_HOME ]] && PATH=$CLOJURESCRIPT_HOME/bin:$PATH
-
-GOROOT=${HOME_}/src/go; export GOROOT
-[[ -d $GOROOT ]] && PATH=$GOROOT/bin:$PATH
-GOPATH=${HOME_}/src/golib; export GOPATH
-[[ -d $GOPATH ]] && PATH=$GOPATH/bin:$PATH
 
 PATH=${HOME_}/bin:$PATH
 
