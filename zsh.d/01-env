@@ -18,6 +18,11 @@ NVM_DIR=${HOME_}/.nvm
 CLOJURESCRIPT_HOME=${HOME_}/src/clojure/clojurescript; export CLOJURESCRIPT_HOME
 [[ -d $CLOJURESCRIPT_HOME ]] && PATH=$CLOJURESCRIPT_HOME/bin:$PATH
 
+if [[ -f ${HOME_}/.gcloud/path.zsh.inc ]]; then
+  source ${HOME_}/.gcloud/path.zsh.inc
+  source ${HOME_}/.gcloud/completion.zsh.inc
+fi
+
 PATH=${HOME_}/bin:$PATH
 
 if [[ $TERM == "dumb" ]]; then
