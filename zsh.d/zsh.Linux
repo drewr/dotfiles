@@ -1,3 +1,5 @@
 if [[ ! $TERM == "dumb" ]]; then
   alias ls="ls --color=auto"
 fi
+
+##[[ -x $(which keychain) ]] && eval `keychain --eval --inherit any --agents ssh,gpg id_rsa 756012ED`
