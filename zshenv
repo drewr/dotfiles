@@ -16,3 +16,5 @@ EDITOR=vi; export EDITOR
 EMAIL="andrew@raines.me"; export EMAIL
 FULLNAME="Andrew Raines"; export FULLNAME
 
+LC_CTYPE=en_US.UTF-8; export LC_CTYPE
+LC_ALL=en_US.UTF-8; export LC_ALL
