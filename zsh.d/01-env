@@ -8,7 +8,13 @@ fi
 [[ -d ${HOME_}/.cabal ]] && PATH=${HOME_}/.cabal/bin:$PATH
 [[ -d ${HOME_}/.local ]] && PATH=${HOME_}/.local/bin:$PATH
 [[ -d ${HOME_}/.cargo ]] && PATH=${HOME_}/.cargo/bin:$PATH
-[[ -d ${HOME_}/.nix-profile ]] && . ${HOME_}/.nix-profile/etc/profile.d/nix.sh
+
+if [[ -d ${HOME_}/.nix-profile ]]; then
+  . ${HOME_}/.nix-profile/etc/profile.d/nix.sh
+  LOCALE_ARCHIVE="$(readlink ~/.nix-profile/lib/locale)/locale-archive"
+  export LOCALE_ARCHIVE
+fi
+
 [[ -s ${HOME_}/.gvm/scripts/gvm ]] && . ${HOME_}/.gvm/scripts/gvm
 
 NVM_DIR=${HOME_}/.nvm
