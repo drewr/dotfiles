@@ -10,7 +10,8 @@ fi
 [[ -d ${HOME_}/.cargo ]] && PATH=${HOME_}/.cargo/bin:$PATH
 
 if [[ -d ${HOME_}/.nix-profile ]]; then
-  . ${HOME_}/.nix-profile/etc/profile.d/nix.sh
+  [[ -f ${HOME_}/.nix-profile/etc/profile.d/nix.sh ]] \
+    && . ${HOME_}/.nix-profile/etc/profile.d/nix.sh
   LOCALE_ARCHIVE="$(readlink ~/.nix-profile/lib/locale)/locale-archive"
   export LOCALE_ARCHIVE
 fi
