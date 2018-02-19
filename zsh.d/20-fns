@@ -3,13 +3,13 @@
 e() {
     local d
 
-    if [[ -z $1 ]]; then
+    if [[ -z "$1" ]]; then
         d=../$(basename $PWD)
     else
-        d=$1
+        d="$1"
     fi
 
-    emacs -nw $d
+    emacs -nw "$d"
 }
 
 psg() { 
