@@ -23,6 +23,8 @@ rsync \
   --exclude package.json \
   --exclude package-lock.json \
   --exclude test \
+  --exclude \*.scss \
+  \
   --include \*.html \
   --include \*.js \
   --include \*.css \
