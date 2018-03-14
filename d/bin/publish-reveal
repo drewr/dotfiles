@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+export_dir=_export
+talk=$1
+
+if [[ -z $talk ]]; then
+  echo $0 TALK
+  exit 1
+fi
+
+rsync \
+  --exclude _export \
+  --exclude .git \
+  --exclude .gitignore \
+  --exclude .travis.yml \
+  --exclude node_modules \
+  --exclude CONTRIBUTING.md \
+  --exclude Gruntfile.js \
+  --exclude LICENSE \
+  --exclude README.md \
+  --exclude bower.json \
+  --exclude demo.html \
+  --exclude package.json \
+  --exclude package-lock.json \
+  --exclude test \
+  --include \*.html \
+  --include \*.js \
+  --include \*.css \
+  --delete \
+  -avz . $export_dir
+
+cd $export_dir
+gsutil rsync -r -d . gs://talks.raines.me/${talk}
