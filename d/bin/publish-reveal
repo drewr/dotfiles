@@ -33,3 +33,4 @@ rsync \
 
 cd $export_dir
 gsutil rsync -r -d . gs://talks.raines.me/${talk}
+gsutil -m acl set -R -a public-read gs://talks.raines.me/${talk}
