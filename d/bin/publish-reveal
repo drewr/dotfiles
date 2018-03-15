@@ -24,10 +24,6 @@ rsync \
   --exclude package-lock.json \
   --exclude test \
   --exclude \*.scss \
-  \
-  --include \*.html \
-  --include \*.js \
-  --include \*.css \
   --delete \
   -avz . $export_dir
 
