@@ -24,10 +24,11 @@ if [[ -f ${HOME_}/.gcloud/path.zsh.inc ]]; then
 fi
 
 if [[ -d ${HOME_}/.nix-profile ]]; then
-  [[ -f ${HOME_}/.nix-profile/etc/profile.d/nix.sh ]] \
-    && . ${HOME_}/.nix-profile/etc/profile.d/nix.sh
-  LOCALE_ARCHIVE="$(readlink ~/.nix-profile/lib/locale)/locale-archive"
-  export LOCALE_ARCHIVE
+  PATH=${HOME_}/.nix-profile/bin:$PATH
+  if [[ -d ${HOME_}/.nix-profile/lib/locale ]]; then
+    LOCALE_ARCHIVE="$(readlink ~/.nix-profile/lib/locale)/locale-archive"
+    export LOCALE_ARCHIVE
+  fi
 fi
 
 PATH=${HOME_}/bin:$PATH
