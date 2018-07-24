@@ -28,7 +28,11 @@ PATH=${GOPATH}/bin:$PATH
 [[ -d $GOPATH ]] || echo warning: $GOPATH not found
 
 if [[ -d ${HOME_}/.nix-profile ]]; then
-  PATH=${HOME_}/.nix-profile/bin:$PATH
+  if [[ -f ${HOME_}/.nix-profile/etc/profile.d/nix.sh ]]; then
+    . ${HOME_}/.nix-profile/etc/profile.d/nix.sh
+  else
+    PATH=${HOME_}/.nix-profile/bin:$PATH
+  fi
   if [[ -d ${HOME_}/.nix-profile/lib/locale ]]; then
     LOCALE_ARCHIVE="$(readlink ~/.nix-profile/lib/locale)/locale-archive"
     export LOCALE_ARCHIVE
