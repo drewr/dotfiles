@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 set -e
 set -x
+date
 cd ~/.org
 time git add --ignore-removal --all && git commit -m "Save!" || echo continuing
 time git pull --rebase
