@@ -6,5 +6,6 @@ date
 cd ~/.org
 time git add --ignore-removal --all && git commit -m "Save!" || echo continuing
 time git pull --rebase
-time git push
+time git push dropbox master
+time git push gitsync master
 cd .
