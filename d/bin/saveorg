@@ -1,10 +1,10 @@
 #!/usr/bin/env zsh
 set -e
 echo '------------------------------------------------------------------------'
-echo '                                saveorg                                 '
+echo -n '                      '$(date)
+echo
 echo '------------------------------------------------------------------------'
 set -x
-date
 cd ~/.org
 echo
 time git add --ignore-removal --all && git commit -m "Save!" || echo continuing
