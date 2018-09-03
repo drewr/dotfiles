@@ -9,11 +9,7 @@ cd ~/.org
 echo
 time git add --ignore-removal --all && git commit -m "Save!" || echo continuing
 echo
-time git pull dropbox master --rebase
-echo
 time git pull gitsync master --rebase
-echo
-time git push dropbox master
 echo
 time git push gitsync master
 cd .
