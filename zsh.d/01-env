@@ -39,6 +39,9 @@ if [[ -d ${HOME_}/.nix-profile ]]; then
   fi
 fi
 
+NIMPATH=${HOME_}/.nimble/bin
+[[ -d $NIMPATH ]] && PATH=$NIMPATH:$PATH
+
 PATH=${HOME_}/bin:$PATH
 
 if [[ $TERM == "dumb" ]]; then
