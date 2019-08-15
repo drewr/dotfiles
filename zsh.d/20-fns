@@ -14,7 +14,7 @@ e() {
 
 psg() { 
   ps="ps -ef"
-  [ $OS = "Darwin" ] && ps="ps jax"
+  [ "$OS" = "Darwin" ] && ps="ps jax"
   eval $ps | grep -i $1 | grep -v grep
 }
 
