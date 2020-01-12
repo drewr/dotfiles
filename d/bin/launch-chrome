@@ -1,0 +1,8 @@
+#!/bin/bash
+
+profile=$1
+[[ $profile == Default ]] || profile="Profile $profile"
+link=$(zenity --entry --title="Launch YouTube" --text="Enter link:" --width 500)
+echo opening \"$link\" as \"$profile\"
+[[ $link == http* ]] || link="https://$link"
+exec google-chrome --app="$link" --profile-directory="$profile"
