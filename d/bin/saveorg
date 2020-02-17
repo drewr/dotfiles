@@ -7,7 +7,7 @@ echo '------------------------------------------------------------------------'
 set -x
 cd ~/.org
 echo
-time git add --ignore-removal --all && git commit -m "Save!" || echo continuing
+time git add --ignore-removal --all && git commit -m "Save $(date)" || echo continuing
 echo
 time git pull gitsync master
 echo
