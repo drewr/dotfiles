@@ -10,7 +10,7 @@ cd ~/Sync/Git/org/refs/heads && ls *sync-conflict* && exit 99
 
 cd ~/.org
 echo
-time git add --ignore-removal --all && git commit -m "Save $(date)" || echo continuing
+time git add --ignore-removal --all && git commit -m "Save $(date) $(hostname)" || echo continuing
 echo
 time git pull gitsync master
 echo
