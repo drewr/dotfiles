@@ -58,3 +58,8 @@ else
   TERM=xterm-256color    
 fi
 
+## Requires `nix-env -i opam && opam init`
+OPAM=${HOME_}/.opam
+if [[ -r $OPAM/opam-init/init.zsh ]]; then
+  . $OPAM/opam-init/init.zsh
+fi
