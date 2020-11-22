@@ -1,6 +1,7 @@
 [user]
 name = Drew Raines
 email = drew@raines.me
+signingkey = AE1ABF3D484C40E5CB1CDC9F57B19548756012ED
 
 [alias]
 ci = commit
@@ -37,3 +38,6 @@ enabled = true
 
 [credential]
 helper = store
+
+[commit]
+gpgsign = true
