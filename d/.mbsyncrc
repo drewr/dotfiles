@@ -2,22 +2,20 @@
 
 IMAPAccount gmail-aaraines
 Host imap.gmail.com
+Port 993
 User aaraines@gmail.com
-Pass {readrc '.auth.aaraines@gmail.com'}
-UseIMAPS yes
-## aptitude install ca-certificate ---v
-CertificateFile /usr/share/ca-certificates/mozilla/Equifax_Secure_CA.crt
+PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.authinfo.gpg | awk '/machine aaraines.*993/ {print $(NF-2)}'"
+SSLType IMAPS
 
 IMAPStore gmail-aaraines
 Account gmail-aaraines
 
 IMAPAccount local-aaraines
 Host localhost
+Port 143
 User aaraines
-Pass imap
-UseIMAPS no
-RequireSSL no
-UseTLSv1 no
+Pass secret
+SSLType None
 
 IMAPStore local-aaraines
 Account local-aaraines
@@ -33,31 +31,29 @@ Sync All
 
 ##### Elasticsearch #####
 
-IMAPAccount gmail-drewres
+IMAPAccount gmail-elastic
 Host imap.gmail.com
-User drew.raines@elasticsearch.com
-Pass {readrc '.auth.drew.raines@elasticsearch.com'}
-UseIMAPS yes
-## aptitude install ca-certificate ---v
-CertificateFile /usr/share/ca-certificates/mozilla/Equifax_Secure_CA.crt
+Port 993
+User drew@elastic.co
+PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.authinfo.gpg | awk '/machine elastic.*993/ {print $(NF-2)}'"
+SSLType IMAPS
 
-IMAPStore gmail-drewres
-Account gmail-drewres
+IMAPStore gmail-elastic
+Account gmail-elastic
 
-IMAPAccount local-drewres
+IMAPAccount local-elastic
 Host localhost
-User drewres
-Pass imap
-UseIMAPS no
-RequireSSL no
-UseTLSv1 no
+Port 143
+User elastic
+Pass secret
+SSLType None
 
-IMAPStore local-drewres
-Account local-drewres
+IMAPStore local-elastic
+Account local-elastic
 
-Channel drewres
-Master :gmail-drewres:
-Slave :local-drewres:
+Channel elastic
+Master :gmail-elastic:
+Slave :local-elastic:
 Patterns !* INBOX
 Create Both
 Expunge Both
@@ -69,21 +65,20 @@ Sync All
 
 IMAPAccount gmail-test
 Host imap.gmail.com
+Port 993
 User testdroid1000@gmail.com
-Pass {readrc '.auth.testdroid1000@gmail.com'}
-UseIMAPS yes
-CertificateFile /usr/share/ca-certificates/mozilla/Equifax_Secure_CA.crt
+PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.authinfo.gpg | awk '/machine testdroid.*993/ {print $(NF-2)}'"
+SSLType IMAPS
 
 IMAPStore gmail-test
 Account gmail-test
 
 IMAPAccount local-test
 Host localhost
+Port 143
 User testdroid1000
-Pass imap
-UseIMAPS no
-RequireSSL no
-UseTLSv1 no
+Pass secret
+SSLType None
 
 IMAPStore local-test
 Account local-test
