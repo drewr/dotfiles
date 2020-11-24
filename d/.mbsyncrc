@@ -90,10 +90,10 @@ Account local-test
 Channel testdroid1000
 Master :gmail-test:
 Slave :local-test:
-Patterns *
-Create Slave
-Expunge Slave
+Patterns !* INBOX
 MaxSize 250k
 MaxMessages 1000
+Create Both
+Expunge Both
 Sync All
 
