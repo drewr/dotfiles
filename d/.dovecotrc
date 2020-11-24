@@ -1,0 +1,57 @@
+# WIP
+#
+# On macOS even though I've changed all the *_dir options, and
+# verified with doveconf that /etc/dovecot is nowhere to be found,
+# it's still trying to keep /etc/dovecot alive:
+#
+#   Nov 24 11:41:49 imap-login: Error: imap-login(init): Fatal: opendir(/etc/dovecot/modules) failed: No such file or directory
+#                                                                       ^^^^^^^^^^^^^^^^^^^^
+#   Nov 24 11:41:49 master: Error: service(imap-login): command startup failed, throttling for 16.000 secs
+#   Nov 24 11:41:49 imap-login: Fatal: master: service(imap-login): child 96078 returned error 89 (Fatal failure)
+#
+
+
+protocols = imap
+#listen = 127.0.0.1, ::1
+listen = 127.0.0.1, ::1
+base_dir = /Users/aar/.dovecot
+state_dir = /Users/aar/.dovecot
+login_plugin_dir = /Users/aar/.dovecot/modules/login
+mail_plugin_dir = /Users/aar/.dovecot/modules
+instance_name = local-imap
+login_trusted_networks = 127.0.0.1/24
+shutdown_clients = yes
+log_path = /Users/aar/.dovecot/dovecot.log
+
+# Rootless, for single-user style
+# https://wiki.dovecot.org/HowTo/Rootless
+
+default_internal_user = aar
+default_login_user = aar
+default_internal_group = staff
+default_process_limit = 10
+default_client_limit = 50
+
+service anvil {
+  chroot =
+}
+
+service imap-login {
+  chroot = 
+
+  inet_listener imap {
+    port = 10143
+  }
+  inet_listener imaps {
+    port = 10993
+  }
+}
+
+passdb {
+  driver = static
+  args = password=thisisfine
+}
+
+userdb {
+  driver = passwd
+}
