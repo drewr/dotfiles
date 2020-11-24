@@ -24,6 +24,8 @@ Channel aaraines
 Master :gmail-aaraines:
 Slave :local-aaraines:
 Patterns !* INBOX list.*
+MaxSize 100k
+MaxMessages 1000
 Create Both
 Expunge Both
 Sync All
@@ -55,6 +57,8 @@ Channel elastic
 Master :gmail-elastic:
 Slave :local-elastic:
 Patterns !* INBOX
+MaxSize 100k
+MaxMessages 1000
 Create Both
 Expunge Both
 Sync All
@@ -89,5 +93,7 @@ Slave :local-test:
 Patterns *
 Create Slave
 Expunge Slave
+MaxSize 250k
+MaxMessages 1000
 Sync All
 
