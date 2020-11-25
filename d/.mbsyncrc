@@ -132,7 +132,7 @@ MaxSize 50k
 Channel test
 Master :gmail-test:
 Slave :local-test-imap-store:
-Patterns !* INBOX label.* "[Gmail]/Sent Mail" "[Gmail]/Starred"
+Patterns !* INBOX "[Gmail]/Sent Mail" "[Gmail]/Starred"
 #MaxMessages 10
 Create Both
 #Expunge Both
