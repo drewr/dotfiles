@@ -10,20 +10,25 @@ SSLType IMAPS
 IMAPStore gmail-aaraines
 Account gmail-aaraines
 
-IMAPAccount local-aaraines
+IMAPAccount local-aaraines-imap-account
 Host localhost
 Port 143
 User aaraines
 Pass secret
 SSLType None
 
-IMAPStore local-aaraines
-Account local-aaraines
+IMAPStore local-aaraines-imap-store
+Account local-aaraines-imap-account
+
+MaildirStore local-aaraines-maildir-store
+Path ./aaraines/
+SubFolders Verbatim
+MaxSize 100k
 
 Channel aaraines
 Master :gmail-aaraines:
-Slave :local-aaraines:
-Patterns !* INBOX list.*
+Slave :local-aaraines-maildir-store:
+Patterns !* INBOX
 MaxSize 100k
 MaxMessages 1000
 Create Both
@@ -43,22 +48,26 @@ SSLType IMAPS
 IMAPStore gmail-elastic
 Account gmail-elastic
 
-IMAPAccount local-elastic
+IMAPAccount local-elastic-imap-account
 Host localhost
 Port 143
 User elastic
 Pass secret
 SSLType None
 
-IMAPStore local-elastic
-Account local-elastic
+IMAPStore local-elastic-imap-store
+Account local-elastic-imap-account
+
+MaildirStore local-elastic-maildir-store
+Path ./elastic/
+SubFolders Verbatim
+MaxSize 100k
 
 Channel elastic
 Master :gmail-elastic:
-Slave :local-elastic:
+Slave :local-elastic-maildir-store:
 Patterns !* INBOX
-MaxSize 100k
-MaxMessages 1000
+MaxMessages 50
 Create Both
 Expunge Both
 Sync All
@@ -84,16 +93,23 @@ User testdroid1000
 Pass secret
 SSLType None
 
-IMAPStore local-test
+IMAPStore local-test-imap-store
 Account local-test
 
-Channel testdroid1000
+MaildirStore local-test-maildir-store
+Path ./test/
+Inbox ./test/
+SubFolders Verbatim
+MaxSize 50k
+
+Channel test
 Master :gmail-test:
-Slave :local-test:
-Patterns !* INBOX
-MaxSize 250k
-MaxMessages 1000
+Slave :local-test-imap-store:
+Patterns !* INBOX label.* "[Gmail]/Sent Mail" "[Gmail]/Starred"
+MaxMessages 10
 Create Both
-Expunge Both
+#Expunge Both
+#Only for maildir
+#SyncState *
 Sync All
 
