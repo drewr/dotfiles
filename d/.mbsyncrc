@@ -30,7 +30,6 @@ Channel aaraines
 Master :gmail-aaraines:
 Slave :local-aaraines-imap-store:
 Patterns !* INBOX
-MaxMessages 1000
 Create Both
 Expunge Both
 Sync All
