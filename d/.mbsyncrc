@@ -19,6 +19,7 @@ SSLType None
 
 IMAPStore local-aaraines-imap-store
 Account local-aaraines-imap-account
+MaxSize 100k
 
 MaildirStore local-aaraines-maildir-store
 Path ./aaraines/
@@ -27,9 +28,8 @@ MaxSize 100k
 
 Channel aaraines
 Master :gmail-aaraines:
-Slave :local-aaraines-maildir-store:
+Slave :local-aaraines-imap-store:
 Patterns !* INBOX
-MaxSize 100k
 MaxMessages 1000
 Create Both
 Expunge Both
@@ -57,6 +57,7 @@ SSLType None
 
 IMAPStore local-elastic-imap-store
 Account local-elastic-imap-account
+MaxSize 100k
 
 MaildirStore local-elastic-maildir-store
 Path ./elastic/
@@ -65,7 +66,7 @@ MaxSize 100k
 
 Channel elastic
 Master :gmail-elastic:
-Slave :local-elastic-maildir-store:
+Slave :local-elastic-imap-store:
 Patterns !* INBOX
 MaxMessages 50
 Create Both
@@ -95,6 +96,7 @@ SSLType None
 
 IMAPStore local-test-imap-store
 Account local-test
+MaxSize 50k
 
 MaildirStore local-test-maildir-store
 Path ./test/
@@ -106,7 +108,7 @@ Channel test
 Master :gmail-test:
 Slave :local-test-imap-store:
 Patterns !* INBOX label.* "[Gmail]/Sent Mail" "[Gmail]/Starred"
-MaxMessages 10
+#MaxMessages 10
 Create Both
 #Expunge Both
 #Only for maildir
