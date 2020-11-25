@@ -29,7 +29,16 @@ MaxSize 100k
 Channel aaraines
 Master :gmail-aaraines:
 Slave :local-aaraines-imap-store:
-Patterns !* INBOX
+Patterns !* INBOX "[Gmail]/Starred"
+Create Both
+Expunge Both
+Sync All
+
+Channel aaraines-gnus
+Master :gmail-aaraines:list.gnus.ding
+Slave :local-aaraines-imap-store:list/gnus
+MaxMessages 1000
+ExpireUnread yes
 Create Both
 Expunge Both
 Sync All
@@ -66,8 +75,25 @@ MaxSize 100k
 Channel elastic
 Master :gmail-elastic:
 Slave :local-elastic-imap-store:
-Patterns !* INBOX
-MaxMessages 50
+Patterns !* ME read-later
+Create Both
+Expunge Both
+Sync All
+
+Channel elastic-github
+Master :gmail-elastic:gh.mention
+Slave :local-elastic-imap-store:github/mentions
+MaxMessages 5000
+ExpireUnread yes
+Create Both
+Expunge Both
+Sync All
+
+Channel elastic-elt
+Master :gmail-elastic:team.ELT
+Slave :local-elastic-imap-store:team/elt
+MaxMessages 5000
+ExpireUnread yes
 Create Both
 Expunge Both
 Sync All
