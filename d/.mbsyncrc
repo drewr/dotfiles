@@ -98,6 +98,14 @@ Create Both
 Expunge Both
 Sync All
 
+Channel elastic-cft
+Master :gmail-elastic:project.cloud-first-testing
+Slave :local-elastic-imap-store:project/cloud-first-testing
+Create Both
+Expunge Both
+Sync All
+
+Group elastic elastic elastic-github elastic-cft
 
 
 ###### Test ######
