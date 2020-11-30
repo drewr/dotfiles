@@ -140,3 +140,66 @@ Create Both
 #SyncState *
 Sync All
 
+###### Desktop Cache ######
+
+IMAPAccount desktop-test
+Host 127.0.0.1
+# Need ssh tunnel first!
+Port 11143
+User testdroid1000
+Pass secret
+SSLType None
+
+IMAPStore desktop-test-imap-store
+Account desktop-test
+MaxSize 50k
+
+IMAPAccount desktop-aaraines
+Host 127.0.0.1
+# Need ssh tunnel first!
+Port 11143
+User aaraines
+Pass secret
+SSLType None
+
+IMAPStore desktop-aaraines-imap-store
+Account desktop-aaraines
+MaxSize 50k
+
+IMAPAccount desktop-elastic
+Host 127.0.0.1
+# Need ssh tunnel first!
+Port 11143
+User elastic
+Pass secret
+SSLType None
+
+IMAPStore desktop-elastic-imap-store
+Account desktop-elastic
+MaxSize 50k
+
+Channel desktop-aaraines
+Master :local-aaraines-imap-store:
+Slave :desktop-aaraines-imap-store:
+Patterns !* INBOX "[Gmail]/Starred"
+Create Both
+Expunge Both
+Sync All
+
+Channel desktop-elastic
+Master :local-elastic-imap-store:
+Slave :desktop-elastic-imap-store:
+Patterns !* ME read-later
+Create Both
+Expunge Both
+Sync All
+
+Channel desktop-test
+Master :local-test-imap-store:
+Slave :desktop-test-imap-store:
+Patterns !* INBOX "[Gmail]/Sent Mail" "[Gmail]/Starred"
+Create Both
+Expunge Both
+Sync All
+
+Group desktop desktop-test desktop-aaraines desktop-elastic
