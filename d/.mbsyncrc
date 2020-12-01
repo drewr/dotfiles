@@ -30,7 +30,7 @@ Channel aaraines
 Master :gmail-aaraines:
 Slave :local-aaraines-imap-store:
 Patterns !* INBOX "[Gmail]/Starred"
-Create Both
+Create Slave
 Expunge Both
 Sync All
 
@@ -39,7 +39,7 @@ Master :gmail-aaraines:list.gnus.ding
 Slave :local-aaraines-imap-store:list/gnus
 MaxMessages 1000
 ExpireUnread yes
-Create Both
+Create Slave
 Expunge Both
 Sync All
 
@@ -77,7 +77,7 @@ Channel elastic
 Master :gmail-elastic:
 Slave :local-elastic-imap-store:
 Patterns !* ME read-later
-Create Both
+Create Slave
 Expunge Both
 Sync All
 
@@ -86,7 +86,7 @@ Master :gmail-elastic:gh.mention
 Slave :local-elastic-imap-store:github/mentions
 MaxMessages 5000
 ExpireUnread yes
-Create Both
+Create Slave
 Expunge Both
 Sync All
 
@@ -95,14 +95,14 @@ Master :gmail-elastic:team.ELT
 Slave :local-elastic-imap-store:team/elt
 MaxMessages 5000
 ExpireUnread yes
-Create Both
+Create Slave
 Expunge Both
 Sync All
 
 Channel elastic-cft
 Master :gmail-elastic:project.cloud-first-testing
 Slave :local-elastic-imap-store:project/cloud-first-testing
-Create Both
+Create Slave
 Expunge Both
 Sync All
 
@@ -143,7 +143,7 @@ Master :gmail-test:
 Slave :local-test-imap-store:
 Patterns !* INBOX "[Gmail]/Sent Mail" "[Gmail]/Starred"
 #MaxMessages 10
-Create Both
+Create Slave
 #Expunge Both
 #Only for maildir
 #SyncState *
@@ -191,7 +191,7 @@ Channel desktop-aaraines
 Master :local-aaraines-imap-store:
 Slave :desktop-aaraines-imap-store:
 Patterns !* INBOX "[Gmail]/Starred"
-Create Both
+Create Slave
 Expunge Both
 Sync All
 
@@ -199,7 +199,7 @@ Channel desktop-elastic
 Master :local-elastic-imap-store:
 Slave :desktop-elastic-imap-store:
 Patterns !* ME read-later
-Create Both
+Create Slave
 Expunge Both
 Sync All
 
@@ -207,7 +207,7 @@ Channel desktop-test
 Master :local-test-imap-store:
 Slave :desktop-test-imap-store:
 Patterns !* INBOX "[Gmail]/Sent Mail" "[Gmail]/Starred"
-Create Both
+Create Slave
 Expunge Both
 Sync All
 
