@@ -78,6 +78,7 @@ Master :gmail-elastic:
 Slave :local-elastic-imap-store:
 Patterns !* ME read-later list/* project/* team/* gh/*
 MaxMessages 5000
+ExpireUnread yes
 Create Slave
 Expunge Both
 Sync All
