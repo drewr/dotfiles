@@ -76,38 +76,11 @@ MaxSize 100k
 Channel elastic
 Master :gmail-elastic:
 Slave :local-elastic-imap-store:
-Patterns !* ME read-later
-Create Slave
-Expunge Both
-Sync All
-
-Channel elastic-github
-Master :gmail-elastic:gh.mention
-Slave :local-elastic-imap-store:github/mentions
+Patterns !* ME read-later list/* project/* team/* gh/*
 MaxMessages 5000
-ExpireUnread yes
 Create Slave
 Expunge Both
 Sync All
-
-Channel elastic-elt
-Master :gmail-elastic:team.ELT
-Slave :local-elastic-imap-store:team/elt
-MaxMessages 5000
-ExpireUnread yes
-Create Slave
-Expunge Both
-Sync All
-
-Channel elastic-cft
-Master :gmail-elastic:project.cloud-first-testing
-Slave :local-elastic-imap-store:project/cloud-first-testing
-Create Slave
-Expunge Both
-Sync All
-
-Group elastic elastic elastic-github elastic-cft
-
 
 ###### Test ######
 
@@ -198,7 +171,7 @@ Sync All
 Channel desktop-elastic
 Master :local-elastic-imap-store:
 Slave :desktop-elastic-imap-store:
-Patterns !* ME read-later
+Patterns *
 Create Slave
 Expunge Both
 Sync All
