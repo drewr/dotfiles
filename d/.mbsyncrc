@@ -34,16 +34,17 @@ Create Slave
 Expunge Both
 Sync All
 
-Channel aaraines-gnus
-Master :gmail-aaraines:list.gnus.ding
-Slave :local-aaraines-imap-store:list/gnus
+Channel aaraines-lists
+Master :gmail-aaraines:
+Slave :local-aaraines-imap-store:
+Patterns !* list/*
 MaxMessages 1000
 ExpireUnread yes
 Create Slave
 Expunge Both
 Sync All
 
-Group aaraines aaraines aaraines-gnus
+Group aaraines aaraines aaraines-lists
 
 ##### Elasticsearch #####
 
