@@ -67,7 +67,7 @@ SSLType None
 
 IMAPStore local-elastic-imap-store
 Account local-elastic-imap-account
-MaxSize 500k
+MaxSize 150k
 
 MaildirStore local-elastic-maildir-store
 Path ./elastic/
