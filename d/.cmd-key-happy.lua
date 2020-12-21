@@ -23,6 +23,7 @@ global_excludes = Set{ "cmd-tab" }
 apps = {
    Terminal = { exclude = Set{ "cmd-escape" } },
    iTerm = { exclude = Set{ "cmd-escape" } },
+   iTerm2 = { exclude = Set{ "cmd-escape" } },
    Eclipse  = { exclude = {} },
    Xcode    = { exclude = {} },
    TextMate = { exclude = Set { "cmd-1",
