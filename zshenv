@@ -1,4 +1,5 @@
-[[ -o interactive ]] && echo "+++Reading .zshenv"
+# -*- sh -*-
+[[ -o interactive ]] && echo "+++Reading .zshenv."
 
 HOME_=$(readlink $(dirname $HOME))
 if [[ -z $HOME_ ]]; then

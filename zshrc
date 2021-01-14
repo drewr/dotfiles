@@ -1,3 +1,4 @@
+# -*- sh -*-
 echo -n "+++Reading .zshrc"
 [[ -o interactive ]] && echo -n " (for interactive use)"
 echo .
