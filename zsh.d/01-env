@@ -63,3 +63,8 @@ OPAM=${HOME_}/.opam
 if [[ -r $OPAM/opam-init/init.zsh ]]; then
   . $OPAM/opam-init/init.zsh
 fi
+
+JANET=${HOME_}/.janet
+if [[ -r ${JANET}/bin/janet ]]; then
+  PATH=${JANET}/bin:$PATH
+fi
