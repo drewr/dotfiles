@@ -5,22 +5,22 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::path::PathBuf;
-use std::io::Cursor;
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Cursor;
 
     #[test]
     fn test_grep() -> Result<(), String> {
         let v = vec![
             "this is the first line",
             "now another",
-            "if this was a haiku it would end here",
+            "if this was a haiku it would end here and have too many syllables",
             "one more tho",
         ];
-        assert_eq!(grep("more", Cursor::new(v))?, Ok());
-
+        assert_eq!(grep("more", Cursor::new(v)), Ok());
+        Ok("done")
     }
 }
 
