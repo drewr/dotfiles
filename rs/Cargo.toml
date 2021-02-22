@@ -13,3 +13,8 @@ edition = "2018"
 [[bin]]
 name = "grep"
 path = "src/grep.rs"
+
+[[bin]]
+name = "dg"
+path = "src/dirty_git.rs"
+
