@@ -1,3 +1,7 @@
+// To be used with xargs:
+//
+//     find . -type d | xargs dg
+
 use std::env::*;
 use std::io::*;
 use std::path::*;
