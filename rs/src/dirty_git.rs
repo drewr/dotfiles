@@ -10,7 +10,10 @@ fn has_dir(path: &str, path_inside: &str) -> bool {
     let mut found = false;
     for entry in Path::new(&path).read_dir().expect("can't read_dir") {
         match entry {
-            Ok(e) if e.file_name() == path_inside => found = true,
+            Ok(e) if e.file_name() == path_inside => {
+                found = true;
+                break;
+            }
             _ => (),
         };
     }
