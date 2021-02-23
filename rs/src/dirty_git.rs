@@ -2,13 +2,12 @@
 //
 //     find . -type d | xargs dg
 
-use std::env::*;
-use std::io::*;
-use std::path::*;
-use std::process::*;
+use std::env::args;
+use std::path::Path;
+use std::process::Command;
 
-fn has_dir(path: String, path_inside: &str) -> bool {
     let p = Path::new(&path);
+fn has_dir(path: &str, path_inside: &str) -> bool {
     let mut found = false;
     for entry in p.read_dir().expect("can't read_dir") {
         if let Ok(entry) = entry {
@@ -20,13 +19,13 @@ fn has_dir(path: String, path_inside: &str) -> bool {
     found
 }
 
-fn path_is_a_repo(path: String) -> bool {
+fn path_is_a_repo(path: &str) -> bool {
     let p = Path::new(&path);
     p.is_dir() && has_dir(path, ".git")
 }
 
-fn git_diff_index(path: &String) -> Option<i32> {
-    if path_is_a_repo(path.clone()) {
+fn git_diff_index(path: &str) -> Option<i32> {
+    if path_is_a_repo(path) {
         match Command::new("git")
             .arg("diff-index")
             .arg("--quiet")
