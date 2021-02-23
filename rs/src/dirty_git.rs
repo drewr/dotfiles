@@ -6,15 +6,13 @@ use std::env::args;
 use std::path::Path;
 use std::process::Command;
 
-    let p = Path::new(&path);
 fn has_dir(path: &str, path_inside: &str) -> bool {
     let mut found = false;
-    for entry in p.read_dir().expect("can't read_dir") {
-        if let Ok(entry) = entry {
-            if entry.file_name() == path_inside {
-                found = true
-            }
-        }
+    for entry in Path::new(&path).read_dir().expect("can't read_dir") {
+        match entry {
+            Ok(e) if e.file_name() == path_inside => found = true,
+            _ => (),
+        };
     }
     found
 }
