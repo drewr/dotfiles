@@ -4,9 +4,8 @@
 
 use std::env::args;
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Output};
 
-/// checks if the path is a dir and contaians ".git" folder
 fn path_is_a_repo(path: &str) -> bool {
     let p = Path::new(&path);
     p.is_dir() && p.join(".git").exists()
@@ -14,11 +13,14 @@ fn path_is_a_repo(path: &str) -> bool {
 
 fn git_diff_index(path: &str) -> Option<i32> {
     if path_is_a_repo(path) {
-        match Command::new("git").arg("diff-index").arg("--quiet").arg("HEAD")
+        match Command::new("git")
+            .arg("diff-index")
+            .arg("--quiet")
+            .arg("HEAD")
             .current_dir(path)
-            .status()
+            .output()
         {
-            Ok(s) => s.code(),
+            Ok(Output { status: s, .. }) => s.code(),
             Err(_) => None,
         }
     } else {
@@ -28,8 +30,12 @@ fn git_diff_index(path: &str) -> Option<i32> {
 
 fn main() -> std::io::Result<()> {
     for dir in args().skip(1) {
+        // TODO eventually take a --debug arg, but don't want to deal
+        // with parsing libraries yet
+        //println!("debug: {:?}", &dir);
         match git_diff_index(&dir) {
-            Some(1) => println!("{}", &dir),
+            Some(128) => println!("nohead {}", &dir),
+            Some(1) => println!("dirty {}", &dir),
             _ => (),
         }
     }
