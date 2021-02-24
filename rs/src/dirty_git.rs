@@ -2,9 +2,17 @@
 //
 //     find . -type d | xargs dg
 
-use std::env::args;
+use clap::Clap;
 use std::path::Path;
 use std::process::{Command, Output};
+
+#[derive(Clap)]
+#[clap(version = "1.0", author = "Drew Raines <drew@raines.me>")]
+struct Opts {
+    #[clap(short)]
+    debug: bool,
+    paths: Vec<String>,
+}
 
 fn path_is_a_repo(path: &str) -> bool {
     let p = Path::new(&path);
@@ -29,10 +37,12 @@ fn git_diff_index(path: &str) -> Option<i32> {
 }
 
 fn main() -> std::io::Result<()> {
-    for dir in args().skip(1) {
-        // TODO eventually take a --debug arg, but don't want to deal
-        // with parsing libraries yet
-        //println!("debug: {:?}", &dir);
+    let opts: Opts = Opts::parse();
+
+    for dir in opts.paths.iter() {
+        if opts.debug {
+            println!("debug: {:?}", &dir);
+        }
         match git_diff_index(&dir) {
             Some(128) => println!("nohead {}", &dir),
             Some(1) => println!("dirty {}", &dir),
