@@ -6,31 +6,15 @@ use std::env::args;
 use std::path::Path;
 use std::process::Command;
 
-fn has_dir(path: &str, path_inside: &str) -> bool {
-    let mut found = false;
-    for entry in Path::new(&path).read_dir().expect("can't read_dir") {
-        match entry {
-            Ok(e) if e.file_name() == path_inside => {
-                found = true;
-                break;
-            }
-            _ => (),
-        };
-    }
-    found
-}
-
+/// checks if the path is a dir and contaians ".git" folder
 fn path_is_a_repo(path: &str) -> bool {
     let p = Path::new(&path);
-    p.is_dir() && has_dir(path, ".git")
+    p.is_dir() && p.join(".git").exists()
 }
 
 fn git_diff_index(path: &str) -> Option<i32> {
     if path_is_a_repo(path) {
-        match Command::new("git")
-            .arg("diff-index")
-            .arg("--quiet")
-            .arg("HEAD")
+        match Command::new("git").arg("diff-index").arg("--quiet").arg("HEAD")
             .current_dir(path)
             .status()
         {
@@ -42,11 +26,12 @@ fn git_diff_index(path: &str) -> Option<i32> {
     }
 }
 
-pub fn main() {
-    for d in args().skip(1) {
-        match git_diff_index(&d) {
-            Some(1) => println!("dirty: {:?}", &d),
+fn main() -> std::io::Result<()> {
+    for dir in args().skip(1) {
+        match git_diff_index(&dir) {
+            Some(1) => println!("{}", &dir),
             _ => (),
         }
     }
+    Ok(())
 }
