@@ -27,20 +27,20 @@ SubFolders Verbatim
 MaxSize 100k
 
 Channel aaraines
-Master :gmail-aaraines:
-Slave :local-aaraines-imap-store:
+Far :gmail-aaraines:
+Near :local-aaraines-imap-store:
 Patterns !* INBOX "[Gmail]/Starred"
-Create Slave
+Create Near
 Expunge Both
 Sync All
 
 Channel aaraines-lists
-Master :gmail-aaraines:
-Slave :local-aaraines-imap-store:
+Far :gmail-aaraines:
+Near :local-aaraines-imap-store:
 Patterns !* list/*
 MaxMessages 1000
 ExpireUnread yes
-Create Slave
+Create Near
 Expunge Both
 Sync All
 
@@ -75,12 +75,12 @@ SubFolders Verbatim
 MaxSize 100k
 
 Channel elastic
-Master :gmail-elastic:
-Slave :local-elastic-imap-store:
+Far :gmail-elastic:
+Near :local-elastic-imap-store:
 Patterns !* ME read-later list/* project/* team/* gh/*
 MaxMessages 5000
 ExpireUnread yes
-Create Slave
+Create Near
 Expunge Both
 Sync All
 
@@ -114,11 +114,11 @@ SubFolders Verbatim
 MaxSize 50k
 
 Channel test
-Master :gmail-test:
-Slave :local-test-imap-store:
+Far :gmail-test:
+Near :local-test-imap-store:
 Patterns !* INBOX "[Gmail]/Sent Mail" "[Gmail]/Starred"
 #MaxMessages 10
-Create Slave
+Create Near
 #Expunge Both
 #Only for maildir
 #SyncState *
@@ -163,26 +163,26 @@ Account desktop-elastic
 MaxSize 50k
 
 Channel desktop-aaraines
-Master :local-aaraines-imap-store:
-Slave :desktop-aaraines-imap-store:
+Far :local-aaraines-imap-store:
+Near :desktop-aaraines-imap-store:
 Patterns !* INBOX "[Gmail]/Starred"
-Create Slave
+Create Near
 Expunge Both
 Sync All
 
 Channel desktop-elastic
-Master :local-elastic-imap-store:
-Slave :desktop-elastic-imap-store:
+Far :local-elastic-imap-store:
+Near :desktop-elastic-imap-store:
 Patterns *
-Create Slave
+Create Near
 Expunge Both
 Sync All
 
 Channel desktop-test
-Master :local-test-imap-store:
-Slave :desktop-test-imap-store:
+Far :local-test-imap-store:
+Near :desktop-test-imap-store:
 Patterns !* INBOX "[Gmail]/Sent Mail" "[Gmail]/Starred"
-Create Slave
+Create Near
 Expunge Both
 Sync All
 
