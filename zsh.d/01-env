@@ -11,8 +11,9 @@ fi
 
 [[ -s ${HOME_}/.gvm/scripts/gvm ]] && . ${HOME_}/.gvm/scripts/gvm
 
-NVM_DIR=${HOME_}/.nvm
-[[ -d ${HOME_}/.nvm ]] && source ${HOME_}/.nvm/nvm.sh
+VOLTA_HOME=${HOME_}/.volta
+[[ -d $VOLTA_HOME/bin ]] && PATH=$VOLTA_HOME/bin:$PATH
+
 [[ -d ${HOME_}/perl5 ]] && . ${HOME_}/perl5/perlbrew/etc/bashrc
 
 CLOJURESCRIPT_HOME=${HOME_}/src/clojure/clojurescript; export CLOJURESCRIPT_HOME
