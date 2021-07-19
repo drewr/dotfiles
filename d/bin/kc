@@ -2,6 +2,7 @@ eval $(keychain --gpg2 --nogui \
                 --eval --agents ssh,gpg \
                 AE1ABF3D484C40E5CB1CDC9F57B19548756012ED \
                 8303DF5FB4CD012B51C5B342A75020AA91174942 \
+                id_rsa \
                 id_ed25519 \
                 google_compute_engine \
          )
