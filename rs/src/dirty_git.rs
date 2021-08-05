@@ -14,12 +14,14 @@ struct Opts {
     paths: Vec<String>,
 }
 
-fn path_is_a_repo(path: &str) -> bool {
+type MyPath = str;
+
+fn path_is_a_repo(path: &MyPath) -> bool {
     let p = Path::new(&path);
     p.is_dir() && p.join(".git").exists()
 }
 
-fn git_diff_index(path: &str) -> Option<i32> {
+fn git_diff_index(path: &MyPath) -> Option<i32> {
     if path_is_a_repo(path) {
         match Command::new("git")
             .arg("diff-index")
