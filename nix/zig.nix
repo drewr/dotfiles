@@ -13,5 +13,6 @@ pkgs.mkShell {
     lld_12
     ninja
     qemu
+    libxml2
   ];
 }
