@@ -4,8 +4,8 @@
                  [cider/cider-nrepl "0.26.0-SNAPSHOT"]]
   :injections [(require 'pjstadig.humane-test-output)
                (pjstadig.humane-test-output/activate!)]
-  :plugins [[lein-ancient "1.0.0-RC3"]
-            [lein-pprint "1.2.0"]
+  :plugins [[lein-ancient/lein-ancient "1.0.0-RC3"]
+            [lein-pprint/lein-pprint "1.2.0"]
             [lein-count/lein-count "1.0.9"]
             [com.jakemccrary/lein-test-refresh "0.21.1"]
             [cider/cider-nrepl "0.26.0-SNAPSHOT"]]}}
