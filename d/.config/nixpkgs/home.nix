@@ -18,13 +18,21 @@
 
   home.packages = [
     pkgs.autossh
-    pkgs.emacs
     pkgs.gnupg
     pkgs.htop
     pkgs.keychain
     pkgs.minikube
-    pkgs.pandoc
     pkgs.tmux
+
+    ## clojure
+    pkgs.clojure
+    pkgs.leiningen
+
+    ## emacs
+    pkgs.pandoc
+    pkgs.emacs
+
+
   ];
 
   # Let Home Manager install and manage itself.
