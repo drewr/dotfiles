@@ -23,6 +23,7 @@
     pkgs.htop
     pkgs.minikube
     pkgs.keychain
+    pkgs.gnupg
   ];
 
   # Let Home Manager install and manage itself.
