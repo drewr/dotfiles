@@ -18,12 +18,12 @@
 
   home.packages = [
     pkgs.emacs
+    pkgs.gnupg
+    pkgs.htop
+    pkgs.keychain
+    pkgs.minikube
     pkgs.pandoc
     pkgs.tmux
-    pkgs.htop
-    pkgs.minikube
-    pkgs.keychain
-    pkgs.gnupg
   ];
 
   # Let Home Manager install and manage itself.
