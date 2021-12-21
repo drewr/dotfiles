@@ -22,6 +22,7 @@
     pkgs.htop
     pkgs.keychain
     pkgs.minikube
+    pkgs.s6-dns
     pkgs.tmux
 
     ## clojure
