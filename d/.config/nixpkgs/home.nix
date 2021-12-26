@@ -18,6 +18,7 @@
 
   home.packages = [
     pkgs.autossh
+    pkgs.fennel
     pkgs.gnupg
     pkgs.htop
     pkgs.keychain
