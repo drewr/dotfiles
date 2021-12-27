@@ -21,6 +21,7 @@
     pkgs.fennel
     pkgs.gnupg
     pkgs.htop
+    pkgs.janet
     pkgs.keychain
     pkgs.minikube
     pkgs.s6-dns
@@ -33,8 +34,6 @@
     ## emacs
     pkgs.pandoc
     pkgs.emacs
-
-
   ];
 
   # Let Home Manager install and manage itself.
