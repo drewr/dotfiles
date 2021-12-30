@@ -34,6 +34,8 @@
     ## emacs
     pkgs.pandoc
     pkgs.emacs
+
+    pkgs.opam
   ];
 
   # Let Home Manager install and manage itself.
