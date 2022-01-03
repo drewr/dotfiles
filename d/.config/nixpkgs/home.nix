@@ -19,11 +19,13 @@
   home.packages = [
     pkgs.autossh
     pkgs.fennel
+    pkgs.fzf
     pkgs.gnupg
     pkgs.htop
     pkgs.janet
     pkgs.keychain
     pkgs.minikube
+    pkgs.opam
     pkgs.s6-dns
     pkgs.tmux
 
@@ -34,8 +36,6 @@
     ## emacs
     pkgs.pandoc
     pkgs.emacs
-
-    pkgs.opam
   ];
 
   # Let Home Manager install and manage itself.
