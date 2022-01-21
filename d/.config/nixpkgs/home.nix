@@ -23,6 +23,7 @@
     pkgs.gnupg
     pkgs.htop
     pkgs.janet
+    pkgs.jq
     pkgs.keychain
     pkgs.minikube
     pkgs.opam
