@@ -25,6 +25,7 @@
     pkgs.janet
     pkgs.jq
     pkgs.keychain
+    pkgs.mcfly
     pkgs.minikube
     pkgs.opam
     pkgs.s6-dns
