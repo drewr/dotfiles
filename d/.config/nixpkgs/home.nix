@@ -28,6 +28,7 @@
     pkgs.opam
     pkgs.s6-dns
     pkgs.tmux
+    pkgs.xh
     pkgs.xz
 
     ## clojure
