@@ -30,6 +30,10 @@ GOPATH=${HOME_}/go; export GOPATH
 PATH=${GOPATH}/bin:$PATH
 [[ -d $GOPATH ]] || echo warning: $GOPATH not found
 
+if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+fi
+
 if [[ -d ${HOME_}/.nix-profile ]]; then
   if [[ -f ${HOME_}/.nix-profile/etc/profile.d/nix.sh ]]; then
     . ${HOME_}/.nix-profile/etc/profile.d/nix.sh
