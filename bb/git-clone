@@ -1,0 +1,25 @@
+#!/usr/bin/env bb
+
+(require '[clojure.java.io :as io]
+         '[clojure.java.shell :as sh])
+
+(def github-pat #"([^@:]+)(@|://)github\.com[:/]([^/]+)/([^./]+).*$")
+
+(defn parse [s]
+  (when s
+    (let [[_ _ _ org repo] (re-matches github-pat s)]
+      (if (and org repo)
+        [org repo]
+        (throw (ex-info "invalid git remote url" {:url s}))))))
+
+(let [[remote] *command-line-args*
+      _ (when-not remote
+          (throw (ex-info "need arg" {:args *command-line-args*})))
+      [org repo] (parse remote)
+      parent (io/file (System/getenv "HOME") "src" org)]
+  (when (and org repo)
+    (if (.exists (io/file parent repo))
+      (println (str (io/file parent repo)) "exists")
+      (do
+        (sh/sh "mkdir" "-p" (str parent))
+        (sh/sh "git" "clone" remote :dir (str parent))))))
