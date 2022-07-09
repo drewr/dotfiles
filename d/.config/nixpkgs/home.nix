@@ -22,20 +22,14 @@
     pkgs.fzf
     pkgs.gnupg
     pkgs.htop
-    pkgs.janet
     pkgs.jq
     pkgs.keychain
     pkgs.mcfly
     pkgs.minikube
-    pkgs.opam
     pkgs.s6-dns
     pkgs.tmux
     pkgs.xh
     pkgs.xz
-
-    ## clojure
-    pkgs.clojure
-    pkgs.leiningen
 
     ## emacs
     pkgs.pandoc
