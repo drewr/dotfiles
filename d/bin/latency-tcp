@@ -1,0 +1,6 @@
+#!/bin/sh
+
+while true; do
+  nix-shell -p tcping-go --run "tcping -c 1 google.com:80" | egrep 'time=|failed:'
+  sleep 11
+done

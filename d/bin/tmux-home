@@ -1,0 +1,8 @@
+tmux new-session \; \
+  send-keys "browser-history" C-m \; \
+  split-window -v \; \
+  send-keys "my-ip" C-m \; \
+  split-window -h -p 65 \; \
+  send-keys 'latency-tcp' C-m \; \
+  split-window -v \; \
+

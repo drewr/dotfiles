@@ -1,0 +1,6 @@
+#!/bin/sh
+
+exec \
+  nix-shell \
+   -p jdk \
+   --run "sudo java -jar ~aar/src/drewr/history/target/uberjar/history-0.99.14-SNAPSHOT-standalone.jar -c /etc/history/history.edn"
