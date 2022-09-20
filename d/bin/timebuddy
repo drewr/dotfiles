@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+
+tzs=(                 \
+  America/Los_Angeles \
+  America/Denver      \
+  America/Chicago     \
+  America/New_York    \
+  Europe/London       \
+  Europe/Amsterdam    \
+  Europe/Athens       \
+  Asia/Istanbul       \
+  Asia/Kolkata        \
+  Asia/Tokyo          \
+  Australia/Brisbane  \
+  )
+
+for tz in $tzs; do
+  printf '%-21s %s\n' $tz "$(TZ=$tz date)"
+done
