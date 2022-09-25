@@ -11,7 +11,9 @@ tzs=(                 \
   Asia/Istanbul       \
   Asia/Kolkata        \
   Asia/Tokyo          \
+  Australia/Adelaide  \
   Australia/Brisbane  \
+  Pacific/Auckland    \
   )
 
 for tz in $tzs; do
