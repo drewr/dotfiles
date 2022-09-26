@@ -1,5 +1,11 @@
 #!/usr/bin/env zsh
 
+# ANSI chart
+# https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124
+BOLD="\e[1;30m"
+BG="\e[46m"
+NOCOLOR="\e[0m"
+
 tzs=(                 \
   America/Los_Angeles \
   America/Denver      \
@@ -16,6 +22,11 @@ tzs=(                 \
   Pacific/Auckland    \
   )
 
-for tz in $tzs; do
-  printf '%-21s %s\n' $tz "$(TZ=$tz date)"
+for ((i = 1; i <= $#tzs; i++)); do
+  tz=$tzs[i]
+  if [[ $((i%2)) -eq 1 ]]; then
+     printf "${BG}"
+  fi
+  printf "%-21s %-40s" $tz "$(TZ=$tz date)"
+  printf "${NOCOLOR}\n"
 done
