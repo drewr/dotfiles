@@ -1,7 +1,6 @@
 use git2;
 use regex::Regex;
-use std::env;
-use std::path;
+use std::{env, path, process};
 
 #[derive(PartialEq, Debug)]
 enum RepoVendor {
@@ -27,7 +26,10 @@ struct RepoToClone {
 fn make_repo(location: &str) -> Option<RepoToClone> {
     let pat = r"([^@:]+)(@|://)(github\.com|git\.sr\.ht)[:/]~?([^/]+)/([^./]+).*$";
     let re = Regex::new(pat).unwrap();
-    let caps = re.captures(location).unwrap();
+    let caps = match re.captures(location) {
+        Some(result) => result,
+        None => return None,
+    };
     match [
         caps.get(1).map_or("", |m| m.as_str()),
         caps.get(3).map_or("", |m| m.as_str()),
@@ -71,7 +73,20 @@ fn make_repo(location: &str) -> Option<RepoToClone> {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let repo = make_repo(&args[1]).unwrap();
+
+    if args.len() < 2 {
+        println!("supply at least one repo");
+        process::exit(1);
+    }
+
+    let repo = match make_repo(&args[1]) {
+        Some(r) => r,
+        None => {
+            println!("invalid repo: {}", &args[1]);
+            process::exit(1);
+        }
+    };
+
     let dest: path::PathBuf = [
         env::var("HOME").unwrap(),
         "src".to_string(),
