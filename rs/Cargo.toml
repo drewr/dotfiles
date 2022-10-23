@@ -8,7 +8,8 @@ edition = "2018"
 
 [dependencies]
 clap = "3.0.0-beta.2"
-
+git2 = "0.15"
+regex = "1"
 
 [[bin]]
 name = "grep"
@@ -17,4 +18,8 @@ path = "src/grep.rs"
 [[bin]]
 name = "dg"
 path = "src/dirty_git.rs"
+
+[[bin]]
+name = "gitclone"
+path = "src/git_clone.rs"
 
