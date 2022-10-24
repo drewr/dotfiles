@@ -12,15 +12,15 @@ mod tests {
     use std::io::Cursor;
 
     #[test]
-    fn test_grep() -> Result<(), String> {
+    fn test_grep() {
         let v = vec![
             "this is the first line",
             "now another",
             "if this was a haiku it would end here and have too many syllables",
             "one more tho",
-        ];
-        assert_eq!(grep("more", Cursor::new(v)), Ok());
-        Ok("done")
+        ].join("\n");
+        let result: io::Result<()> = grep("more", Cursor::new(v));
+        assert!(result.is_ok(), "we found it");
     }
 }
 
