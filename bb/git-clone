@@ -3,11 +3,11 @@
 (require '[clojure.java.io :as io]
          '[clojure.java.shell :as sh])
 
-(def github-pat #"([^@:]+)(@|://)github\.com[:/]([^/]+)/([^./]+).*$")
+(def github-pat #"([^@:]+)(@|://)(github\.com|git\.sr\.ht)[:/]~?([^/]+)/([^./]+).*$")
 
 (defn parse [s]
   (when s
-    (let [[_ _ _ org repo] (re-matches github-pat s)]
+    (let [[_ _ _ _ org repo] (re-matches github-pat s)]
       (if (and org repo)
         [org repo]
         (throw (ex-info "invalid git remote url" {:url s}))))))
