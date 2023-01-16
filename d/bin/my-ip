@@ -2,5 +2,5 @@
 
 while true; do
   curl -s ipinfo.io | jq -r ". | \"\(.ip) \(.city) \(.region)/\(.country) \(.org)\"" 2>/dev/null || echo waiting...
-  sleep 60;
+  sleep 300;
 done
