@@ -18,6 +18,7 @@
 
   home.packages = [
     pkgs.autossh
+    pkgs.awscli
     pkgs.fennel
     pkgs.fzf
     pkgs.gnupg
