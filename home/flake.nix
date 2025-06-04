@@ -10,7 +10,7 @@
   outputs = inputs@{ nixpkgs, home-manager, ... }: {
     homeConfigurations."aar" = home-manager.lib.homeManagerConfiguration {
       #inherit (inputs) nixpkgs; # Pass nixpkgs to home.nix
-      pkgs = import nixpkgs { system = "arm64-darwin"; };
+      pkgs = import nixpkgs { system = "aarch64-darwin"; };
       modules = [
         ./default.nix # This is the link to your main Home Manager config
       ];
