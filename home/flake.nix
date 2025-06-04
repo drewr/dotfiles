@@ -2,8 +2,9 @@
   description = "My Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05"; # Or a specific branch/commit
-    home-manager.url = "github:nix-community/home-manager/release-25.05"; # Match stateVersion
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    #    home-manager.url = "github:nix-community/home-manager/release-25.05"; # Match stateVersion
+    home-manager.url = "https://github.com/nix-community/home-manager/commit/86b95fc1ed2b9b04a451a08ccf13d78fb421859c";
     home-manager.inputs.nixpkgs.follows = "nixpkgs"; # Crucial for consistent Nixpkgs version
   };
 
