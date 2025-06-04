@@ -12,7 +12,7 @@
       #inherit (inputs) nixpkgs; # Pass nixpkgs to home.nix
       pkgs = import nixpkgs { system = "arm64-darwin"; };
       modules = [
-        ./home/default.nix # This is the link to your main Home Manager config
+        ./default.nix # This is the link to your main Home Manager config
       ];
 
       # You can pass extra arguments to your home.nix like this:
