@@ -8,9 +8,9 @@
   # };
 
   outputs = inputs@{ nixpkgs, home-manager, ... }: {
-    homeConfigurations."yourusername" = home-manager.lib.homeManagerConfiguration {
-      inherit (inputs) nixpkgs; # Pass nixpkgs to home.nix
-      # Or: pkgs = import nixpkgs { system = "x86_64-linux"; }; # If you want to specify system here
+    homeConfigurations."drewr" = home-manager.lib.homeManagerConfiguration {
+      #inherit (inputs) nixpkgs; # Pass nixpkgs to home.nix
+      pkgs = import nixpkgs { system = "arm64-darwin"; }; # If you want to specify system here
       modules = [
         ./home/default.nix # This is the link to your main Home Manager config
       ];
