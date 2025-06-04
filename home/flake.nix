@@ -10,7 +10,7 @@
   outputs = inputs@{ nixpkgs, home-manager, ... }: {
     homeConfigurations."drewr" = home-manager.lib.homeManagerConfiguration {
       #inherit (inputs) nixpkgs; # Pass nixpkgs to home.nix
-      pkgs = import nixpkgs { system = "arm64-darwin"; }; # If you want to specify system here
+      pkgs = import nixpkgs { system = "arm64-darwin"; };
       modules = [
         ./home/default.nix # This is the link to your main Home Manager config
       ];
