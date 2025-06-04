@@ -7,18 +7,23 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, ... }: {
-    homeConfigurations."aar" = home-manager.lib.homeManagerConfiguration {
-      #inherit (inputs) nixpkgs; # Pass nixpkgs to home.nix
-      pkgs = import nixpkgs { system = "aarch64-darwin"; };
-      modules = [
-        ./default.nix # This is the link to your main Home Manager config
-      ];
+  outputs = inputs@{ nixpkgs, home-manager, ... }:
+    let
+      system = builtins.currentSystem;
+      pkgs = import nixpkgs { inherit system; };
+    in
+      {
+        homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          inherit (pkgs.lib) lib;
 
-      # You can pass extra arguments to your home.nix like this:
-      # extraSpecialArgs = {
-      #   myCustomArg = "hello";
-      # };
-    };
-  };
+          extraSpecialArgs = {
+            inherit system;
+          };
+
+          modules = [
+            ./default.nix
+          ];
+        };
+      };
 }
