@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05"; # Or a specific branch/commit
-    home-manager.url = "github:nix-community/home-manager/release-24.05"; # Match stateVersion
+    home-manager.url = "github:nix-community/home-manager/release-25.05"; # Match stateVersion
     home-manager.inputs.nixpkgs.follows = "nixpkgs"; # Crucial for consistent Nixpkgs version
   };
 
