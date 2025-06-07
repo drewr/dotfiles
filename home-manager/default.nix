@@ -1,4 +1,4 @@
-{ config, pkgs, system, ... }:
+{ config, pkgs, system, una, ... }:
 
 {
   home.username = "aar";
@@ -19,7 +19,7 @@
     pkgs.s6-dns
     pkgs.tcping-go
     pkgs.tmux
-    pkgs.una
+    una
     pkgs.xh
     pkgs.xz
 
