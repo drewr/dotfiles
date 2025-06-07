@@ -2,6 +2,6 @@
 
 while true; do
   /bin/echo -n `date +%H:%M` ''
-  nix-shell -p tcping-go --run "tcping -c 1 google.com:80" | grep -E 'time=|failed:'
+  nix-shell -p tcping-go --run "tcping -c 1 dns9.quad9.net:443" | grep -E 'time=|failed:'
   sleep 11
 done
