@@ -15,12 +15,12 @@
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        inherit una;
       in
         {
           legacyPackages = {
             homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
+              inherit una;
               modules = [
                 ./default.nix
               ];
