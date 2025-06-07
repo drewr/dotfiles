@@ -45,7 +45,7 @@
     ".tmux.conf".source = ./d/tmux.conf;
 
     ".config/home-manager/current-config".text = ''
-      hoping to put in \${config}
+      hoping to put in ${config.home}
     '';
   };
 
