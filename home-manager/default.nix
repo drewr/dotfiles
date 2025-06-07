@@ -1,14 +1,5 @@
 { config, pkgs, system, ... }:
 
-let
-  username = "aar";
-  derivedHome =
-    if system == "x86_64-linux" then "/home/${username}"
-    else if system == "aarch64-linux" then "/home/${username}"
-    else if system == "x86_64-darwin" then "/Users/${username}"
-    else if system == "aarch64-darwin" then "/Users/${username}"
-    else "/home/${username}"; # Fallback
-in
 {
   home.username = username;
   home.homeDirectory = derivedHome;
