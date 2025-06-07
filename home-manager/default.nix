@@ -1,8 +1,8 @@
 { config, pkgs, system, ... }:
 
 {
-  home.username = username;
-  home.homeDirectory = derivedHome;
+  home.username = "aar";
+  home.homeDirectory = "/Users/aar";
   home.stateVersion = "22.05";
 
   home.packages = [
