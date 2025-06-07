@@ -50,7 +50,7 @@
   };
 
   home.sessionVariables = {
-    HM_VERSION = config.home.full;
+    HM_VERSION = "THIS SHOULD GET A VALUE FROM config";
   };
 
   programs.home-manager.enable = true;
