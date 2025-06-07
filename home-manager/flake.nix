@@ -20,12 +20,12 @@
           legacyPackages = {
             homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
-              inherit una;
               modules = [
                 ./default.nix
               ];
 
               extraSpecialArgs = {
+                inherit una;
               };
             };
           };
