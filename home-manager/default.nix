@@ -50,7 +50,7 @@
   };
 
   home.sessionVariables = {
-    HM_VERSION = "${config}";
+    HM_VERSION = "${builtins.toJSON config}";
   };
 
   programs.home-manager.enable = true;
