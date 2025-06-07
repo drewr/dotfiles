@@ -28,25 +28,6 @@
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
     # # fonts?
     # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
-
-    (pkgs.writeShellScriptBin "latency-tcp" ''
-      #!/bin/sh
-
-      while true; do
-        /bin/echo -n `date +%H:%M` \'\'
-        tcping -c 1 dns9.quad9.net | grep -E 'time=|failed:'
-        sleep 11
-      done
-    '')
-
-    (pkgs.writeShellScriptBin "my-ip" ''
-      #!/bin/sh
-
-      while true; do
-        curl -s ipinfo.io | jq -r ". | \"\(.ip) \(.city) \(.region)/\(.country) \(.org)\"" 2>/dev/null || echo waiting...
-        sleep 300;
-      done
-    '')
   ];
 
   home.file = {

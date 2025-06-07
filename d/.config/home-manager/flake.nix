@@ -22,6 +22,7 @@
               inherit pkgs;
               modules = [
                 ./default.nix
+                ./network.nix
               ];
 
               extraSpecialArgs = {
