@@ -2,28 +2,28 @@
   description = "My Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
+    utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    una.url = "github:jwiegley/una";
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, ... }:
-    let
-      system = builtins.currentSystem;
-      pkgs = import nixpkgs { inherit system; };
-    in
-      {
-        homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          inherit (pkgs.lib) lib;
+  outputs = { self, nixpkgs, home-manager, utils, una }:
+    utils.lib.eachDefaultSystem (system:
+      let
 
-          extraSpecialArgs = {
-            inherit system;
+      in
+        {
+          legacyPackages = {
+            homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
+              pkgs = import nixpkgs { inherit system; };
+              inherit system;
+              modules = [
+                ./default.nix
+              ];
+            };
           };
-
-          modules = [
-            ./default.nix
-          ];
-        };
-      };
+        }
+    );
 }

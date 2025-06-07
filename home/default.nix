@@ -1,12 +1,12 @@
-{ config, pkgs, ... }:
+{ system, config, pkgs, ... }:
 
 let
   username = "aar";
   derivedHome =
-    if targetSystem == "x86_64-linux" then "/home/${username}"
-    else if targetSystem == "aarch64-linux" then "/home/${username}"
-    else if targetSystem == "x86_64-darwin" then "/Users/${username}"
-    else if targetSystem == "aarch64-darwin" then "/Users/${username}"
+    if system == "x86_64-linux" then "/home/${username}"
+    else if system == "aarch64-linux" then "/home/${username}"
+    else if system == "x86_64-darwin" then "/Users/${username}"
+    else if system == "aarch64-darwin" then "/Users/${username}"
     else "/home/${username}"; # Fallback
 in
 {
