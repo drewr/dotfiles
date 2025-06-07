@@ -19,6 +19,7 @@
     pkgs.s6-dns
     pkgs.tcping-go
     pkgs.tmux
+    pkgs.una
     pkgs.xh
     pkgs.xz
 
