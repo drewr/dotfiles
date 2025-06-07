@@ -45,12 +45,12 @@
     ".tmux.conf".source = ./d/tmux.conf;
 
     ".config/home-manager/current-config".text = ''
-      ${config}
+      hoping to put in \${config}
     '';
   };
 
   home.sessionVariables = {
-    HM_VERSION = "${builtins.toJSON config}";
+    HM_VERSION = config.home.version;
   };
 
   programs.home-manager.enable = true;
