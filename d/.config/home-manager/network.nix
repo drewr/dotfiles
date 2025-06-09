@@ -7,7 +7,7 @@
   ];
 
   home.file = {
-    "bin/my-ip".source = ./d/my-ip;
-    "bin/latency-tcp".source = ./d/latency-tcp;
+    "bin/my-ip".source = ./d/bin/my-ip;
+    "bin/latency-tcp".source = ./d/bin/latency-tcp;
   };
 }

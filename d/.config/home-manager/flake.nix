@@ -23,6 +23,7 @@
               modules = [
                 ./default.nix
                 ./clojure.nix
+                ./desktop.nix
                 ./network.nix
               ];
 
