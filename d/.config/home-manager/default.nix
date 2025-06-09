@@ -10,14 +10,13 @@
     pkgs.awscli
     pkgs.emacs
     pkgs.fzf
+    pkgs.git
     pkgs.gnupg
     pkgs.htop
     pkgs.jq
     pkgs.keychain
     pkgs.pandoc
     pkgs.ripgrep
-    pkgs.s6-dns
-    pkgs.tcping-go
     pkgs.tmux
     una
     pkgs.xh

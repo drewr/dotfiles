@@ -22,6 +22,7 @@
               inherit pkgs;
               modules = [
                 ./default.nix
+                ./clojure.nix
                 ./network.nix
               ];
 
