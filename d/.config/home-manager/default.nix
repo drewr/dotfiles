@@ -14,6 +14,7 @@
     pkgs.gnupg
     pkgs.htop
     pkgs.jq
+    pkgs.jujutsu
     pkgs.keychain
     pkgs.pandoc
     pkgs.ripgrep
