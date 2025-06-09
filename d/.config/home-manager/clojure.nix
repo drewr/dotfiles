@@ -9,6 +9,5 @@
 
   home.file = {
     ".lein/profiles.clj".source = ./d/lein/profiles.clj;
-    ".foo".source = ./../home/foo;
   };
 }
