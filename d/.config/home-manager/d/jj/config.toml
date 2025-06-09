@@ -1,0 +1,6 @@
+[user]
+name = "Drew Raines"
+email = "drew@raines.me"
+
+[ui]
+default-command = "log"
