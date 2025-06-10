@@ -34,6 +34,8 @@
     ".gitconfig".source = ./d/gitconfig;
     ".tmux.conf".source = ./d/tmux.conf;
 
+    "bin/rand".source = ./d/bin/rand;
+
     ".config/home-manager/current-config".text = ''
       hoping to put in \$\{config.home\} at some point
     '';
