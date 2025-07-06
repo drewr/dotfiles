@@ -2,6 +2,7 @@
 
 {
   home.packages = [
+    pkgs.pssh
     pkgs.s6-dns
     pkgs.tcping-go
   ];
