@@ -19,7 +19,7 @@
     pkgs.pandoc
     pkgs.ripgrep
     pkgs.tmux
-    una
+    una.packages.${pkgs.system}.default
     pkgs.xh
     pkgs.xz
 
