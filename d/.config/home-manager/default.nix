@@ -13,6 +13,7 @@
     pkgs.git
     pkgs.gnupg
     pkgs.htop
+    pkgs.ispell
     pkgs.jq
     pkgs.jujutsu
     pkgs.keychain
