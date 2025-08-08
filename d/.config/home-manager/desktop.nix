@@ -2,6 +2,7 @@
 
 {
   home.packages = [
+    pkgs.msmtp
   ];
 
   home.file = {
