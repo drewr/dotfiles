@@ -1,2 +1,41 @@
 theme = Alabaster
 font-family = Menlo
+macos-option-as-alt = true
+
+# alt because I use cmd-key-happy to swap cmd and option
+# Could use esc:CHAR instead of text:ESCAPE here.
+keybind = alt+a=text:\x1ba
+keybind = alt+b=text:\x1bb
+keybind = alt+c=text:\x1bc
+keybind = alt+d=text:\x1bd
+keybind = alt+e=text:\x1be
+keybind = alt+f=text:\x1bf
+keybind = alt+g=text:\x1bg
+keybind = alt+h=text:\x1bh
+keybind = alt+i=text:\x1bi
+keybind = alt+j=text:\x1bj
+keybind = alt+k=text:\x1bk
+keybind = alt+l=text:\x1bl
+keybind = alt+m=text:\x1bm
+keybind = alt+n=text:\x1bn
+keybind = alt+o=text:\x1bo
+keybind = alt+p=text:\x1bp
+keybind = alt+q=text:\x1bq
+keybind = alt+s=text:\x1bs
+keybind = alt+t=text:\x1bt
+keybind = alt+u=text:\x1bu
+keybind = alt+v=text:\x1bv
+keybind = alt+w=text:\x1bw
+keybind = alt+x=text:\x1bx
+keybind = alt+y=text:\x1by
+keybind = alt+z=text:\x1bz
+
+# Paredit bindings
+keybind = alt+[=text:\x1b\x28
+keybind = alt+]=text:\x1b\x29
+
+# macos-option-as-alt seemed to fix these, but I'm leaving them commented here so I remember how to do it.
+#keybind = alt+shift+period=esc:>
+#keybind = alt+shift+comma=esc:<
+#keybind = ctrl+alt+f=text:\x1b\x06
+#keybind = ctrl+alt+b=text:\x1b\x02
