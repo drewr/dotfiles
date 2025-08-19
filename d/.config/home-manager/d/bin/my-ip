@@ -1,6 +1,7 @@
 #!/bin/sh
 
 while true; do
+  /bin/echo -n `date +%H:%M` ''
   curl -s ipinfo.io | jq -r ". | \"\(.ip) \(.city) \(.region)/\(.country) \(.org)\"" 2>/dev/null || echo waiting...
   sleep 300;
 done
