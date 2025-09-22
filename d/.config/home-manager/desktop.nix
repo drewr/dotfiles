@@ -2,6 +2,7 @@
 
 {
   home.packages = [
+    pkgs.mpv
     pkgs.msmtp
   ];
 
