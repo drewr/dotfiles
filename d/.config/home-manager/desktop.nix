@@ -11,5 +11,6 @@
     ".Xmodmap".source = ./d/X11/Xmodmap;
     ".Xdefaults".source = ./d/X11/Xdefaults;
     ".xinitrc".source = ./d/X11/xinitrc;
+    ".config/ghostty/config".source = ./d/ghostty.conf;
   };
 }
