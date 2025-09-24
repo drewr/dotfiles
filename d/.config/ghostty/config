@@ -39,3 +39,6 @@ keybind = alt+]=text:\x1b\x29
 #keybind = alt+shift+comma=esc:<
 #keybind = ctrl+alt+f=text:\x1b\x06
 #keybind = ctrl+alt+b=text:\x1b\x02
+
+# But not M-!
+keybind = alt+shift+x=esc:!
