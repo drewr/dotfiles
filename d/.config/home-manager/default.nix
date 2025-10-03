@@ -10,6 +10,7 @@
     pkgs.awscli
     pkgs.emacs
     pkgs.fzf
+    pkgs.gh
     pkgs.git
     pkgs.gnupg
     pkgs.htop
