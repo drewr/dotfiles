@@ -15,6 +15,7 @@
     pkgs.gnupg
     pkgs.htop
     pkgs.ispell
+    pkgs.jet
     pkgs.jq
     pkgs.jujutsu
     pkgs.keychain
