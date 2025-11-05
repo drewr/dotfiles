@@ -1,8 +1,8 @@
-{ config, pkgs, system, una, ... }:
+{ config, pkgs, lib, system, una, ... }:
 
 {
-  home.username = "aar";
-  home.homeDirectory = "/Users/aar";
+  home.username = lib.mkDefault "aar";
+  home.homeDirectory = lib.mkDefault "/home/aar";
   home.stateVersion = "22.05";
 
   home.packages = [
