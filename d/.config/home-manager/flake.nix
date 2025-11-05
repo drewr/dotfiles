@@ -12,28 +12,33 @@
   };
 
   outputs = { self, nixpkgs, home-manager, utils, una }:
-    utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-        {
-          legacyPackages = {
-            homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
-              inherit pkgs;
-              modules = [
-                ./default.nix
-                ./clojure.nix
-                ./desktop.nix
-                ./network.nix
-              ];
+  let
+    homeModules = [
+      ./default.nix
+      ./clojure.nix
+      ./desktop.nix
+      ./network.nix
+    ];
+  in {
+    homeManagerModules.default = { pkgs, ... }: {
+      imports = homeModules;
+      _module.args.una = una;
+    };
+    
+    homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
+      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      modules = homeModules;
+      extraSpecialArgs = { inherit una; };
+    };
 
-              extraSpecialArgs = {
-                inherit una;
-              };
-            };
-          };
-        }
-    );
+    legacyPackages = utils.lib.eachDefaultSystemMap (system: {
+      homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.${system};
+        modules = homeModules;
+        extraSpecialArgs = { inherit una; };
+      };
+    });
+  };
 }
 
 
