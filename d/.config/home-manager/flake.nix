@@ -37,6 +37,16 @@
         modules = homeModules;
         extraSpecialArgs = { inherit una; };
       };
+      homeConfigurations.drewr = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.${system};
+        modules = homeModules ++ [
+          {
+            home.username = "drewr";
+            home.homeDirectory = "/home/drewr";
+          }
+        ];
+        extraSpecialArgs = { inherit una; };
+      };
     });
   };
 }
