@@ -22,7 +22,7 @@
     pkgs.pandoc
     pkgs.ripgrep
     pkgs.tmux
-    una.packages.${pkgs.system}.default
+    # compile takes forever... ## una.packages.${pkgs.system}.default
     pkgs.xh
     pkgs.xz
 
