@@ -9,7 +9,6 @@
     };
     utils.url = "github:numtide/flake-utils";
     una.url = "github:jwiegley/una";
-    una.inputs.haskellNix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, home-manager, utils, una }:
