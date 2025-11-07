@@ -273,3 +273,8 @@ fix-agent() {
   fi
   export GPG_AGENT_INFO=`/bin/ls -t1 $(find /tmp/. -uid $UID -name S.gpg-agent -type s 2>/dev/null) | head -1`:0:1
 }
+
+# Cross-platform k8s-style random strings. Default to 12 bytes
+randstr() {
+  LC_ALL=C tr -dc 'bcdfghjklmnpqrstvwxz2456789' < /dev/urandom | head -c "${1:-12}" && echo
+}
