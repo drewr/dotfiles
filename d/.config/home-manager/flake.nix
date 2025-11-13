@@ -7,16 +7,14 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    utils.url = "github:numtide/flake-utils";
-    una = {
+    una-src = {
       url = "github:jwiegley/una";
       flake = false;
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, utils, una }:
+  outputs = { self, nixpkgs, home-manager, una-src }:
   let
-    una = pkgs.haskell.packages.ghc98.callCabal2nix "una" una {};
     homeModules = [
       ./default.nix
       ./util.nix
@@ -24,40 +22,46 @@
       ./desktop.nix
       ./network.nix
     ];
-  in {
-    homeManagerModules.default = { pkgs, ... }: {
-      imports = homeModules ++ [
-        {
-          home.packages = [ una ];
-        }
-      ];
-      _module.args.una = una;
-    };
-    
-    homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
-      modules = homeModules;
-      extraSpecialArgs = { inherit una; };
-    };
 
-    legacyPackages = utils.lib.eachDefaultSystemMap (system: {
-      homeConfigurations.aar = home-manager.lib.homeManagerConfiguration {
+    mkHomeConfig = system: username: extraModules:
+      let
         pkgs = nixpkgs.legacyPackages.${system};
-        modules = homeModules;
-        extraSpecialArgs = { inherit una; };
-      };
-      homeConfigurations.drewr = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.${system};
-        modules = homeModules ++ [
+        unaPackage = pkgs.haskell.packages.ghc98.callCabal2nix "una" una-src {};
+        homeDirectory =
+          if pkgs.stdenv.isDarwin
+          then "/Users/${username}"
+          else "/home/${username}";
+      in
+      home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = homeModules ++ extraModules ++ [
           {
-            home.username = "drewr";
-            home.homeDirectory = "/home/drewr";
+            home.packages = [ unaPackage ];
+            home.username = username;
+            home.homeDirectory = homeDirectory;
           }
         ];
-        extraSpecialArgs = { inherit una; };
+        extraSpecialArgs = { una = unaPackage; };
       };
-    });
+  in {
+    homeManagerModules.default = { pkgs, ... }:
+      let
+        unaPackage = pkgs.haskell.packages.ghc98.callCabal2nix "una" una-src {};
+      in {
+        imports = homeModules;
+        home.packages = [ unaPackage ];
+        _module.args.una = unaPackage;
+      };
+
+    homeConfigurations = {
+      "aar@aarch64-darwin" = mkHomeConfig "aarch64-darwin" "aar" [];
+      "drewr@aarch64-darwin" = mkHomeConfig "aarch64-darwin" "drewr" [];
+
+      "aar@x86_64-linux" = mkHomeConfig "x86_64-linux" "aar" [];
+      "drewr@x86_64-linux" = mkHomeConfig "x86_64-linux" "drewr" [];
+
+      "aar@aarch64-linux" = mkHomeConfig "aarch64-linux" "aar" [];
+      "drewr@aarch64-linux" = mkHomeConfig "aarch64-linux" "drewr" [];
+    };
   };
 }
-
-
