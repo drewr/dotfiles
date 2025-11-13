@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+ORG="$1"
+USERNAME="$2"
+DAYS="${3:-7}"
+DATE_SINCE=$(date -d "$DAYS days ago" --iso-8601 2>/dev/null || date -v-${DAYS}d +%Y-%m-%d)
+
+echo "=== Activity for $USERNAME in $ORG (last $DAYS days) ==="
+echo
+
+echo "Commits"
+gh search commits \
+  --owner="$ORG" \
+  --author="$USERNAME" \
+  --committer-date=">=$DATE_SINCE" \
+  --json repository,commit,sha,committer \
+  --jq '.[] | "[\(.commit.committer.date)] \(.repository.name): \(.commit.message | split("\n")[0])"'
+echo
+
+echo "Pull Requests"
+gh search prs \
+  --owner="$ORG" \
+  --involves="$USERNAME" \
+  --updated=">=$DATE_SINCE" \
+  --json number,title,repository,state,updatedAt,author \
+  --jq '.[] | "[\(.updatedAt)] \(.repository.name)#\(.number): \(.title) (\(.state)) by @\(.author.login)"'
+echo
+
+echo "Issues"
+gh search issues \
+  --owner="$ORG" \
+  --involves="$USERNAME" \
+  --updated=">=$DATE_SINCE" \
+  --json number,title,repository,state,updatedAt,author \
+  --jq '.[] | "[\(.updatedAt)] \(.repository.name)#\(.number): \(.title) (\(.state)) by @\(.author.login)"'
+echo
+
+echo "Comments"
+gh api graphql -f query="
+{
+  search(query: \"org:$ORG commenter:$USERNAME updated:>=$DATE_SINCE\", type: ISSUE, first: 50) {
+    nodes {
+      ... on Issue {
+        number
+        title
+        updatedAt
+        repository {
+          name
+        }
+        comments(last: 10) {
+          nodes {
+            author {
+              login
+            }
+            createdAt
+            body
+          }
+        }
+      }
+      ... on PullRequest {
+        number
+        title
+        updatedAt
+        repository {
+          name
+        }
+        comments(last: 10) {
+          nodes {
+            author {
+              login
+            }
+            createdAt
+            body
+          }
+        }
+      }
+    }
+  }
+}" \
+   --jq ".data.search.nodes[]
+         | . as \$issue
+         | .comments.nodes[]
+         | select(.author.login == \"$USERNAME\")
+         | (.body | gsub(\"[\\n\\r]+\"; \" \") | gsub(\" +\"; \" \")) as \$body
+         | \"[\(.createdAt) \(\$issue.repository.name)#\(\$issue.number)] \(\$body[:70])\(if (\$body | length) > 70 then \"...\" else \"\" end)\""

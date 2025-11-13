@@ -8,20 +8,29 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     utils.url = "github:numtide/flake-utils";
-    una.url = "github:jwiegley/una";
+    una = {
+      url = "github:jwiegley/una";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, utils, una }:
   let
+    una = pkgs.haskell.packages.ghc98.callCabal2nix "una" una {};
     homeModules = [
       ./default.nix
+      ./util.nix
       ./clojure.nix
       ./desktop.nix
       ./network.nix
     ];
   in {
     homeManagerModules.default = { pkgs, ... }: {
-      imports = homeModules;
+      imports = homeModules ++ [
+        {
+          home.packages = [ una ];
+        }
+      ];
       _module.args.una = una;
     };
     
