@@ -23,10 +23,12 @@
       ./network.nix
     ];
 
-    mkHomeConfig = system: username: extraModules:
+    buildUna = pkgs: pkgs.haskell.packages.ghc98.callCabal2nix "una" una-src {};
+    mkUnaPackage = system: buildUna nixpkgs.legacyPackages.${system};
+
+    mkHomeConfig = system: username: unaPackage: extraModules:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        unaPackage = pkgs.haskell.packages.ghc98.callCabal2nix "una" una-src {};
         homeDirectory =
           if pkgs.stdenv.isDarwin
           then "/Users/${username}"
@@ -43,25 +45,28 @@
         ];
         extraSpecialArgs = { una = unaPackage; };
       };
+
+    systems = {
+      aarch64-darwin = mkUnaPackage "aarch64-darwin";
+      x86_64-linux = mkUnaPackage "x86_64-linux";
+      aarch64-linux = mkUnaPackage "aarch64-linux";
+    };
   in {
-    homeManagerModules.default = { pkgs, ... }:
-      let
-        unaPackage = pkgs.haskell.packages.ghc98.callCabal2nix "una" una-src {};
-      in {
-        imports = homeModules;
-        home.packages = [ unaPackage ];
-        _module.args.una = unaPackage;
-      };
+    homeManagerModules.default = { pkgs, ... }: {
+      imports = homeModules;
+      home.packages = [ (buildUna pkgs) ];
+      _module.args.una = buildUna pkgs;
+    };
 
     homeConfigurations = {
-      "aar@aarch64-darwin" = mkHomeConfig "aarch64-darwin" "aar" [];
-      "drewr@aarch64-darwin" = mkHomeConfig "aarch64-darwin" "drewr" [];
+      "aar@aarch64-darwin" = mkHomeConfig "aarch64-darwin" "aar" systems.aarch64-darwin [];
+      "drewr@aarch64-darwin" = mkHomeConfig "aarch64-darwin" "drewr" systems.aarch64-darwin [];
 
-      "aar@x86_64-linux" = mkHomeConfig "x86_64-linux" "aar" [];
-      "drewr@x86_64-linux" = mkHomeConfig "x86_64-linux" "drewr" [];
+      "aar@x86_64-linux" = mkHomeConfig "x86_64-linux" "aar" systems.x86_64-linux [];
+      "drewr@x86_64-linux" = mkHomeConfig "x86_64-linux" "drewr" systems.x86_64-linux [];
 
-      "aar@aarch64-linux" = mkHomeConfig "aarch64-linux" "aar" [];
-      "drewr@aarch64-linux" = mkHomeConfig "aarch64-linux" "drewr" [];
+      "aar@aarch64-linux" = mkHomeConfig "aarch64-linux" "aar" systems.aarch64-linux [];
+      "drewr@aarch64-linux" = mkHomeConfig "aarch64-linux" "drewr" systems.aarch64-linux [];
     };
   };
 }
