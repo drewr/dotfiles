@@ -3,6 +3,9 @@ name = Drew Raines
 email = drew@raines.me
 signingkey = 8303DF5FB4CD012B51C5B342A75020AA91174942
 
+[github]
+username = drewr
+
 [alias]
 ci = commit
 co = checkout
