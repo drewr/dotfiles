@@ -1,4 +1,7 @@
-install: .FORCE
-	@zsh install
+.PHONY: install home
 
-.FORCE:
+install:
+	zsh install
+
+home: install
+	zsh build-home-manager
