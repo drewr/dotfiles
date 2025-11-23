@@ -12,4 +12,9 @@ else
   nix_arch=aarch64-linux
 fi
 
-( cd $HOME/.config/home-manager && home-manager switch --flake .#${username}@${nix_arch} )
+(
+  cd $HOME/.config/home-manager \
+    && rm -f flake.lock \
+    && nix run github:nix-community/home-manager/release-25.05 -- \
+          switch --flake .#${username}@${nix_arch}
+)
