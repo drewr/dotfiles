@@ -19,6 +19,7 @@
     pkgs.jq
     pkgs.jujutsu
     pkgs.keychain
+    pkgs.gnumake
     pkgs.pandoc
     pkgs.ripgrep
     pkgs.tmux
