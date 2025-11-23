@@ -4,6 +4,7 @@
   home.packages = [
     pkgs.mpv
     pkgs.msmtp
+    pkgs.python3Packages.grip
   ];
 
   home.file = {
