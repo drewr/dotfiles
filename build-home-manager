@@ -6,13 +6,10 @@ username=${LOGNAME:-$(whoami)}
 
 if [ "$system" = "Darwin arm64" ]; then
   nix_arch=aarch64-darwin
-  username=aar
 elif [ "$system" = "x86_64 GNU/Linux" ]; then
   nix_arch=x86_64-linux
-  username=drewr
 else
   nix_arch=aarch64-linux
-  username=drewr
 fi
 
 ( cd $HOME/.config/home-manager && home-manager switch --flake .#${username}@${nix_arch} )
