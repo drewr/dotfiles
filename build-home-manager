@@ -4,13 +4,15 @@ system=$(uname -mo)
 nix_arch=$system
 username=${LOGNAME:-$(whoami)}
 
-if [ "$system" = "Darwin arm64" ]; then
+if [ "$system" = "arm64 Darwin" ]; then
   nix_arch=aarch64-darwin
 elif [ "$system" = "x86_64 GNU/Linux" ]; then
   nix_arch=x86_64-linux
 else
   nix_arch=aarch64-linux
 fi
+
+echo BUILDING ${username}@${nix_arch}
 
 (
   cd $HOME/.config/home-manager \
