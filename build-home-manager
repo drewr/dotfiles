@@ -4,7 +4,7 @@ system=$(uname -mo)
 nix_arch=$system
 username=${LOGNAME:-$(whoami)}
 
-if [ "$system" = "arm64 Darwin" ]; then
+if [ "$system" = "arm64 Darwin" -o "$system" = "Darwin arm64" ]; then
   nix_arch=aarch64-darwin
 elif [ "$system" = "x86_64 GNU/Linux" ]; then
   nix_arch=x86_64-linux
