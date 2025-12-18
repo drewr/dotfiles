@@ -49,6 +49,9 @@ fi
 NIMPATH=${HOME_}/.nimble/bin
 [[ -d $NIMPATH ]] && PATH=$NIMPATH:$PATH
 
+CLAUDEPATH=${HOME_}/.claude
+[[ -d ${CLAUDEPATH}/bin ]] && PATH=${CLAUDEPATH}:$PATH
+
 PATH=${HOME_}/bin:$PATH
 
 if [[ $TERM == "dumb" ]]; then
