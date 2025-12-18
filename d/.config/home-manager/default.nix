@@ -40,6 +40,10 @@
 
     "bin/rand".source = ./d/bin/rand;
 
+    ".npmrc".text = ''
+    prefix=${config.home.homeDirectory}/.npm
+    '';
+
     ".config/home-manager/current-config".text = ''
       hoping to put in \$\{config.home\} at some point
     '';
