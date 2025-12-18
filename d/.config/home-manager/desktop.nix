@@ -2,6 +2,7 @@
 
 {
   home.packages = [
+    pkgs.ffmpeg
     pkgs.mpv
     pkgs.msmtp
     pkgs.python3Packages.grip
