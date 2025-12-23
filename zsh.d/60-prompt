@@ -6,7 +6,7 @@ setopt prompt_subst
 ### RPROMPT='[%T]'
 
 if not_in_cloud; then
-  PROMPT='%n@%m %w %* %! %? %B%3~%b(${vcs_info_msg_0_})%# '; export PROMPT
+  PROMPT='%n@%m %w %* %! %? %B%3~%b${nix_prompt}${vcs_info_msg_0_}%# '; export PROMPT
 else
-  PROMPT='%n@%m %w %* %! %? %~%# '; export PROMPT
+  PROMPT='%n@%m %w %* %! %? %~${nix_prompt}%# '; export PROMPT
 fi

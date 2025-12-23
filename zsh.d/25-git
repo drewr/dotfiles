@@ -42,10 +42,17 @@ if not_in_cloud; then
     zstyle ":vcs_info:(sv[nk]|bzr):*" branchformat "%b%F{1}:%F{yellow}%r%{$reset_color%}"
     zstyle ":vcs_info:*" enable git svn bzr hg
     precmd () {
+      nix_info=$(nix-zsh-env)
+      if [[ -n $nix_info ]]; then
+        nix_prompt="[%F{blue}${nix_info}%{$reset_color%}]"
+      else
+        nix_prompt=""
+      fi
+
       if [[ -z $(git ls-files --other --exclude-standard 2> /dev/null) ]] {
-        zstyle ":vcs_info:*" formats "%b%c%u%{$reset_color%}"
+        zstyle ":vcs_info:*" formats "[%b%c%u%{$reset_color%}]"
       } else {
-        zstyle ":vcs_info:*" formats "%b%c%u%F{red}●%{$reset_color%}"
+        zstyle ":vcs_info:*" formats "[%b%c%u%F{red}●%{$reset_color%}]"
       }
       vcs_info
     }
@@ -56,10 +63,17 @@ if not_in_cloud; then
     zstyle ":vcs_info:(sv[nk]|bzr):*" branchformat "%b:%r"
     zstyle ":vcs_info:*" enable git svn bzr hg
     precmd () {
+      nix_info=$(nix-zsh-env)
+      if [[ -n $nix_info ]]; then
+        nix_prompt="[${nix_info}]"
+      else
+        nix_prompt=""
+      fi
+
       if [[ -z $(git ls-files --other --exclude-standard 2> /dev/null) ]] {
-        zstyle ":vcs_info:*" formats "%b%c%u"
+        zstyle ":vcs_info:*" formats "[%b%c%u]"
       } else {
-        zstyle ":vcs_info:*" formats "%b%c%u●"
+        zstyle ":vcs_info:*" formats "[%b%c%u●]"
       }
       vcs_info
     }
