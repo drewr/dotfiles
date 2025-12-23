@@ -44,7 +44,7 @@
           {
             home.packages = [
               unaPackage
-              zigutils.packages.${system}.nix-zsh-env
+              zigutils.packages.${pkgs.system}.nix-zsh-env
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -63,7 +63,7 @@
       imports = homeModules;
       home.packages = [
         (buildUna pkgs)
-        zigutils.packages.${system}.nix-zsh-env
+        zigutils.packages.${pkgs.system}.nix-zsh-env
       ];
       _module.args.una = buildUna pkgs;
     };
