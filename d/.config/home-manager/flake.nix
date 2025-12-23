@@ -11,9 +11,13 @@
       url = "github:jwiegley/una";
       flake = false;
     };
+    zigutils = {
+      url = "github:drewr/zigutils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, una-src }:
+  outputs = { self, nixpkgs, home-manager, una-src, zigutils }:
   let
     homeModules = [
       ./default.nix
@@ -38,7 +42,10 @@
         inherit pkgs;
         modules = homeModules ++ extraModules ++ [
           {
-            home.packages = [ unaPackage ];
+            home.packages = [
+              unaPackage
+              zigutils.packages.${system}.nix-zsh-env
+            ];
             home.username = username;
             home.homeDirectory = homeDirectory;
           }
@@ -54,7 +61,10 @@
   in {
     homeManagerModules.default = { pkgs, ... }: {
       imports = homeModules;
-      home.packages = [ (buildUna pkgs) ];
+      home.packages = [
+        (buildUna pkgs)
+        zigutils.packages.${system}.nix-zsh-env
+      ];
       _module.args.una = buildUna pkgs;
     };
 
