@@ -15,9 +15,13 @@
       url = "github:drewr/zigutils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, una-src, zigutils }:
+  outputs = { self, nixpkgs, home-manager, una-src, zigutils, claude-code }:
   let
     homeModules = [
       ./default.nix
@@ -46,6 +50,7 @@
               unaPackage
               zigutils.packages.${pkgs.system}.nix-zsh-env
               zigutils.packages.${pkgs.system}.gitclone
+              claude-code.packages.${pkgs.system}.default
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -66,6 +71,7 @@
         (buildUna pkgs)
         zigutils.packages.${pkgs.system}.nix-zsh-env
         zigutils.packages.${pkgs.system}.gitclone
+        pkgs.claude-code
       ];
       _module.args.una = buildUna pkgs;
     };
