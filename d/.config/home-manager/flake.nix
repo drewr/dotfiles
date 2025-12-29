@@ -45,6 +45,7 @@
             home.packages = [
               unaPackage
               zigutils.packages.${pkgs.system}.nix-zsh-env
+              zigutils.packages.${pkgs.system}.gitclone
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -64,6 +65,7 @@
       home.packages = [
         (buildUna pkgs)
         zigutils.packages.${pkgs.system}.nix-zsh-env
+        zigutils.packages.${pkgs.system}.gitclone
       ];
       _module.args.una = buildUna pkgs;
     };
