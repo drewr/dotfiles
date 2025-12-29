@@ -1,5 +1,6 @@
 # -*- sh -*-
 
+alias history="fc -lE -500"
 alias gl="git log -5 --pretty=oneline"
 alias gb="git branch"
 alias gs="git status"
