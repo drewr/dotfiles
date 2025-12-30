@@ -18,12 +18,97 @@ gh search commits \
 echo
 
 echo "Pull Requests"
-gh search prs \
-  --owner="$ORG" \
-  --involves="$USERNAME" \
-  --updated=">=$DATE_SINCE" \
-  --json number,title,repository,state,updatedAt,author \
-  --jq '.[] | "[\(.updatedAt)] \(.repository.name)#\(.number): \(.title) (\(.state)) by @\(.author.login)"'
+gh api graphql -f query="
+{
+  search(query: \"org:$ORG updated:>=$DATE_SINCE is:pr\", type: ISSUE, first: 100) {
+    nodes {
+      ... on PullRequest {
+        number
+        title
+        state
+        updatedAt
+        author {
+          login
+        }
+        repository {
+          name
+        }
+        comments(first: 100) {
+          nodes {
+            author {
+              login
+            }
+          }
+        }
+        reviews(first: 100) {
+          nodes {
+            author {
+              login
+            }
+          }
+        }
+        mergedBy {
+          login
+        }
+      }
+    }
+  }
+}" \
+  --jq ".data.search.nodes[]
+        | select(
+            .author.login == \"$USERNAME\" or
+            .mergedBy.login == \"$USERNAME\" or
+            (.comments.nodes[].author.login | . == \"$USERNAME\") or
+            (.reviews.nodes[].author.login | . == \"$USERNAME\")
+          )
+        | \"[\(.updatedAt)] \(.repository.name)#\(.number): \(.title) (\(.state)) by @\(.author.login)\""
+echo
+
+echo "PRs ignored (review requested but not touched)"
+gh api graphql -f query="
+{
+  search(query: \"org:$ORG updated:>=$DATE_SINCE is:pr review-requested:$USERNAME\", type: ISSUE, first: 100) {
+    nodes {
+      ... on PullRequest {
+        number
+        title
+        state
+        updatedAt
+        author {
+          login
+        }
+        repository {
+          name
+        }
+        comments(first: 100) {
+          nodes {
+            author {
+              login
+            }
+          }
+        }
+        reviews(first: 100) {
+          nodes {
+            author {
+              login
+            }
+          }
+        }
+        mergedBy {
+          login
+        }
+      }
+    }
+  }
+}" \
+  --jq ".data.search.nodes[]
+        | select(
+            .author.login != \"$USERNAME\" and
+            (.mergedBy.login // \"\" | . != \"$USERNAME\") and
+            ((.comments.nodes | map(.author.login) | contains([\"$USERNAME\"])) | not) and
+            ((.reviews.nodes | map(.author.login) | contains([\"$USERNAME\"])) | not)
+          )
+        | \"[\(.updatedAt)] \(.repository.name)#\(.number): \(.title) (\(.state)) by @\(.author.login)\""
 echo
 
 echo "Issues"
