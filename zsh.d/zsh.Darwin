@@ -3,4 +3,10 @@
 alias ls="ls -G"
 PATH=/opt/local/bin:/opt/local/sbin:$PATH
 
+active-utun() {
+  ifconfig | awk '/^[a-z0-9]+:/{iface=$1; sub(/:/, "", iface)} /10\.171\./{print iface; exit}'
+}
 
+inactive-utun() {
+  ifconfig | awk '/^utun[0-9]+:/{if(iface && has_inet==0) print iface; iface=$1; gsub(/:/, "", iface); has_inet=0} /^[[:space:]]+inet /{has_inet=1} END{if(iface && has_inet==0) print iface}'
+}
