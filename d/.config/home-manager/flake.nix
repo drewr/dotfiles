@@ -56,7 +56,10 @@
             home.homeDirectory = homeDirectory;
           }
         ];
-        extraSpecialArgs = { una = unaPackage; };
+        extraSpecialArgs = {
+          una = unaPackage;
+          inherit claude-code;
+        };
       };
 
     systems = {
@@ -71,7 +74,7 @@
         (buildUna pkgs)
         zigutils.packages.${pkgs.system}.nix-zsh-env
         zigutils.packages.${pkgs.system}.gitclone
-        pkgs.claude-code
+        claude-code.packages.${pkgs.system}.default
       ];
       _module.args.una = buildUna pkgs;
     };
