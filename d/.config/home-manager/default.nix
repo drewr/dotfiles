@@ -7,7 +7,7 @@
 
   home.packages = [
     pkgs.autossh
-    pkgs.awscli
+    pkgs.awscli2
     pkgs.emacs
     pkgs.fzf
     pkgs.gh
