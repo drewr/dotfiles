@@ -19,9 +19,13 @@
       url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    datumctl = {
+      url = "github:datum-cloud/datumctl";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, una-src, zigutils, claude-code }:
+  outputs = { self, nixpkgs, home-manager, una-src, zigutils, claude-code, datumctl }:
   let
     homeModules = [
       ./default.nix
@@ -51,6 +55,7 @@
               zigutils.packages.${pkgs.system}.nix-zsh-env
               zigutils.packages.${pkgs.system}.gitclone
               claude-code.packages.${pkgs.system}.default
+              datumctl.packages.${pkgs.system}.default
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -75,6 +80,7 @@
         zigutils.packages.${pkgs.system}.nix-zsh-env
         zigutils.packages.${pkgs.system}.gitclone
         claude-code.packages.${pkgs.system}.default
+        datumctl.packages.${pkgs.system}.default
       ];
       _module.args.una = buildUna pkgs;
     };
