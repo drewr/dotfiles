@@ -23,9 +23,13 @@
       url = "github:datum-cloud/datumctl";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    gemini-cli = {
+      url = "github:drewr/gemini-cli";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, una-src, zigutils, claude-code, datumctl }:
+  outputs = { self, nixpkgs, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli }:
   let
     homeModules = [
       ./default.nix
@@ -56,6 +60,7 @@
               zigutils.packages.${pkgs.system}.gitclone
               claude-code.packages.${pkgs.system}.default
               datumctl.packages.${pkgs.system}.default
+              gemini-cli.packages.${pkgs.system}.default
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -81,6 +86,7 @@
         zigutils.packages.${pkgs.system}.gitclone
         claude-code.packages.${pkgs.system}.default
         datumctl.packages.${pkgs.system}.default
+        gemini-cli.packages.${pkgs.system}.default
       ];
       _module.args.una = buildUna pkgs;
     };
