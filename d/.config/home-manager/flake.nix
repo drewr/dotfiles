@@ -24,12 +24,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     gemini-cli = {
-      url = "github:drewr/gemini-cli";
+      url = "github:sadjow/gemini-cli-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    codex-cli = {
+      url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli }:
+  outputs = { self, nixpkgs, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli }:
   let
     homeModules = [
       ./default.nix
@@ -61,6 +65,7 @@
               claude-code.packages.${pkgs.system}.default
               datumctl.packages.${pkgs.system}.default
               gemini-cli.packages.${pkgs.system}.default
+              codex-cli.packages.${pkgs.system}.default
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -87,6 +92,7 @@
         claude-code.packages.${pkgs.system}.default
         datumctl.packages.${pkgs.system}.default
         gemini-cli.packages.${pkgs.system}.default
+        codex-cli.packages.${pkgs.system}.default
       ];
       _module.args.una = buildUna pkgs;
     };
