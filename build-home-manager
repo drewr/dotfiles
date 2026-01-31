@@ -15,8 +15,14 @@ fi
 echo BUILDING ${username}@${nix_arch}
 
 (
-  cd $HOME/.config/home-manager \
-    && rm -f flake.lock \
-    && nix run github:nix-community/home-manager/release-25.05 -- \
-          switch --flake .#${username}@${nix_arch}
+  cd "$HOME/.config/home-manager" || exit 1
+  if [ -z "${KEEP_FLAKE_LOCK:-}" ]; then
+    rm -f flake.lock
+  fi
+  nix_args=""
+  if [ -n "${NIXPKGS_INPUT:-}" ]; then
+    nix_args="--override-input nixpkgs ${NIXPKGS_INPUT}"
+  fi
+  nix run github:nix-community/home-manager/release-25.11 -- \
+        switch --flake ".#${username}@${nix_arch}" ${nix_args}
 )
