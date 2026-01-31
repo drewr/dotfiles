@@ -3,7 +3,9 @@
 {
   home.packages = [
     pkgs.ffmpeg
-    pkgs.mpv
+    ## Won't stop rebuilding the entire world (swift, mainly), then
+    ## fails. We can just run it with `nix run` instead.
+    # pkgs.mpv
     pkgs.msmtp
     pkgs.python3Packages.grip
   ];
