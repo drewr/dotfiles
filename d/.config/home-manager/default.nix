@@ -8,6 +8,7 @@
   home.packages = [
     pkgs.autossh
     pkgs.awscli2
+    pkgs.curlFull
     pkgs.emacs
     pkgs.fzf
     pkgs.gh
