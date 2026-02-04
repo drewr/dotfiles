@@ -9,6 +9,7 @@
     pkgs.autossh
     pkgs.awscli2
     pkgs.curlFull
+    pkgs.dnslookup
     pkgs.emacs
     pkgs.fzf
     pkgs.gh
