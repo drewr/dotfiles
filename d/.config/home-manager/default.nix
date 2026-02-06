@@ -24,6 +24,7 @@
     pkgs.gnumake
     pkgs.pandoc
     pkgs.ripgrep
+    pkgs.simple-http-server
     pkgs.tmux
     # compile takes forever... ## una.packages.${pkgs.system}.default
     pkgs.xh
