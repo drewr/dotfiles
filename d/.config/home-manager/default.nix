@@ -18,6 +18,7 @@
     pkgs.htop
     pkgs.ispell
     pkgs.jet
+    pkgs.opencode
     pkgs.jq
     pkgs.jujutsu
     pkgs.keychain
