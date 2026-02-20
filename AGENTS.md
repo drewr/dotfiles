@@ -42,6 +42,7 @@ The main configuration is in `d/.config/home-manager/flake.nix`, which includes,
 - `datumctl` - Datum cloud control tool
 - `gemini-cli` - Gemini CLI tool
 - `codex-cli` - Codex CLI tool
+- `opencode` - OpenCode CLI (github:anomalyco/opencode)
 - `una` - Haskell-based tool (custom build)
 
 **Supported Systems:**
@@ -92,7 +93,8 @@ Modular zsh setup in `zsh.d/`:
 **CLI Tools & AI Integration:**
 - Integrated Claude Code from Nix flake
 - Added `gemini-cli` and `datumctl`
-- Added custom Zig utilities (`nix-zsh-env`, `gitclone`)
+- Added customix-zsh-env Zig utilities (`n`, `gitclone`)
+- Added `opencode` from github:anomalyco/opencode
 - Enhanced GitHub integration with PR management and user activity tracking
 
 **Configuration Management:**
