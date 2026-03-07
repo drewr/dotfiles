@@ -16,9 +16,12 @@ echo BUILDING ${username}@${nix_arch}
 
 (
   cd "$HOME/.config/home-manager" || exit 1
-  if [ -z "${KEEP_FLAKE_LOCK:-}" ]; then
-    rm -f flake.lock
+
+  if [ "${UPDATE:-}" = "1" ]; then
+    echo "Updating flake dependencies..."
+    nix flake update
   fi
+
   nix_args=""
   if [ -n "${NIXPKGS_INPUT:-}" ]; then
     nix_args="--override-input nixpkgs ${NIXPKGS_INPUT}"

@@ -214,19 +214,12 @@ This repository follows these principles:
 
 ### Updating Dependencies
 
-See if anything changed:
-
 ```bash
-# Update all flake inputs
-cd ~/.config/home-manager
-nix flake update
+# Update flake inputs and regenerate lockfile
+UPDATE=1 ./build-home-manager
 ```
 
-If the output is non-empty:
-
-```bash
-make home
-```
+This updates all dependencies to their latest versions and saves the new `flake.lock` to the dotfiles. Commit the updated lockfile to preserve working versions.
 
 ### Garbage Collection
 
@@ -246,7 +239,7 @@ When working in this repository:
 2. **Don't Break Reproducibility**: Avoid manual `nix-env -i` installs
 3. **Multi-user Setup**: Remember there are configurations for both `aar` and `drewr`
 4. **Platform Awareness**: Check which system is being targeted (Darwin vs Linux)
-5. **Flake Updates**: This repo doesn't track a `flake.lock`
+5. **Flake Lock**: This repo tracks `flake.lock` for home-manager to pin dependency versions
 6. **Script Permissions**: New scripts in `d/bin/` need to be executable
 7. **Home Manager**: Changes require rebuild with `./build-home-manager`
 8. **Coding Agents Integration**: Prefer OpenCode
