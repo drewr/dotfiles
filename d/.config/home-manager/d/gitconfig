@@ -44,3 +44,6 @@ helper = store
 
 [commit]
 gpgsign = true
+
+[init]
+defaultBranch = main
