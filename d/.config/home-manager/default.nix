@@ -40,6 +40,7 @@
   home.file = {
     ".gitconfig".source = ./d/gitconfig;
     ".tmux.conf".source = ./d/tmux.conf;
+    ".ssh/allowed_signers".source = ./d/ssh-allowed-signers;
 
     "bin/rand".source = ./d/bin/rand;
 
