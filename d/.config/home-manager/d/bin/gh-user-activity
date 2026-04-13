@@ -64,6 +64,39 @@ gh api graphql -f query="
         | \"[\(.updatedAt)] \(.repository.name)#\(.number): \(.title) (\(.state)) by @\(.author.login)\""
 echo
 
+echo "Pull requests needing specific review from $USERNAME"
+gh api graphql -f query="
+{
+  search(query: \"org:$ORG is:pr is:open review-requested:$USERNAME\", type: ISSUE, first: 100) {
+    nodes {
+      ... on PullRequest {
+        number
+        title
+        updatedAt
+        author {
+          login
+        }
+        repository {
+          name
+        }
+        reviewRequests(first: 20) {
+          nodes {
+            requestedReviewer {
+              ... on User {
+                login
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}" \
+  --jq ".data.search.nodes[]
+        | select(.reviewRequests.nodes[].requestedReviewer.login == \"$USERNAME\")
+        | \"[\(.updatedAt)] \(.repository.name)#\(.number): \(.title) by @\(.author.login)\""
+echo
+
 echo "PRs ignored (review requested but not touched)"
 gh api graphql -f query="
 {
