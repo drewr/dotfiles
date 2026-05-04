@@ -38,6 +38,7 @@
   ];
 
   home.file = {
+    ".claude/settings.defaults.json".source = ./d/claude-settings-defaults.json;
     ".gitconfig".source = ./d/gitconfig;
     ".tmux.conf".source = ./d/tmux.conf;
     ".ssh/allowed_signers".source = ./d/ssh-allowed-signers;
@@ -56,6 +57,20 @@
   home.sessionVariables = {
     HM_VERSION = "THIS SHOULD GET A VALUE FROM config";
   };
+
+  home.activation.mergeClaudeSettings = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    defaults="$HOME/.claude/settings.defaults.json"
+    settings="$HOME/.claude/settings.json"
+    if [ -f "$defaults" ]; then
+      if [ -f "$settings" ]; then
+        tmp=$(${pkgs.coreutils}/bin/mktemp)
+        ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$defaults" "$settings" > "$tmp" \
+          && mv "$tmp" "$settings"
+      else
+        ${pkgs.coreutils}/bin/install -Dm644 "$defaults" "$settings"
+      fi
+    fi
+  '';
 
   programs.home-manager.enable = true;
 }

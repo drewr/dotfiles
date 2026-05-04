@@ -1,0 +1,8 @@
+{
+  "model": "sonnet[1m]",
+  "theme": "light",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
+}
