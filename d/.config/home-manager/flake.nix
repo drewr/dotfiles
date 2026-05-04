@@ -3,6 +3,9 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # Pinned to the rev where ghc-9.8.4 is in cache.nixos.org; do not bump
+    # without verifying the new rev's ghc98 derivation is cached.
+    nixpkgs-haskell.url = "github:nixos/nixpkgs/b12141ef619e0a9c1c84dc8c684040326f27cdcc";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -33,7 +36,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli }:
+  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli }:
   let
     homeModules = [
       ./default.nix
@@ -43,7 +46,7 @@
       ./network.nix
     ];
 
-    buildUna = pkgs: pkgs.haskell.packages.ghc98.callCabal2nix "una" una-src {};
+    buildUna = pkgs: nixpkgs-haskell.legacyPackages.${pkgs.system}.haskell.packages.ghc98.callCabal2nix "una" una-src {};
     mkUnaPackage = system: buildUna nixpkgs.legacyPackages.${system};
 
     mkHomeConfig = system: username: unaPackage: extraModules:
