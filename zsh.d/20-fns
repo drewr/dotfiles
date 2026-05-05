@@ -96,14 +96,23 @@ gitcb() {
   git checkout -b $(basename $b) $b
 }
 
+# ~/.ssh/rc (run by sshd before the shell starts) creates ~/.ssh/ssh_auth_sock
+# as a stable symlink to the real agent socket and updates tmux's session
+# environment. This function reads that state into the current shell. It runs
+# at shell startup (called from zshrc) and before every command (preexec), so
+# shells that were open before a new SSH connection landed also pick it up.
 update_auth_sock() {
   if [[ -n $TMUX ]]; then
     TMUX_SOCK=$(echo $TMUX|cut -d , -f 1)
-    NEW_SSH_AUTH_SOCK=$(tmux -S $TMUX_SOCK showenv|grep ^SSH_AUTH_SOCK|cut -d = -f 2)
+    NEW_SSH_AUTH_SOCK=$(tmux -S $TMUX_SOCK showenv 2>/dev/null|grep ^SSH_AUTH_SOCK|cut -d = -f 2)
     if [[ -n $NEW_SSH_AUTH_SOCK ]] && [[ -S $NEW_SSH_AUTH_SOCK ]]; then
       SSH_AUTH_SOCK=$NEW_SSH_AUTH_SOCK
+      return
     fi
   fi
+  # Stable symlink kept current by ~/.ssh/rc on each inbound SSH connection
+  local stable=~/.ssh/ssh_auth_sock
+  [[ -S $stable ]] && SSH_AUTH_SOCK=$stable
 }
 preexec_functions+=update_auth_sock
 

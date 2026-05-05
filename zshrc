@@ -28,3 +28,8 @@ done
 unsetopt EXTENDED_GLOB
 
 [[ -f ~/.zsh.d/zsh.${OS} ]] && source ~/.zsh.d/zsh.${OS}
+
+# Run once at startup so SSH_AUTH_SOCK is correct before the first command.
+# ~/.ssh/rc handles the other side: updating the symlink and tmux environment
+# when a new inbound SSH connection arrives (including non-interactive ones).
+update_auth_sock
