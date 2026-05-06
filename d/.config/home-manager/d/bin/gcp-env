@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<EOF
+Usage: $0 {staging|prod}
+
+Examples:
+  $0 staging
+  $0 prod
+EOF
+  exit 1
+}
+
+if [[ $# -lt 1 ]]; then
+  echo "❌ Missing environment argument."
+  usage
+fi
+
+ENV="$1"
+
+case "$ENV" in
+  staging|stg)
+    ENV_NAME="STAGING"
+    SERVICE_ACCOUNT="developer@datum-cloud-staging.iam.gserviceaccount.com"
+    PROJECT_ID="datum-cloud-staging"
+    CLUSTER_NAME="infrastructure-control-plane-staging"
+    ;;
+  prod|production)
+    ENV_NAME="PRODUCTION"
+    SERVICE_ACCOUNT="developer@datum-cloud-prod.iam.gserviceaccount.com"
+    PROJECT_ID="datum-cloud-prod"
+    CLUSTER_NAME="infrastructure-control-plane-prod"
+    ;;
+  *)
+    echo "❌ Unknown environment: '$ENV'"
+    usage
+    ;;
+esac
+
+REGION="us-east4"
+
+echo "🔁 Switching to $ENV_NAME environment..."
+echo "👉 Service account: $SERVICE_ACCOUNT"
+echo "👉 Project:        $PROJECT_ID"
+echo "👉 Cluster:        $CLUSTER_NAME"
+echo
+
+# 1. Configure gcloud to always impersonate this service account
+echo "▶ gcloud config set auth/impersonate_service_account ..."
+gcloud config set auth/impersonate_service_account "$SERVICE_ACCOUNT"
+
+# 2. Configure ADC (used by Pulumi, SDKs, etc.)
+echo "▶ gcloud auth application-default login --impersonate-service-account ..."
+gcloud auth application-default login --impersonate-service-account "$SERVICE_ACCOUNT"
+
+# 3. Authenticate gcloud CLI as the service account (for gcloud / GKE commands)
+echo "▶ gcloud auth login --impersonate-service-account ..."
+gcloud auth login --impersonate-service-account "$SERVICE_ACCOUNT"
+
+# 4. Get Kubernetes credentials for the chosen control plane
+echo "▶ gcloud container clusters get-credentials ..."
+gcloud container clusters get-credentials "$CLUSTER_NAME" \
+  --region "$REGION" \
+  --project "$PROJECT_ID"
+
+echo
+echo "✅ Now authenticated as:"
+gcloud config get-value account
+
+echo "✅ kubectl context:"
+kubectl config current-context || echo "kubectl not configured or not installed."

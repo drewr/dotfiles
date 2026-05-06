@@ -44,6 +44,7 @@
     ".tmux.conf".source = ./d/tmux.conf;
     ".ssh/allowed_signers".source = ./d/ssh-allowed-signers;
 
+    "bin/gcp-env" = { source = ./d/bin/gcp-env; executable = true; };
     "bin/rand".source = ./d/bin/rand;
 
     ".npmrc".text = ''
