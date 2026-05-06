@@ -14,6 +14,7 @@
     pkgs.fzf
     pkgs.gh
     pkgs.git
+    pkgs.google-cloud-sdk
     pkgs.gnupg
     pkgs.htop
     pkgs.ispell
