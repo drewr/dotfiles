@@ -14,6 +14,7 @@
     pkgs.fzf
     pkgs.gh
     pkgs.git
+    pkgs.google-cloud-sdk
     pkgs.gnupg
     pkgs.htop
     pkgs.ispell
@@ -43,6 +44,7 @@
     ".tmux.conf".source = ./d/tmux.conf;
     ".ssh/allowed_signers".source = ./d/ssh-allowed-signers;
 
+    "bin/gcp-env" = { source = ./d/bin/gcp-env; executable = true; };
     "bin/rand".source = ./d/bin/rand;
 
     ".npmrc".text = ''
