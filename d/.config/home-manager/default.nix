@@ -24,6 +24,7 @@
     pkgs.jq
     pkgs.jujutsu
     pkgs.keychain
+    pkgs.kubectl
     pkgs.gnumake
     pkgs.pandoc
     pkgs.ripgrep
