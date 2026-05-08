@@ -51,7 +51,7 @@
 
     mkHomeConfig = system: username: unaPackage: extraModules:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs { system = system; config.allowUnfree = true; };
         homeDirectory =
           if pkgs.stdenv.isDarwin
           then "/Users/${username}"

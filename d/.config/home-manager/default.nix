@@ -14,7 +14,7 @@
     pkgs.fzf
     pkgs.gh
     pkgs.git
-    pkgs.claude-code-acp
+    pkgs.claude-agent-acp
     pkgs.codex-acp
     pkgs.goose-cli
     (pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
