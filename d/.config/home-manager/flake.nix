@@ -34,13 +34,9 @@
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    opencode = {
-      url = "github:anomalyco/opencode";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli, opencode }:
+  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli }:
   let
     homeModules = [
       ./default.nix
@@ -73,7 +69,7 @@
               datumctl.packages.${pkgs.system}.default
               gemini-cli.packages.${pkgs.system}.default
               codex-cli.packages.${pkgs.system}.default
-              opencode.packages.${pkgs.system}.default
+              (pkgs.callPackage ./packages/opencode/package.nix {})
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -101,7 +97,7 @@
         datumctl.packages.${pkgs.system}.default
         gemini-cli.packages.${pkgs.system}.default
         codex-cli.packages.${pkgs.system}.default
-        opencode.packages.${pkgs.system}.default
+        (pkgs.callPackage ./packages/opencode/package.nix {})
       ];
       _module.args.una = buildUna pkgs;
     };
