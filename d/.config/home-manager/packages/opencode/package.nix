@@ -8,7 +8,6 @@
   fzf,
   ripgrep,
   versionCheckHook,
-  versionCheckHomeHook,
   writeShellScriptBin,
 }:
 
@@ -60,7 +59,6 @@ stdenv.mkDerivation {
   doInstallCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHook
-    versionCheckHomeHook
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     (writeShellScriptBin "sysctl" "echo 0")
