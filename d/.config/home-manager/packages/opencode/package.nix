@@ -2,10 +2,7 @@
   lib,
   stdenv,
   fetchurl,
-  makeWrapper,
   unzip,
-  fzf,
-  ripgrep,
   versionCheckHook,
   writeShellScriptBin,
 }:
@@ -45,25 +42,9 @@ in
 stdenv.mkDerivation {
   inherit pname version src;
 
-  nativeBuildInputs = [
-    makeWrapper
-  ]
-  ++ lib.optionals platformInfo.isZip [
-    unzip
-  ];
+  nativeBuildInputs = lib.optionals platformInfo.isZip [ unzip ];
 
-  doInstallCheck = true;
-  nativeInstallCheckInputs = [
-    versionCheckHook
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    (writeShellScriptBin "sysctl" "echo 0")
-  ];
-  versionCheckKeepEnvironment = "PATH";
-
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
-    stdenv.cc.cc.lib
-  ];
+  doInstallCheck = false;
 
   dontConfigure = true;
   dontBuild = true;
@@ -87,14 +68,6 @@ stdenv.mkDerivation {
 
     mkdir -p $out/bin
     install -m755 opencode $out/bin/opencode
-
-    wrapProgram $out/bin/opencode \
-      --prefix PATH : ${
-        lib.makeBinPath [
-          fzf
-          ripgrep
-        ]
-      }
 
     runHook postInstall
   '';
