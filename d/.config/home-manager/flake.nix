@@ -34,13 +34,9 @@
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    openhands-nix = {
-      url = "github:drewr/openhands-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli, openhands-nix }:
+  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli }:
   let
     homeModules = [
       ./default.nix
@@ -73,7 +69,6 @@
               datumctl.packages.${pkgs.system}.default
               gemini-cli.packages.${pkgs.system}.default
               codex-cli.packages.${pkgs.system}.default
-              openhands-nix.packages.${pkgs.system}.default
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
