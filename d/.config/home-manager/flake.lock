@@ -226,6 +226,26 @@
         "type": "github"
       }
     },
+    "opencode": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1780582669,
+        "narHash": "sha256-RJMZ8GoSQ9QztJpkE3OxHmFFHNpYzM6JtSI4kPmknLQ=",
+        "owner": "anomalyco",
+        "repo": "opencode",
+        "rev": "7e09660c3b1eab6f2a5bf3179d4fcf245303cbd9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anomalyco",
+        "repo": "opencode",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "claude-code": "claude-code",
@@ -235,6 +255,7 @@
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-haskell": "nixpkgs-haskell",
+        "opencode": "opencode",
         "una-src": "una-src",
         "zigutils": "zigutils"
       }
