@@ -26,7 +26,9 @@ echo BUILDING ${username}@${nix_arch}
   if [ -n "${NIXPKGS_INPUT:-}" ]; then
     nix_args="--override-input nixpkgs ${NIXPKGS_INPUT}"
   fi
-  NIX_CONFIG="extra-substituters=https://cache.numtide.com https://cache.nixos.org extra-trusted-public-keys=niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= cache.nixos.org-1:6NCHd0Y9XMDA9/4lQpJzN3fPXMmHIvWtGBJpvGm0w1g=" \
+  NIX_CONFIG="extra-substituters = https://cache.numtide.com
+extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=
+accept-flake-config = true" \
     nix run github:nix-community/home-manager/release-26.05 -- \
-          switch --accept-flake-config --flake ".#${username}@${nix_arch}" ${nix_args}
+          switch --flake ".#${username}@${nix_arch}" ${nix_args}
 )
