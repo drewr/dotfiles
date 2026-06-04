@@ -18,20 +18,8 @@
       url = "github:drewr/zigutils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    claude-code = {
-      url = "github:sadjow/claude-code-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     datumctl = {
       url = "github:datum-cloud/datumctl";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    gemini-cli = {
-      url = "github:sadjow/gemini-cli-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    codex-cli = {
-      url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     llm-agents = {
@@ -40,7 +28,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli, llm-agents }:
+  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, datumctl, llm-agents }:
   let
     homeModules = [
       ./default.nix
@@ -69,10 +57,10 @@
               unaPackage
               zigutils.packages.${pkgs.system}.nix-zsh-env
               zigutils.packages.${pkgs.system}.gitclone
-              claude-code.packages.${pkgs.system}.default
+              llm-agents.packages.${pkgs.system}.claude-code
               datumctl.packages.${pkgs.system}.default
-              gemini-cli.packages.${pkgs.system}.default
-              codex-cli.packages.${pkgs.system}.default
+              llm-agents.packages.${pkgs.system}.gemini-cli
+              llm-agents.packages.${pkgs.system}.codex
               llm-agents.packages.${pkgs.system}.opencode
             ];
             home.username = username;
@@ -81,7 +69,6 @@
         ];
         extraSpecialArgs = {
           una = unaPackage;
-          inherit claude-code;
         };
       };
 
@@ -97,10 +84,10 @@
         (buildUna pkgs)
         zigutils.packages.${pkgs.system}.nix-zsh-env
         zigutils.packages.${pkgs.system}.gitclone
-        claude-code.packages.${pkgs.system}.default
+        llm-agents.packages.${pkgs.system}.claude-code
         datumctl.packages.${pkgs.system}.default
-        gemini-cli.packages.${pkgs.system}.default
-        codex-cli.packages.${pkgs.system}.default
+        llm-agents.packages.${pkgs.system}.gemini-cli
+        llm-agents.packages.${pkgs.system}.codex
         llm-agents.packages.${pkgs.system}.opencode
       ];
       _module.args.una = buildUna pkgs;
