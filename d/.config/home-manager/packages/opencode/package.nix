@@ -4,7 +4,6 @@
   fetchurl,
   makeWrapper,
   unzip,
-  wrapBuddy,
   fzf,
   ripgrep,
   versionCheckHook,
@@ -51,9 +50,6 @@ stdenv.mkDerivation {
   ]
   ++ lib.optionals platformInfo.isZip [
     unzip
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    wrapBuddy
   ];
 
   doInstallCheck = true;
@@ -67,10 +63,6 @@ stdenv.mkDerivation {
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
-  ];
-
-  wrapBuddyExtraNeeded = lib.optionals stdenv.hostPlatform.isLinux [
-    "libstdc++.so.6"
   ];
 
   dontConfigure = true;
