@@ -1,6 +1,14 @@
 {
   description = "My Home Manager configuration";
 
+  nixConfig = {
+    extra-substituters = [ "https://cache.numtide.com" "https://cache.nixos.org" ];
+    extra-trusted-public-keys = [
+      "cache.numtide.com-1:5JYbf/2gGSu0U1+ZwSzNcsmDYBp3UQwtRgus0qA56I8="
+      "cache.nixos.org-1:6NCHd0Y9XMDA9/4lQpJzN3fPXMmHIvWtGBJpvGm0w1g="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     # Pinned to the rev where ghc-9.8.4 is in cache.nixos.org; do not bump
