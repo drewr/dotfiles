@@ -34,9 +34,13 @@
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli }:
+  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, claude-code, datumctl, gemini-cli, codex-cli, llm-agents }:
   let
     homeModules = [
       ./default.nix
@@ -69,7 +73,7 @@
               datumctl.packages.${pkgs.system}.default
               gemini-cli.packages.${pkgs.system}.default
               codex-cli.packages.${pkgs.system}.default
-              (pkgs.callPackage ./packages/opencode/package.nix {})
+              llm-agents.packages.${pkgs.system}.opencode
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -97,7 +101,7 @@
         datumctl.packages.${pkgs.system}.default
         gemini-cli.packages.${pkgs.system}.default
         codex-cli.packages.${pkgs.system}.default
-        (pkgs.callPackage ./packages/opencode/package.nix {})
+        llm-agents.packages.${pkgs.system}.opencode
       ];
       _module.args.una = buildUna pkgs;
     };
