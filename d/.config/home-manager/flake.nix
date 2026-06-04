@@ -4,7 +4,7 @@
   nixConfig = {
     extra-substituters = [ "https://cache.numtide.com" "https://cache.nixos.org" ];
     extra-trusted-public-keys = [
-      "cache.numtide.com-1:5JYbf/2gGSu0U1+ZwSzNcsmDYBp3UQwtRgus0qA56I8="
+      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
       "cache.nixos.org-1:6NCHd0Y9XMDA9/4lQpJzN3fPXMmHIvWtGBJpvGm0w1g="
     ];
   };
