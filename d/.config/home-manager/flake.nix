@@ -70,6 +70,7 @@
               llm-agents.packages.${pkgs.system}.gemini-cli
               llm-agents.packages.${pkgs.system}.codex
               llm-agents.packages.${pkgs.system}.opencode
+              llm-agents.packages.${pkgs.system}.pi
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -97,6 +98,7 @@
         llm-agents.packages.${pkgs.system}.gemini-cli
         llm-agents.packages.${pkgs.system}.codex
         llm-agents.packages.${pkgs.system}.opencode
+        llm-agents.packages.${pkgs.system}.pi
       ];
       _module.args.una = buildUna pkgs;
     };
