@@ -69,6 +69,7 @@
               datumctl.packages.${pkgs.system}.default
               llm-agents.packages.${pkgs.system}.gemini-cli
               llm-agents.packages.${pkgs.system}.codex
+              llm-agents.packages.${pkgs.system}.opencode
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -95,6 +96,7 @@
         datumctl.packages.${pkgs.system}.default
         llm-agents.packages.${pkgs.system}.gemini-cli
         llm-agents.packages.${pkgs.system}.codex
+        llm-agents.packages.${pkgs.system}.opencode
       ];
       _module.args.una = buildUna pkgs;
     };

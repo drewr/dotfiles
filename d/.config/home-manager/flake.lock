@@ -143,11 +143,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783222121,
-        "narHash": "sha256-E/ElL373TO8lQ2aMvYyzN+k4xkVaUGoRqoa8AtM71tI=",
+        "lastModified": 1783388784,
+        "narHash": "sha256-w+YU5vatysjLZIg1wOKSzo/RL9Z66eBQuIjVnBM/1Zg=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "a1645f40777620c4bd2b6d854b290c2fc354a266",
+        "rev": "63d02d1c19f1c2b47a5bc7e55c620b6af7b218a6",
         "type": "github"
       },
       "original": {
@@ -168,11 +168,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1783335367,
-        "narHash": "sha256-TJ4+wYOJYYX+z//9C4psF0e1K8TgXrWRITnERhL/oP8=",
+        "lastModified": 1783425991,
+        "narHash": "sha256-G/4M0cErDYVomgd+3sd1xQJnC3e56coq3ge7z1jw9ME=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "5dd40d7cef40fce5ac4f922b92d92373ef71daf2",
+        "rev": "7423d972b4c7d6f8ba9f5ea61aa7e900c5ed1e12",
         "type": "github"
       },
       "original": {
@@ -213,6 +213,27 @@
         "type": "github"
       }
     },
+    "opencode": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783426461,
+        "narHash": "sha256-e3ub7iy8Nwv/FNrip7nWwibziQO6wQTNTc2gSYQ4Jtg=",
+        "owner": "drewr",
+        "repo": "opencode",
+        "rev": "6ddf015043465c97608d77001f78da330467b3c7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "drewr",
+        "ref": "dev",
+        "repo": "opencode",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "datumctl": "datumctl",
@@ -220,6 +241,7 @@
         "llm-agents": "llm-agents",
         "nixpkgs": "nixpkgs",
         "nixpkgs-haskell": "nixpkgs-haskell",
+        "opencode": "opencode",
         "una-src": "una-src",
         "zigutils": "zigutils"
       }
