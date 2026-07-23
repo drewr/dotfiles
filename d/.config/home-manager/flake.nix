@@ -71,6 +71,7 @@
               llm-agents.packages.${pkgs.system}.codex
               llm-agents.packages.${pkgs.system}.opencode
               llm-agents.packages.${pkgs.system}.pi
+              llm-agents.packages.${pkgs.system}.hermes-agent
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -99,6 +100,7 @@
         llm-agents.packages.${pkgs.system}.codex
         llm-agents.packages.${pkgs.system}.opencode
         llm-agents.packages.${pkgs.system}.pi
+        llm-agents.packages.${pkgs.system}.hermes-agent
       ];
       _module.args.una = buildUna pkgs;
     };
