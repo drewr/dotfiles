@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+USERNAME="$1"
+shift
+
+STATE="open"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --status)
+      STATE="$2"
+      shift 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+[[ $# -eq 0 ]] && { echo "Usage: gh-assigned <username> [--status <open|closed|all>] <org> [org...]"; exit 1; }
+
+ORGANIZATIONS=("$@")
+
+echo "=== Issues across $(echo "${ORGANIZATIONS[@]}" | tr ' ' ', ') assigned to $USERNAME ==="
+
+for org in "${ORGANIZATIONS[@]}"; do
+  gh search issues \
+    --assignee="$USERNAME" \
+    --owner="$org" \
+    --state="$STATE" \
+    --sort=updated \
+    --order=desc \
+    --limit=200 \
+    --json number,title,repository,state,updatedAt,author
+done | jq -rs 'add | sort_by(.updatedAt) | reverse[] | ((.title[:30] + (" " * 30))[:30]) as $t | "\(.updatedAt)|\($t)|https://github.com/\(.repository.nameWithOwner)/issues/\(.number)"'
