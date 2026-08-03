@@ -33,3 +33,41 @@ for org in "${ORGANIZATIONS[@]}"; do
     --limit=200 \
     --json number,title,repository,state,updatedAt,author
 done | jq -rs 'add | sort_by(.updatedAt) | reverse[] | ((.title[:30] + (" " * 30))[:30]) as $t | "\(.updatedAt)|\($t)|https://github.com/\(.repository.nameWithOwner)/issues/\(.number)"'
+
+echo ""
+echo "=== PRs across $(echo "${ORGANIZATIONS[@]}" | tr ' ' ', ') requesting review from $USERNAME ==="
+
+for org in "${ORGANIZATIONS[@]}"; do
+  gh api graphql -f query='
+    query($searchQuery: String!) {
+      search(query: $searchQuery, type: ISSUE, first: 100) {
+        nodes {
+          ... on PullRequest {
+            number
+            title
+            updatedAt
+            repository { nameWithOwner }
+            reviewRequests(first: 10) {
+              nodes {
+                requestedReviewer {
+                  __typename
+                  ... on User { login }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ' -f searchQuery="org:$org type:pr state:$STATE review-requested:$USERNAME"
+done | jq -rs --arg user "$USERNAME" '
+  [.[] | .data.search.nodes[]] |
+  map(select(
+    .reviewRequests.nodes |
+    any(.requestedReviewer.__typename == "User" and .requestedReviewer.login == $user)
+  )) |
+  sort_by(.updatedAt) |
+  reverse[] |
+  ((.title[:30] + (" " * 30))[:30]) as $t |
+  "\(.updatedAt)|\($t)|https://github.com/\(.repository.nameWithOwner)/pull/\(.number)"
+'
