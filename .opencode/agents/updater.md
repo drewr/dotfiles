@@ -38,6 +38,33 @@ If `make update` succeeded, run `make home` (runs `make install` then
 `zsh build-home-manager`). This builds and switches the Home Manager
 generation for the current system.
 
+### 4. Commit the lockfile
+
+Once `make home` runs (whether it succeeds on the full update or succeeds
+after pinning a lagging input back), commit the lockfile:
+
+```bash
+git add d/.config/home-manager/flake.lock
+git commit -m "chore: update deps"
+```
+
+Put the update summary in the commit message body: list which inputs updated
+and, if any were pinned back, call out the lagging dependency and why. Use
+multiple `-m` flags (each becomes a paragraph) to build the message, e.g.:
+
+```bash
+git add d/.config/home-manager/flake.lock
+git commit -m "chore: update deps" -m "- nixpkgs: 148bab9 -> b7c2ada
+- home-manager: bf9ce9f -> 7834e82"
+```
+
+(For a clean full update a short `chore: update deps` message is fine; the
+pinned-back detail matters most when an input lagged.)
+
+Only commit the `flake.lock` itself — never sweep in unrelated working-tree or
+staged changes. If `git status` shows other modifications, stage only
+`d/.config/home-manager/flake.lock`.
+
 ## Handling failures (do NOT just give up)
 
 A failure at any step is a decision point. Investigate before deciding. Run
@@ -83,9 +110,19 @@ healthy updates too. Only surgically hold back the failing input.
 
 Always end by summarizing:
 - what updated,
-- what was pinned back (if anything) and why,
+- what was pinned back (if anything) and why — call out any lagging dependency
+  so it can be revisited later,
 - any remaining failures that need human attention,
-- and whether the Home Manager switch succeeded.
+- and whether the Home Manager switch succeeded,
+- and the commit hash of the lockfile commit (if one was made).
 
-If you made lockfile edits, remind the user the changes are uncommitted and
-suggest committing `d/.config/home-manager/flake.lock`.
+### Commit on any successful build
+
+Always commit `d/.config/home-manager/flake.lock` whenever `make home` runs
+successfully — whether the full update switched cleanly or a lagging input was
+pinned back to keep the build green. Pinning a failing input back is an
+acceptable, expected outcome; the progress from the healthy inputs should be
+committed and the lagging dependency should be called out in the report so it
+can be revisited later. Only refrain from committing if `make home` never
+succeeded (e.g. a hard infra failure that left the lockfile half-updated), in
+which case stop and report instead.
