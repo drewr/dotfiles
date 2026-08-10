@@ -1,257 +1,74 @@
 # Dotfiles Repository
 
-Personal dotfiles and development environment configuration managed with shell, [Nix](https://nixos.org/), and [Home Manager](https://github.com/nix-community/home-manager).
+Personal dotfiles and development environment, declaratively managed with shell scripts, [Nix](https://nixos.org/), and [Home Manager](https://github.com/nix-community/home-manager). Reproducible across macOS (aarch64-darwin) and Linux (x86_64-linux, aarch64-linux).
 
-## Repository Overview
+## Core build flow (know this before editing)
 
-This repository contains personal configuration files, shell scripts, and environment setup for Unix-like systems (macOS and Linux). The configuration is declaratively managed using Nix flakes and Home Manager, enabling reproducible development environments across multiple machines. It is bootstrapped by a Makefile.
+The repo is NOT built in place. `make install` copies files into `$HOME`, then Home Manager builds from `$HOME/.config/home-manager` (the installed copy), not from the repo's `d/.config/home-manager`.
 
-## Structure
+- `make install` — copies `zprofile`, `zshrc`, `zshenv`, `zsh.d/`, and the whole `d/` tree into `$HOME`.
+- `make home` — runs `make install` first, then `zsh build-home-manager` (build + switch).
+- `make update` — `nix flake update --flake d/.config/home-manager` (regenerates the lockfile only).
+- `./build-home-manager` — by itself, runs against the **installed** `$HOME/.config/home-manager`. If you edit the repo's Nix files, you must `make install` (or `make home`) first for changes to be picked up.
+- `UPDATE=1 make home` / `UPDATE=1 ./build-home-manager` — updates flake inputs then builds. **Human-only action** (see below).
+
+## Warn before these actions
+
+- **`UPDATE=1` / `make update` / flake input bumps** — human-only. A nixpkgs bump can silently break the build on cross-system, especially the pinned `nixpkgs-haskell` rev whose ghc-9.8.4 must stay cacheable. Don't bump autonomously; hand to the human. The `updater` agent (`.opencode/agents/updater.md`) is the sanctioned path for updates.
+- **Manual `nix-env -i` package installs** — forbidden; breaks reproducibility. All packages go through Home Manager.
+- **Credentials/secrets setup** (AWS, GPG, keychain) — out of scope; never commit secrets.
+- **No CI** exists — the human is the only build gate across the three supported systems. Local build success does not verify the other systems.
+
+## Where things live
 
 ```
-dotfiles/
-├── d/                          # User home directory files
-│   ├── .config/home-manager/   # Home Manager configuration
-│   │   ├── flake.nix          # Main Nix flake with dependencies
-│   │   ├── default.nix        # Base packages and settings
-│   │   ├── util.nix           # Utility tools
-│   │   ├── clojure.nix        # Clojure development environment
-│   │   ├── desktop.nix        # Desktop applications (ffmpeg, ghostty, etc.)
-│   │   └── network.nix        # Network utilities
-│   └── bin/                    # Custom utility scripts (30+ tools)
-├── zsh.d/                      # Zsh configuration modules
-├── nix/                        # Language-specific Nix configs
-├── conf/                       # Application configurations
-├── etc/                        # System-level configs
-├── vm/                         # VM and Puppet configurations
-├── install                     # Installation script
-└── build-home-manager          # Home Manager build wrapper
+d/.config/home-manager/     # Nix flake + modules (the real config)
+  flake.nix                 # inputs, mkHomeConfig, homeConfigurations
+  default.nix / util.nix / clojure.nix / desktop.nix / network.nix
+  flake.lock                # pinned deps, committed
+  d/                        # sources for home.file entries (gitconfig, tmux.conf, bin/, ...)
+d/bin/                      # legacy scripts installed to $HOME/bin via `make install`
+d/.config/home-manager/d/bin/  # scripts installed via home.file (gcp-env, rand, my-ip, ...)
+zsh.d/                      # zsh modules, numeric-prefixed load order; zsh.Darwin / zsh.Linux
+nix/                        # language-specific nix (python, rust, zig)
+conf/ etc/ bb/ go/ hs/ rs/ linux/   # misc configs and language trees
+build-home-manager          # build switch wrapper
+install / Makefile          # bootstrap
 ```
 
-## Key Components
+## Two bin directories — both needed, different how they reach ~/bin (easy to get wrong)
 
-### Nix Flake Configuration
+Both dirs end up contributing files to `~/bin`, each by a different mechanism and a different final form. The two pipelines are disjoint in `~/bin` — no name is served by both:
 
-The main configuration is in `d/.config/home-manager/flake.nix`, which includes, among other things:
+- **`d/.config/home-manager/d/bin/`** — 6 scripts (gcp-env, rand, my-ip, latency-tcp, gh-user-activity, gh-assigned). Each must be registered in a module's `home.file` (e.g. `network.nix` does `"bin/my-ip".source = ./d/bin/my-ip`). These reach `~/bin` **only** as Home Manager–managed **symlinks** — reproducible and rebuilt by `make home`.
+- Root **`d/bin/`** — 29 scripts. These are **copied** (not symlinked) into `~/bin` by `make install` when it tar-extracts the whole `d/` tree. They land as real files and stay nix-unmanaged.
 
-**External Dependencies:**
-- `nixpkgs` - NixOS package collection (unstable channel)
-- `home-manager` - User environment management
-- `zigutils` - Custom Zig utilities (nix-zsh-env, gitclone)
-- `claude-code` - Claude Code CLI
-- `datumctl` - Datum cloud control tool
-- `gemini-cli` - Gemini CLI tool
-- `codex-cli` - Codex CLI tool
-- `opencode` - OpenCode CLI (github:anomalyco/opencode)
-- `una` - Haskell-based tool (custom build)
+`make install`'s tar preserves paths: the flake `d/` subtree copies into `~/.config/home-manager/d/` (e.g. `~/.config/home-manager/d/bin/rand`), never flattened into `~/bin`. So the 6 flake scripts are never plain files in `~/bin` — only symlinks, from `home.file`. The two mechanisms don't overlap.
 
-**Supported Systems:**
-- `aarch64-darwin` (Apple Silicon macOS)
-- `aarch64-linux` (ARM Linux)
-- `x86_64-linux` (Intel/AMD Linux)
+Deciding where a script belongs:
+- **Nix-managed / reproducible** → put it in `d/.config/home-manager/d/bin/` AND register it in `home.file` (only `make home` restores the symlink).
+- **Plain file copied by `make install`** (no nix wiring needed) → root `d/bin/`. New scripts there need `chmod +x` and are picked up as copies by any `make install`/`make home`.
 
-**User Configurations:**
-- `aar@{system}` - Primary user configuration
-- `drewr@{system}` - Secondary user configuration
+## Adding / modifying configuration
 
-### Custom Utilities (d/bin/)
+- **Packages** — edit the relevant module's `home.packages` list (default.nix for core, clojure/desktop/network/util for concerns). Reference by module-correct file, then `make home`.
+- **Flake deps** — add to `inputs` in `flake.nix`, wire into `outputs`, then resolve the lockfile (`nix flake update --flake d/.config/home-manager`). Note `nixpkgs-haskell` is an intentional separate pinned input — don't merge it into `nixpkgs`.
+- **Zsh** — new module files in `zsh.d/` with numeric prefix (e.g. `35-myconfig`); lower numbers load first. Platform-specific in `zsh.Darwin` / `zsh.Linux`. `zshrc` sources `~/.zsh.d/[0-9][0-9]*` in order and loads `zsh.${OS}`.
+- **Exact-string note**: `home.file` sources resolve relative to the module file (`./d/...` = `d/.config/home-manager/d/...`), not the repo root.
 
-The repository includes 30+ custom shell scripts and utilities:
-- `gh-user-activity` - GitHub user activity tracker
-- `my-ip` - IP address lookup
-- `latency-tcp` - TCP latency measurement
-- `rand` - Random number/string generation
-- `awsg`, `envg`, `gpgg` - AWS, environment, and GPG helpers
-- `kc` - Kubernetes context management
-- `timebuddy` - Time zone helper
-- `took` - Command timing utility
-- And many more specialized tools
+## Supported systems & users
 
-### Zsh Configuration
+- Systems: `aarch64-darwin`, `x86_64-linux`, `aarch64-linux`.
+- Users: **`aar@`** (primary) and **`drewr@`** (secondary) for each system — 6 `homeConfigurations` total in `flake.nix`.
+- `build-home-manager` auto-detects system from `uname` (`aarch64-darwin` / `x86_64-linux` / else `aarch64-linux`) and username from `LOGNAME`; pins Home Manager via `nix run github:nix-community/home-manager/release-26.05`.
 
-Modular zsh setup in `zsh.d/`:
-- `00-opts` - Shell options
-- `01-env` - Environment variables
-- `10-completion` - Command completion
-- `15-alias` - Shell aliases
-- `20-fns` - Custom functions
-- `25-git` - Git-specific configuration
-- `30-screen` - Screen/tmux integration
-- `60-prompt` - Prompt customization
-- Platform-specific: `zsh.Darwin`, `zsh.Linux`
+## Key flake inputs (in flake.nix)
 
-## Recent Development Activity
+- `nixpkgs` (nixos-unstable) and `nixpkgs-haskell` (**pinned rev**, ghc-9.8.4 cache-critical — do not bump without verifying).
+- `home-manager` (follows nixpkgs), `zigutils`, `datumctl`, `llm-agents.nix` (provides claude-code, gemini-cli, codex, opencode, pi, hermes-agent), `una-src` (Haskell tool, built via `nixpkgs-haskell` ghc98).
 
-### Last 6 Months Highlights
+## Notes
 
-**Networking & Tools (Jan-Feb 2026):**
-- Added `dnslookup` utility for DNS queries
-- Added research skill for structured research reports
-- Upgraded to `curlFull` with HTTP/3 support
-- Added Wireguard interface management for macOS
-
-**CLI Tools & AI Integration:**
-- Integrated Claude Code from Nix flake
-- Added `gemini-cli` and `datumctl`
-- Added customix-zsh-env Zig utilities (`n`, `gitclone`)
-- Added `opencode` from github:anomalyco/opencode
-- Enhanced GitHub integration with PR management and user activity tracking
-
-**Configuration Management:**
-- Made `flake.lock` configurable per system
-- Upgraded to AWS CLI v2
-- Updated Home Manager release tracking
-- Fixed tmux window resize issues
-
-**Terminal & Desktop:**
-- Switched Ghostty theme with Geist Mono font
-- Fixed Emacs keybindings in Ghostty (M-!, CTRL-i)
-- Added `ffmpeg` for media processing
-- Removed `mpv` from bundled packages (available via `nix run`)
-
-**Development Environment:**
-- Added `jet` (JSON/EDN processor)
-- Added `jujutsu` (version control)
-- Enhanced Clojure development with Leiningen plugins
-- Added Gnus dependencies for email
-
-## Installation & Usage
-
-### Initial Setup
-
-```bash
-# Clone the repository
-git clone <repo-url> ~/src/drewr/dotfiles
-cd ~/src/drewr/dotfiles
-
-# Run installation script
-make
-```
-
-### Building Home Manager Configuration
-
-```bash
-# Build for current system (auto-detected)
-make home
-```
-
-## Working in This Repository
-
-### Adding New Packages
-
-1. Edit the appropriate `.nix` file in `d/.config/home-manager/`:
-   - `default.nix` - Core tools and utilities
-   - `clojure.nix` - Clojure-related packages
-   - `desktop.nix` - Tools that require a window system
-   - `network.nix` - Network tools
-   - `util.nix` - Miscellaneous utilities
-
-2. Add the package to `home.packages` list:
-   ```nix
-   home.packages = [
-     pkgs.new-package
-   ];
-   ```
-
-3. Rebuild: `./build-home-manager`
-
-### Adding Custom Scripts
-
-1. Create script in `d/bin/`
-2. Make it executable: `chmod +x d/bin/script-name`
-3. Reference it in the appropriate `.nix` file:
-   ```nix
-   home.file = {
-     "bin/script-name".source = ./d/bin/script-name;
-   };
-   ```
-
-### Adding Flake Dependencies
-
-1. Edit `d/.config/home-manager/flake.nix`
-2. Add input in the `inputs` section:
-   ```nix
-   inputs = {
-     new-tool = {
-       url = "github:owner/repo";
-       inputs.nixpkgs.follows = "nixpkgs";
-     };
-   };
-   ```
-3. Add to `outputs` function signature and `mkHomeConfig`
-4. Update `flake.lock`: `nix flake update`
-
-### Modifying Zsh Configuration
-
-- Add new zsh scripts to `zsh.d/` with numeric prefix (e.g., `35-myconfig`)
-- Lower numbers load first
-- Platform-specific configs go in `zsh.Darwin` or `zsh.Linux`
-
-## File Locations
-
-After installation, files are symlinked/copied to:
-- `~/.zshrc`, `~/.zshenv`, `~/.zprofile` - Zsh initialization
-- `~/.zsh.d/` - Zsh configuration modules
-- `~/bin/` - Custom utility scripts
-- `~/.config/home-manager/` - Home Manager configuration
-- `~/.gitconfig` - Git configuration
-- `~/.tmux.conf` - Tmux configuration
-- `~/.config/ghostty/config` - Ghostty terminal config
-
-## Configuration Philosophy
-
-This repository follows these principles:
-
-1. **Declarative Configuration**: Use Nix to declare what should be installed
-2. **Reproducibility**: Same configuration produces same environment
-3. **Multi-platform**: Support both macOS and Linux
-4. **Modularity**: Separate concerns into focused `.nix` files
-5. **Custom Tooling**: Build small, focused utilities for common tasks
-6. **Version Control**: Track all configuration in git
-7. **Flake Inputs**: Pin external dependencies for stability
-
-## Maintenance
-
-### Updating Dependencies
-
-```bash
-# Update flake inputs and regenerate lockfile
-UPDATE=1 ./build-home-manager
-```
-
-This updates all dependencies to their latest versions and saves the new `flake.lock` to the dotfiles. Commit the updated lockfile to preserve working versions.
-
-### Garbage Collection
-
-```bash
-# Remove old Home Manager generations
-nix run github:nix-community/home-manager expire-generations "-30 days"
-
-# Run Nix garbage collection
-nix-collect-garbage -d
-```
-
-## Notes for Claude
-
-When working in this repository:
-
-1. **Nix Configuration**: All package management goes through Home Manager Nix files and home-manager config is in a non-standard location
-2. **Don't Break Reproducibility**: Avoid manual `nix-env -i` installs
-3. **Multi-user Setup**: Remember there are configurations for both `aar` and `drewr`
-4. **Platform Awareness**: Check which system is being targeted (Darwin vs Linux)
-5. **Flake Lock**: This repo tracks `flake.lock` for home-manager to pin dependency versions
-6. **Script Permissions**: New scripts in `d/bin/` need to be executable
-7. **Home Manager**: Changes require rebuild with `./build-home-manager`
-8. **Coding Agents Integration**: Prefer OpenCode
-
-## Related Files
-
-- `.gitignore` - Keeps Nix build artifacts out of git
-- `Makefile` - Additional build automation
-
-## Git Workflow
-
-This repository uses a simple trunk-based workflow:
-- Main branch: `main`
-- Commits focus on incremental improvements
-- Commit messages describe the change, not implementation details
+- Home Manager config lives in a non-standard location (`d/.config/home-manager/`, not repo root).
+- Only commit intended files; the updater agent commits only `d/.config/home-manager/flake.lock`.
+- Fresh `install` script also creates `$HOME/go` and builds `zsh-cache`/compinit data in `$HOME/.zsh-cache`.
