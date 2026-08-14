@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# ping1 - run a single ping against a host and print the resolved IP address
+# and the first latency sample on a single line.
+#
+#   $ ping1 edge.datum.net
+#   PING edge.datum.net (67.14.168.1): 20.952 ms
+
+[ "$#" -eq 1 ] || { echo "usage: ping1 host" >&2; exit 64; }
+
+host="$1"
+
+first="$(ping -c 1 "$host" 2>/dev/null | head -1)"
+rtt="$(ping -c 1 "$host" 2>/dev/null | sed -n -E 's/.*time=([0-9.]+) ms.*/\1 ms/p' | head -1)"
+
+[ -n "$rtt" ] || rtt="time out"
+
+echo "$first" | sed -E "s/: [0-9]+ data bytes\$/: ${rtt}/"

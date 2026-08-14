@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# pingn - run a single ping against each host and print the results sorted by
+# latency (shortest first).
+#
+#   $ pingn edge.datum.net 1.1.1.1
+#   PING edge.datum.net (67.14.168.1): 20.952 ms
+#   PING 1.1.1.1 (1.1.1.1): 21.003 ms
+
+[ "$#" -ge 1 ] || { echo "usage: pingn host [host ...]" >&2; exit 64; }
+
+rows=""
+
+for host in "$@"; do
+  ms="$(ping -c 1 "$host" 2>/dev/null | sed -n -E 's/.*time=([0-9.]+) ms.*/\1/p' | head -1)"
+  if [ -n "$ms" ]; then
+    key="$ms"
+    first="$(ping -c 1 "$host" 2>/dev/null | head -1)"
+    addr="$(printf '%s' "$first" | sed -E 's/.*\(([^)]*)\).*/\1/')"
+    value="PING $host ($addr): ${ms} ms"
+  else
+    key="999999"
+    value="$host: timeout"
+  fi
+  rows="$rows
+$key	$value"
+done
+
+printf '%s\n' "$rows" | sed '/^$/d' | sort -n -k1,1 | sed 's/^[^[:space:]]*[[:space:]]//'
