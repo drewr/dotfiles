@@ -30,6 +30,7 @@
     pkgs.keychain
     pkgs.kubectl
     pkgs.gnumake
+    pkgs.nodejs
     pkgs.pandoc
     pkgs.ripgrep
     pkgs.simple-http-server
