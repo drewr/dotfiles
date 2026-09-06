@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+#
+# update-dotfiles: pull, refresh flake deps, rebuild home-manager, commit.
+#
+# Equivalent to: git pull && make update && make home && git add . && git commit -m "chore: update deps"
+# but safer: fails fast on errors, fast-forwards instead of merging, can stash
+# local changes, and skips the commit when nothing actually changed.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_MSG="chore: update deps"
+
+# --- option parsing -----------------------------------------------------------
+do_pull=1
+do_commit=1
+do_stash=0
+commit_msg="$DEFAULT_MSG"
+
+usage() {
+    cat <<EOF
+usage: $(basename "$0") [options]
+
+Pulls the latest dotfiles, refreshes Nix flake dependencies, rebuilds
+home-manager, then commits any resulting changes.
+
+options:
+  -m MSG        commit message (default: "$DEFAULT_MSG")
+  --no-pull     skip the initial git pull
+  --no-commit   do not commit (leaves the tree dirty for review)
+  --stash       stash local changes before pulling and restore them at the end
+  -h, --help    show this help and exit
+EOF
+}
+
+if [[ -t 1 ]]; then
+    c_info=$'\033[1;34m'; c_warn=$'\033[1;33m'; c_err=$'\033[1;31m'; c_rst=$'\033[0m'
+else
+    c_info=; c_warn=; c_err=; c_rst=
+fi
+log()  { printf '%s==>%s %s\n' "$c_info" "$c_rst" "$*"; }
+warn() { printf '%swarning:%s %s\n' "$c_warn" "$c_rst" "$*" >&2; }
+die()  { printf '%serror:%s %s\n' "$c_err" "$c_rst" "$*" >&2; exit 1; }
+
+while (($#)); do
+    case "$1" in
+        -m) shift; (($#)) || die "option -m requires an argument"; commit_msg="$1" ;;
+        --no-pull)    do_pull=0 ;;
+        --no-commit)  do_commit=0 ;;
+        --stash)      do_stash=1 ;;
+        -h|--help)    usage; exit 0 ;;
+        *) die "unknown option: $1 (see --help)" ;;
+    esac
+    shift
+done
+
+# --- setup -------------------------------------------------------------------
+cd "$SCRIPT_DIR"
+
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+    || die "not inside a git repository"
+
+stash_dirty=0
+if ((do_stash)) && [[ -n "$(git status --porcelain)" ]]; then
+    log "stashing local changes"
+    git stash push -u -m "update-dotfiles: auto-stash before update"
+    stash_dirty=1
+fi
+
+restore_stash() {
+    if ((stash_dirty)); then
+        log "restoring stashed changes"
+        git stash pop
+    fi
+}
+
+trap restore_stash EXIT
+
+# --- pull --------------------------------------------------------------------
+if ((do_pull)); then
+    branch="$(git branch --show-current)"
+    [[ -n "$branch" ]] || die "not on any branch"
+    upstream="$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)"
+    [[ -n "$upstream" ]] || die "no upstream configured for '$branch'; cannot pull"
+    log "pulling latest from $upstream"
+    git pull --ff-only
+fi
+
+# --- update & rebuild --------------------------------------------------------
+log "updating flake dependencies"
+make update
+
+log "rebuilding home-manager"
+make home
+
+# --- commit ------------------------------------------------------------------
+if ((do_commit)); then
+    git add .
+    if git diff --cached --quiet; then
+        log "no changes to commit"
+    else
+        log "committing changes"
+        git commit -m "$commit_msg"
+    fi
+fi
+
+log "done"
