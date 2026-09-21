@@ -65,6 +65,7 @@
               unaPackage
               zigutils.packages.${pkgs.system}.nix-zsh-env
               zigutils.packages.${pkgs.system}.gitclone
+              zigutils.packages.${pkgs.system}.tmphttp
               llm-agents.packages.${pkgs.system}.claude-code
               datumctl.packages.${pkgs.system}.default
               llm-agents.packages.${pkgs.system}.gemini-cli
@@ -94,6 +95,7 @@
         (buildUna pkgs)
         zigutils.packages.${pkgs.system}.nix-zsh-env
         zigutils.packages.${pkgs.system}.gitclone
+        zigutils.packages.${pkgs.system}.tmphttp
         llm-agents.packages.${pkgs.system}.claude-code
         datumctl.packages.${pkgs.system}.default
         llm-agents.packages.${pkgs.system}.gemini-cli

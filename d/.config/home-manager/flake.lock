@@ -289,11 +289,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785497348,
-        "narHash": "sha256-uDhSTSEmBiOyh3DJMrnH4CT0FKkzgMOAPITYBJhcR5k=",
+        "lastModified": 1790005260,
+        "narHash": "sha256-8yHQHw6+QJm9O/kMLMaOo/dIP2U6X58TedUfyOAkLKc=",
         "owner": "drewr",
         "repo": "zigutils",
-        "rev": "b413d9f6d2359801fe59f8a6387e76463b003b29",
+        "rev": "92e506d290c6d876140ed8233157918ee8122ed9",
         "type": "github"
       },
       "original": {
