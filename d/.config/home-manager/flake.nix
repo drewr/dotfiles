@@ -49,6 +49,18 @@
     buildUna = pkgs: nixpkgs-haskell.legacyPackages.${pkgs.system}.haskell.packages.ghc98.callCabal2nix "una" una-src {};
     mkUnaPackage = system: buildUna nixpkgs.legacyPackages.${system};
 
+    # OpenCode 2.x as eg opencode2; provide an `opencode` alias so existing
+    # invocations keep working.
+    mkOpendcode2 = pkgs: llmAgents: let
+      oc2 = llmAgents.packages.${pkgs.system}.opencode2;
+    in pkgs.symlinkJoin {
+      name = "opencode";
+      paths = [ oc2 ];
+      postBuild = ''
+        ln -s ${oc2}/bin/opencode2 $out/bin/opencode
+      '';
+    };
+
     mkHomeConfig = system: username: unaPackage: extraModules:
       let
         pkgs = import nixpkgs { system = system; config.allowUnfree = true; };
@@ -70,7 +82,7 @@
               datumctl.packages.${pkgs.system}.default
               llm-agents.packages.${pkgs.system}.gemini-cli
               llm-agents.packages.${pkgs.system}.codex
-              llm-agents.packages.${pkgs.system}.opencode
+              (mkOpendcode2 pkgs llm-agents)
               llm-agents.packages.${pkgs.system}.pi
               llm-agents.packages.${pkgs.system}.hermes-agent
             ];
@@ -100,7 +112,7 @@
         datumctl.packages.${pkgs.system}.default
         llm-agents.packages.${pkgs.system}.gemini-cli
         llm-agents.packages.${pkgs.system}.codex
-        llm-agents.packages.${pkgs.system}.opencode
+        (mkOpendcode2 pkgs llm-agents)
         llm-agents.packages.${pkgs.system}.pi
         llm-agents.packages.${pkgs.system}.hermes-agent
       ];
