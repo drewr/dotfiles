@@ -34,9 +34,18 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Use the git scheme (not github:) because jolt's flake declares
+    # `inputs.self.submodules = true`, which the github fetcher rejects
+    # (NixOS/nix#13571). The git+https fetcher supports submodules.
+    jolt = {
+      url = "git+https://github.com/jolt-lang/jolt";
+      # Note: jolt's flake only exposes packages for x86_64-linux and
+      # aarch64-darwin; aarch64-linux is not supported upstream.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, datumctl, llm-agents }:
+  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, datumctl, llm-agents, jolt }:
   let
     homeModules = [
       ./default.nix
@@ -61,6 +70,14 @@
       '';
     };
 
+    # jolt's flake only exposes packages for x86_64-linux and aarch64-darwin;
+    # aarch64-linux is not supported upstream, so return null there and filter
+    # nulls out of the package lists below.
+    mkJoltPackage = system:
+      if builtins.hasAttr system jolt.packages
+      then jolt.packages.${system}.jolt
+      else null;
+
     mkHomeConfig = system: username: unaPackage: extraModules:
       let
         pkgs = import nixpkgs { system = system; config.allowUnfree = true; };
@@ -73,7 +90,7 @@
         inherit pkgs;
         modules = homeModules ++ extraModules ++ [
           {
-            home.packages = [
+            home.packages = builtins.filter (p: p != null) [
               unaPackage
               zigutils.packages.${pkgs.system}.nix-zsh-env
               zigutils.packages.${pkgs.system}.gitclone
@@ -85,6 +102,7 @@
               (mkOpendcode2 pkgs llm-agents)
               llm-agents.packages.${pkgs.system}.pi
               llm-agents.packages.${pkgs.system}.hermes-agent
+              (mkJoltPackage pkgs.system)
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -103,7 +121,7 @@
   in {
     homeManagerModules.default = { pkgs, ... }: {
       imports = homeModules;
-      home.packages = [
+      home.packages = builtins.filter (p: p != null) [
         (buildUna pkgs)
         zigutils.packages.${pkgs.system}.nix-zsh-env
         zigutils.packages.${pkgs.system}.gitclone
@@ -115,6 +133,7 @@
         (mkOpendcode2 pkgs llm-agents)
         llm-agents.packages.${pkgs.system}.pi
         llm-agents.packages.${pkgs.system}.hermes-agent
+        (mkJoltPackage pkgs.system)
       ];
       _module.args.una = buildUna pkgs;
     };

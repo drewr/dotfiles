@@ -132,6 +132,28 @@
         "type": "github"
       }
     },
+    "jolt": {
+      "inputs": {
+        "makes": "makes",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790346006,
+        "narHash": "sha256-MGnDy9/7W1X7RKpSgu+u+m5ZoVV1fyL9XCvTFlCzseE=",
+        "ref": "refs/heads/main",
+        "rev": "a6e881b1427548cff998fcc6480cded4ea95e75b",
+        "revCount": 3717,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/jolt-lang/jolt"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://github.com/jolt-lang/jolt"
+      }
+    },
     "llm-agents": {
       "inputs": {
         "bun2nix": "bun2nix",
@@ -153,6 +175,23 @@
       "original": {
         "owner": "numtide",
         "repo": "llm-agents.nix",
+        "type": "github"
+      }
+    },
+    "makes": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785480273,
+        "narHash": "sha256-/g8O4PW0v3NNChKyrWw/EqpEAUCKiI9/KFE2EiXoUlA=",
+        "owner": "makeplus",
+        "repo": "makes",
+        "rev": "d14cb578c2f04e6f9d00e01c7c4e416a9baf94e9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "makeplus",
+        "repo": "makes",
+        "rev": "d14cb578c2f04e6f9d00e01c7c4e416a9baf94e9",
         "type": "github"
       }
     },
@@ -192,6 +231,7 @@
       "inputs": {
         "datumctl": "datumctl",
         "home-manager": "home-manager",
+        "jolt": "jolt",
         "llm-agents": "llm-agents",
         "nixpkgs": "nixpkgs",
         "nixpkgs-haskell": "nixpkgs-haskell",
