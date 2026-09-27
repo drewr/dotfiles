@@ -140,11 +140,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790346006,
-        "narHash": "sha256-MGnDy9/7W1X7RKpSgu+u+m5ZoVV1fyL9XCvTFlCzseE=",
+        "lastModified": 1790541717,
+        "narHash": "sha256-+gWR0tRmLHZYl6p9DsHCqhb/3xvQDYQR4+Ujrr5+Czc=",
         "ref": "refs/heads/main",
-        "rev": "a6e881b1427548cff998fcc6480cded4ea95e75b",
-        "revCount": 3717,
+        "rev": "d6efc4532169b97002d19d0b289c9afe490ce32b",
+        "revCount": 3788,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jolt-lang/jolt"
@@ -165,11 +165,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1790372205,
-        "narHash": "sha256-CWIDZFX/HsNJeMv6hOqVT6m/5Tkx9xfEzok+Lw2zkHk=",
+        "lastModified": 1790544273,
+        "narHash": "sha256-7sHKIrBWisORd15dWSjFWmMzBrIaq3X382D0z3hQxHE=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "2e9c743bc337136b0714f27dae05d575ad81f0ee",
+        "rev": "731841902f710c6b0696cffb3ce50eba3732a88e",
         "type": "github"
       },
       "original": {
@@ -197,11 +197,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1790185690,
-        "narHash": "sha256-xJ+X4hBtOcAFGBOe5nAMyMUeF9foJBmIOu3NjBqBycU=",
+        "lastModified": 1790463110,
+        "narHash": "sha256-hKlVl12B1dF0Q5vd9dY3lIJM5mFGWYSlXwSLAqHZ1+s=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "4975466d324710c576dc11ad614684e6bd8cad8e",
+        "rev": "e158d9ed9b51c98974c5e66e1ba1c9e0255fecaa",
         "type": "github"
       },
       "original": {
