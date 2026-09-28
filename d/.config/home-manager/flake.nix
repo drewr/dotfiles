@@ -55,13 +55,13 @@
       ./network.nix
     ];
 
-    buildUna = pkgs: nixpkgs-haskell.legacyPackages.${pkgs.system}.haskell.packages.ghc98.callCabal2nix "una" una-src {};
+    buildUna = pkgs: nixpkgs-haskell.legacyPackages.${pkgs.stdenv.hostPlatform.system}.haskell.packages.ghc98.callCabal2nix "una" una-src {};
     mkUnaPackage = system: buildUna nixpkgs.legacyPackages.${system};
 
     # OpenCode 2.x as eg opencode2; provide an `opencode` alias so existing
     # invocations keep working.
     mkOpendcode2 = pkgs: llmAgents: let
-      oc2 = llmAgents.packages.${pkgs.system}.opencode2;
+      oc2 = llmAgents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2;
     in pkgs.symlinkJoin {
       name = "opencode";
       paths = [ oc2 ];
@@ -79,7 +79,7 @@
       let
         pkgs = import nixpkgs { system = system; config.allowUnfree = true; };
         homeDirectory =
-          if pkgs.stdenv.isDarwin
+          if pkgs.stdenv.hostPlatform.isDarwin
           then "/Users/${username}"
           else "/home/${username}";
       in
@@ -89,17 +89,17 @@
           {
             home.packages = builtins.filter (p: p != null) [
               unaPackage
-              zigutils.packages.${pkgs.system}.nix-zsh-env
-              zigutils.packages.${pkgs.system}.gitclone
-              zigutils.packages.${pkgs.system}.tmphttp
-              llm-agents.packages.${pkgs.system}.claude-code
-              datumctl.packages.${pkgs.system}.default
-              llm-agents.packages.${pkgs.system}.gemini-cli
-              llm-agents.packages.${pkgs.system}.codex
+              zigutils.packages.${pkgs.stdenv.hostPlatform.system}.nix-zsh-env
+              zigutils.packages.${pkgs.stdenv.hostPlatform.system}.gitclone
+              zigutils.packages.${pkgs.stdenv.hostPlatform.system}.tmphttp
+              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code
+              datumctl.packages.${pkgs.stdenv.hostPlatform.system}.default
+              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
+              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
               (mkOpendcode2 pkgs llm-agents)
-              llm-agents.packages.${pkgs.system}.pi
-              llm-agents.packages.${pkgs.system}.hermes-agent
-              (mkJoltPackage pkgs.system)
+              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
+              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hermes-agent
+              (mkJoltPackage pkgs.stdenv.hostPlatform.system)
             ];
             home.username = username;
             home.homeDirectory = homeDirectory;
@@ -120,17 +120,17 @@
       imports = homeModules;
       home.packages = builtins.filter (p: p != null) [
         (buildUna pkgs)
-        zigutils.packages.${pkgs.system}.nix-zsh-env
-        zigutils.packages.${pkgs.system}.gitclone
-        zigutils.packages.${pkgs.system}.tmphttp
-        llm-agents.packages.${pkgs.system}.claude-code
-        datumctl.packages.${pkgs.system}.default
-        llm-agents.packages.${pkgs.system}.gemini-cli
-        llm-agents.packages.${pkgs.system}.codex
+        zigutils.packages.${pkgs.stdenv.hostPlatform.system}.nix-zsh-env
+        zigutils.packages.${pkgs.stdenv.hostPlatform.system}.gitclone
+        zigutils.packages.${pkgs.stdenv.hostPlatform.system}.tmphttp
+        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code
+        datumctl.packages.${pkgs.stdenv.hostPlatform.system}.default
+        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
+        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
         (mkOpendcode2 pkgs llm-agents)
-        llm-agents.packages.${pkgs.system}.pi
-        llm-agents.packages.${pkgs.system}.hermes-agent
-        (mkJoltPackage pkgs.system)
+        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
+        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hermes-agent
+        (mkJoltPackage pkgs.stdenv.hostPlatform.system)
       ];
       _module.args.una = buildUna pkgs;
     };

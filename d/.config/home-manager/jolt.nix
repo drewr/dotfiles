@@ -19,7 +19,7 @@ system:
     pkgs = import nixpkgs { system = system; config.allowUnfree = true; };
     base = jolt.packages.${system}.jolt;
   in
-  if pkgs.stdenv.isLinux
+  if pkgs.stdenv.hostPlatform.isLinux
   then pkgs.symlinkJoin {
     name = "jolt";
     paths = [ base ];

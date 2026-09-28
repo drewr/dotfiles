@@ -1,4 +1,4 @@
-{ config, pkgs, lib, system, una, ... }:
+{ config, pkgs, lib, una, ... }:
 
 {
   home.username = lib.mkDefault "aar";
@@ -35,7 +35,7 @@
     pkgs.ripgrep
     pkgs.simple-http-server
     pkgs.tmux
-    # compile takes forever... ## una.packages.${pkgs.system}.default
+    # compile takes forever... ## una.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.xh
     pkgs.xz
 
