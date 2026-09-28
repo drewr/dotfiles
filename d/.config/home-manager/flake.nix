@@ -73,10 +73,7 @@
     # jolt's flake only exposes packages for x86_64-linux and aarch64-darwin;
     # aarch64-linux is not supported upstream, so return null there and filter
     # nulls out of the package lists below.
-    mkJoltPackage = system:
-      if builtins.hasAttr system jolt.packages
-      then jolt.packages.${system}.jolt
-      else null;
+    mkJoltPackage = (import ./jolt.nix { inherit nixpkgs jolt; });
 
     mkHomeConfig = system: username: unaPackage: extraModules:
       let
