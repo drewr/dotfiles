@@ -119,11 +119,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790951810,
-        "narHash": "sha256-ZUmi6DTKRHpN3SB2JDgKgR4MhGO0Etp+9fc1vIy7Vwg=",
+        "lastModified": 1790989254,
+        "narHash": "sha256-ZN+riaeFuE+DZ5zfqJiXlM12jLwZzeIXiNkU1YeHMXI=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "894214fea96c02d7e46b03b81dc8e9ca97ab05be",
+        "rev": "acd21c5a3420a9d5fd0ed06299b10828267ef9ba",
         "type": "github"
       },
       "original": {
@@ -140,11 +140,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790915241,
-        "narHash": "sha256-1T908nqAKK/4cGVEiH+7QGPTyFS/Xu3PsEGwN3IGOjs=",
+        "lastModified": 1791061726,
+        "narHash": "sha256-WzOQ6xmvKaD/vAhM6EDlr9448aDWVuBbFNEHEN2o9WU=",
         "ref": "refs/heads/main",
-        "rev": "a1f6b669df0920c0c5796e5abe6c8e76873927a9",
-        "revCount": 3937,
+        "rev": "52fdfb050203b87b25bf4074fc49c163f0f65122",
+        "revCount": 4000,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jolt-lang/jolt"
@@ -165,11 +165,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1790947657,
-        "narHash": "sha256-Qhw25MEtJdqzYshdaLc1EPGpIQOwxI++D50w/A7p1rs=",
+        "lastModified": 1791072324,
+        "narHash": "sha256-hm+VeaOyLQLe37IvSADW4IKIxTvm9W/nZDd+S7flKzU=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "54b915b290377072e2903d2fcdae122dd37f64fc",
+        "rev": "4e0a04f23b1113a125efb0246f57752674ade3d9",
         "type": "github"
       },
       "original": {
