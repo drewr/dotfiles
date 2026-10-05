@@ -13,6 +13,7 @@
     pkgs.emacs
     pkgs.fzf
     pkgs.gh
+    pkgs.hut
     pkgs.git
     pkgs.claude-agent-acp
     pkgs.codex-acp
