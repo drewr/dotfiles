@@ -1,0 +1,47 @@
+apiVersion: compute.datumapis.com/v1alpha
+kind: Workload
+metadata:
+  name: buildbox
+spec:
+  template:
+    spec:
+      networkInterfaces:
+        - ipFamilies:
+            - IPv6
+          name: eth0
+          network:
+            name: default
+          reclaimPolicy: Delete
+      runtime:
+        class: general-purpose
+        resources:
+          instanceType: datumcloud/d1-standard-2
+        sandbox:
+          imagePullSecrets:
+            - name: ghcr-drewr
+          containers:
+            - name: buildbox
+              image: ghcr.io/drewr/nixos-gp:26.05
+              securityContext:
+                capabilities:
+                  add:
+                    - SYS_ADMIN
+                    - MKNOD
+                    - CHOWN
+                    - DAC_OVERRIDE
+                    - FOWNER
+                    - FSETID
+                    - KILL
+                    - NET_BIND_SERVICE
+                    - SETFCAP
+                    - SETGID
+                    - SETPCAP
+                    - SETUID
+                    - SYS_CHROOT
+  placements:
+    - name: default
+      locations:
+        - name: us-central-1
+      scaleSettings:
+        instanceManagementPolicy: OrderedReady
+        minReplicas: 1
