@@ -1,0 +1,5 @@
+*
+!flake.nix
+!flake.lock
+!forktest.js
+!init.sh

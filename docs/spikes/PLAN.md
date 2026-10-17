@@ -1,8 +1,9 @@
 # Plan: Datum Compute + Unikraft for opencode/claude sessions
 
-Status: Spikes 1, 2, 2b PASSED on Datum's unikernel tier. Spike 3 blocked before the
-run step (build host), Spike 4 pending. Build is moving to an EC2 box; see
-`docs/spikes/NEXT-STEPS.md` for the current state and next actions.
+Status: Spikes 1, 2, 2b, 3 PASSED on Datum's unikernel tier (Node runs, H6). The
+agents ship as Bun single-file executables, so Spike 5 (H15, Bun) is next, then
+Spike 4 (transport). Builds run on the EC2 box in `buildbox/ec2/`; see
+`docs/spikes/NEXT-STEPS.md`.
 
 ## Goal
 
@@ -20,12 +21,13 @@ to `general-purpose`. SSH is expected to travel over iroh via Datum Connect
 | H2 | Unikraft has only `vfork`, not true `fork` | **REFUTED (live evidence)** | Spike 1 case C: a child mutated a local variable and the parent still saw the original value → **TRUE copy-on-write `fork()`**, not a vfork alias. Upstream README says vfork-only; the deployed Datum build is newer/better. |
 | H3 | A single root/init process can spawn children (s6/systemd idea) | **CONFIRMED (live)** | Spike 2: an entrypoint with `ppid=1` spawned a long-lived child, the child ran across ticks (`ppid=410`), and the parent reaped it with the correct exit code (5). |
 | H4 | systemd or s6 can be that init | **s6 WORKS (revised up)** | Spike 2b: `s6-supervise` started a service under Unikraft (`[echo-svc] starting: pid=415`). `s6-svscan` fails only because of H14 — it spawns helpers by PATH lookup. systemd remains out (cgroups, udev, dbus, namespaces). |
-| **H14** | `execve` performs PATH search for a bare program name | **REFUTED (key finding)** | Spike 2b: `command -v s6-supervise` → `/command/s6-supervise`, but a bare-name `exec` "FAILED (exit 111) — confirms no PATH search". Unikraft's `execve` requires an absolute (or explicit relative) path. This is why `s6-svscan` cannot spawn `s6-supervise`. |
+| **H14** | `execve` performs PATH search for a bare program name | **REFUTED (key finding)** | Spike 2b: `command -v s6-supervise` → `/command/s6-supervise`, but a bare-name `exec` "FAILED (exit 111) — confirms no PATH search". Unikraft's `execve` requires an absolute (or explicit relative) path. This is why `s6-svscan` cannot spawn `s6-supervise`. **Workaround (decided, untested): give s6 a shim with hardcoded absolute paths** (e.g. s6-svscan spawns `/command/s6-supervise`, not `s6-supervise`), so nothing depends on PATH lookup. |
 | **H11** | `/proc` exists and is usable | **CONFIRMED** | Spike 2: `/proc` is a directory with 112 entries; `/proc/self/stat` and `/proc/self/status` read OK. |
 | **H12** | Signals work | **CONFIRMED** | Spike 2: `SIGUSR1` self-delivery ran the handler; `waitpid` reported the child's real exit status. |
 | **H13** | PTYs / `setsid` are available (needed for TUI over SSH) | **CONFIRMED** | Spike 2: `setsid()` returned a valid session id; `open("/dev/ptmx")` succeeded. |
 | H5 | We can control the Unikraft kernel config via `--kraftfile` | REFUTED (key finding) | `internal/cmd/compute/build/compute_image.go`: "The runtime kernel is intentionally omitted; Datum Compute injects the correct runtime at boot." Image is initrd-only; `org.unikraft.kernel.image` is supplied by Datum. `--kraftfile` delegates the userspace build to the `unikraft` CLI but cannot inject a kernel. |
 | H6 | Node/Bun (opencode, claude-code) run | **LIKELY OK (revised up)** | H2's refutation is decisive: true COW `fork()` means libuv `child_process`, Worker threads, and `posix_spawn` all have their primitives. The remaining risks are not fork: (a) Node needs `/proc`, `epoll`, `inotify`, `io_uring`-optional, signals, and a large runtime; (b) 2 GiB RAM ceiling with the rootfs held in memory. |
+| **H15** | The agents' Bun runtime runs on Unikraft | **OPEN (Spike 5)** | `claude` 2.1.301 (268 MB) and `opencode2` 2.0.30 (212 MB) from llm-agents.nix are Bun single-file executables, not Node scripts, so H6 does not cover them. |
 | H7 | Real NixOS boot on the unikernel class | REFUTED | No user-supplied kernel on the sandbox/unikernel path (H5). |
 | H8 | alpine-sized with agents on unikernel | REFUTED (for unikernel) | Rootfs lives in RAM against a 2 GiB cap; Node runtime + two agents is 200 MB+ even static. |
 | H9 | A VM runtime shape can boot a user-supplied OS image | CONFIRMED (new) | `VirtualMachineRuntime`: "boots a full OS provided by the user via an image", with a native `datum/<ssh-keys>` annotation. Class-independent: "Either a sandbox or a virtual machine can run in any class the platform offers." |
@@ -142,3 +144,7 @@ parallel with the spikes.
   open TCP port. Datum Compute's job is to *run* the unikernel, not build it.
 - 2026-10-17: The AWS provisioning and all subsequent work continue from the user's
   other machine; see `docs/spikes/NEXT-STEPS.md`.
+- 2026-10-17: H6 passed. Agents are Bun executables, so Spike 5 tests Bun before
+  Spike 4 (transport). H14 is to be worked around with an s6 shim that uses
+  hardcoded absolute paths. Commits from phone-driven sessions go unsigned over
+  HTTPS (`gh` credentials), to be signed later.
