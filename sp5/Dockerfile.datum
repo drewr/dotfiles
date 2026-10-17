@@ -1,0 +1,12 @@
+# Build the rootfs with nix inside BuildKit, pinned by flake.lock, then ship only
+# the rootfs. sandbox=false because a BuildKit RUN step cannot create the
+# namespaces the nix sandbox needs; inputs stay pinned by the lock.
+FROM docker.io/nixos/nix:2.35.3@sha256:ff480dbb23511aa1c10710aa068ceea5b93fed9bfce5f5379f3a6b07282cbc7b AS build
+COPY . /src
+RUN nix --extra-experimental-features 'nix-command flakes' --option sandbox false \
+      build --out-link /result path:/src#rootfs \
+ && cp -a /result/. /rootfs
+
+FROM scratch
+COPY --from=build /rootfs/ /
+ENTRYPOINT ["/bin/sh", "/init"]
