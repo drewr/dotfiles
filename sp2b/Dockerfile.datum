@@ -1,0 +1,4 @@
+FROM scratch
+# rootfs is assembled on the build box; this stage only copies it in.
+COPY rootfs/ /
+ENTRYPOINT ["/bin/sh", "/init"]
