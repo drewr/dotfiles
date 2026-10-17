@@ -1,0 +1,32 @@
+apiVersion: compute.datumapis.com/v1alpha
+kind: Workload
+metadata:
+  name: sp4ssh
+spec:
+  template:
+    spec:
+      runtime:
+        class: unikernel
+        resources:
+          instanceType: datumcloud/d1-standard-2
+        sandbox:
+          imagePullSecrets:
+            - name: ghcr-drewr-v2
+          containers:
+            - name: sshprobe
+              image: ghcr.io/drewr/sp4-ssh:dev
+              env:
+                - name: IROH_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: sp4-iroh
+                      key: IROH_SECRET
+      networkInterfaces:
+        - network:
+            name: default
+  placements:
+    - name: dallas
+      locations:
+        - name: us-central-1
+      scaleSettings:
+        minReplicas: 1

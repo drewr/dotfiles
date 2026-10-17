@@ -1,8 +1,8 @@
 # Plan: Datum Compute + Unikraft for opencode/claude sessions
 
-Status: Spikes 1, 2, 2b, 3 PASSED on Datum's unikernel tier (Node runs, H6). The
-agents ship as Bun single-file executables, so Spike 5 (H15, Bun) is next, then
-Spike 4 (transport). Builds run on the EC2 box in `buildbox/ec2/`; see
+Status: Spikes 1, 2, 2b, 3, 4, 5A PASSED on Datum's unikernel tier: Node and the
+claude-code Bun binary start, and interactive SSH over iroh works with no
+gateway. Remaining: 5B (API + tool call, needs a key), then the spawn tool. Builds run on the EC2 box in `buildbox/ec2/`; see
 `docs/spikes/NEXT-STEPS.md`.
 
 ## Goal
@@ -93,7 +93,12 @@ opencode/claude-code. Expect failure at `fork()`. If it fails, determine whether
 agent mode avoids `fork` (unlikely for Node) before declaring the unikernel path
 unable to host these agents.
 
-### Spike 4 — Transport
+### Spike 4 — Transport (PASSED, see `sp4/RESULTS.md`)
+Result: dropbear + `dumbpipe listen-tcp` inside the instance, `ssh -o
+ProxyCommand="dumbpipe connect <ticket>"` outside; exec and interactive PTY work.
+The instance's `lo` is down at boot and must be configured by init.
+
+Original plan:
 `datumctl connect local --port 22` inside the instance + `iroh-ssh` / `datumctl
 connect dial` on the Mac, with `~/.ssh/config` `ProxyCommand iroh-ssh proxy %h`.
 Only meaningful once a listener runs (Spike 2+).
@@ -148,3 +153,8 @@ parallel with the spikes.
   Spike 4 (transport). H14 is to be worked around with an s6 shim that uses
   hardcoded absolute paths. Commits from phone-driven sessions go unsigned over
   HTTPS (`gh` credentials), to be signed later.
+- 2026-10-17: Spike 4 passed with dumbpipe standing in for `datumctl connect
+  local` (not released). The iroh secret is generated client-side and passed in
+  as a Secret, so the client knows the ticket in advance. Observed: the guest
+  runs a Linux 6.12 kernel with kernel threads (`kthreadd`, `kworker`), so it
+  is likely a Linux microVM, unconfirmed.
