@@ -1,63 +1,63 @@
-# Spike 3 — can opencode / claude-code run on a Unikraft instance?
+# Spike 3 — fitting the build inside Datum Compute's 2 GiB, and the DNS blocker
 
-Status: **BLOCKED on build environment stability, not yet on the hypothesis.**
+Date: 2026-10-17. Follows `docs/datum-compute-buildbox-diagnosis.md`.
 
-## What this spike is meant to answer
+## What was measured
 
-H6: Node/Bun (which opencode and claude-code require) run under Unikraft.
+* **Node rootfs assembles at 153 MB**, and assembly itself used only ~440 MB of the
+  container's memory. The unikernel image, once built, is small.
+* **Disk page cache is reclaimable.** Writing 1.5 GB to a real file took
+  `memory.current` to 1.59 GB and did not trigger the OOM — the kernel reclaimed
+  cache under the cap.
+* **tmpfs is unreclaimable.** `memory.current` and `memory.peak` count tmpfs pages
+  in full, with no reclaim. This is what pushes a container over the limit.
+* A deliberate 2.6 GB allocation to `/dev/shm` reproduced the silent recreation
+  deterministically (new `boot_id`, wiped filesystem).
 
-Sub-questions:
-* Does `node` start at all in a unikernel (no fork needed)?
-* Can `node` spawn child processes (`spawnSync`, `execSync`) — the agent tool-call path?
-* Does agent startup / TUI initialisation work?
-* Does tool use (which shells out) work?
+## Causes found for build failures inside `d1-standard-2`
 
-## Progress
+1. **Build state in tmpfs.** The first version of `sp3/boxrun.sh` ran
+   `buildkitd --root /dev/shm/buildkit`. tmpfs pages are unreclaimable and count
+   against the 2 GiB cgroup limit, so the build drove the container into the OOM
+   described in issue #491. Fixed to `--root /var/lib/buildkit` (disk).
+2. **Intermittent DNS failure.** The buildbox has IPv6-only nameservers:
 
-The probe (`forktest.js`) is written and the packaging pipeline is built
-(`sp3/boxrun.sh`): it fetches `nodejs` and busybox-static, assembles a rootfs,
-copies the glibc loader + node's `.so` closure, dedupes byte-identical libraries
-(292 MB → 153 MB), `patchelf`s the interpreter and rpath, and runs
-`datumctl compute build --analyze --push`.
+   ```
+   nameserver 2001:4860:4860::6464
+   nameserver 2001:4860:4860::64
+   nameserver 2606:4700:4700::64
+   ```
 
-Blockers hit while trying to get the image built:
+   IPv6 DNS resolution times out intermittently. In one probe,
+   `nslookup releases.nixos.org` returned "no servers could be reached" while
+   `nslookup cache.nixos.org` resolved on the next attempt, and plain
+   `curl https://releases.nixos.org/` returned HTTP 200 moments later. When DNS
+   fails, `nix profile add` fails, the toolchain install silently no-ops, and the
+   build cannot run. This masqueraded as more OOM events.
 
-1. **The buildbox instance resets repeatedly.** `/root/sp3`, `/tmp/dc`, and the
-   docker config are wiped between calls, sometimes mid-build. `datumctl compute
-   instances` shows the container `NotRunning`, then it recovers. This looks like
-   the `buildbox` workload restarting under load, not an issue with the spike.
+## Answer: what would let us run BuildKit on Datum Compute reliably
 
-2. **Missing build tooling on a fresh buildbox generation.** Each new generation
-   came up without `tar`, `gzip`, `patchelf`, `buildkitd`, or `runc`. Installing
-   them via `nix profile add` works but requires the instance to stay up, and it
-   needs network (one attempt failed DNS resolution to `releases.nixos.org` for
-   ~2 minutes; it recovered).
+| Option | Helps? | Reason |
+| - | - | - |
+| Different OS | No | The 2 GiB cap is a cgroup limit tied to the instance type, not the image. `drewr/nixos-gp` is capped the same as any other image. |
+| A larger instance type | Yes, directly | `d1-standard-2` is the only type available today. A larger type moves the cap. This is what issues #137 and #492 are about. |
+| Keep the build under 2 GiB | Yes, partially | Feasible: keep state on disk, not tmpfs; use `nodejs-slim`; build in stages. Assembly used only ~440 MB, so the headroom exists if transient allocations are bounded. |
+| Remote BuildKit | Yes, best near-term | `datumctl compute build --buildkit-host tcp://HOST:PORT` uses a BuildKit that is not under the 2 GiB cap. Sidesteps the limit entirely. |
+| Fix DNS | Needed regardless | IPv6-only resolvers that intermittently time out break any network-dependent build. |
+| Build elsewhere, deploy to Datum | Yes, recommended | Datum Compute should *run* the unikernel, not build it. Build on a host with more memory, push to GHCR, and `datumctl compute deploy`. |
 
-3. **`buildkitd` needs `runc`** to find a worker (`no worker found, rebuild the
-   buildkit daemon?`). Installing `nixpkgs#runc` fixes it and the worker starts
-   with the `overlayfs` snapshotter.
+## Reframe
 
-4. **Registry credentials.** `datumctl compute build --push` reads
-   `~/.docker/config.json`. The buildbox did not have one, so pushes 401'd until
-   the local GHCR config was copied over. (The local config holds a personal GHCR
-   PAT; a scoped, build-only token would be better for a long-lived setup.)
+The 2 GiB limit constrains **building large images on Datum**, not **running
+unikernel instances**. A unikernel instance with a 153 MB or smaller rootfs fits
+comfortably in 2 GiB of RAM. So the architecture that works is:
 
-5. **`datumctl compute exec` does not pipe stdin.** `... -- sh -s` with a piped
-   script silently produces no output. Scripts must be passed via `-c`.
+1. Build the unikernel image on a machine with adequate memory (or a remote
+   BuildKit).
+2. Push it to a registry.
+3. `datumctl compute deploy` it as a `unikernel` workload.
 
-## What is still unknown
+## Open items
 
-H6 itself. Nothing has been run inside a unikernel yet, because the image has not
-been built. The `--analyze` gate has not reported on the Node rootfs either — that
-alone would be informative (it checks the entrypoint, dynamic loader, and libs).
-
-## Next attempt (when the buildbox is stable)
-
-* Run the entire assemble + build in one detached, nohup'd command so a session
-  drop does not kill it, and poll the log file afterwards.
-* Or build the image locally (macOS has Docker/linuxkit) and push from the Mac,
-  skipping the buildbox entirely. This avoids the buildbox stability problem
-  completely and is probably the right move: `datumctl compute build` can run
-  anywhere Docker BuildKit is available.
-* Consider a leaner Node: `nodejs-slim` exists in the closure listing and would
-  cut the rootfs substantially.
+* Report the IPv6 DNS instability on Compute instances (separate from #491/#492).
+* Decide the build host: a remote BuildKit, or build on the Mac and push.
