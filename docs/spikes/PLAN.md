@@ -90,6 +90,11 @@ unable to host these agents.
 connect dial` on the Mac, with `~/.ssh/config` `ProxyCommand iroh-ssh proxy %h`.
 Only meaningful once a listener runs (Spike 2+).
 
+**Constraint (important):** ssh-over-iroh must NOT depend on a project-scoped
+Connect gateway (e.g. the `connect-gw-*` workload). Nothing may assume one exists.
+Use the **project-less local tunnel** path (`datumctl connect local` / `dial TICKET`)
+from `feat/projectless-local-tunnel`, which needs no login, project, or gateway.
+
 ## Deliverables that survive regardless of spike outcome
 
 1. Secret transfer (works on both runtime shapes):
