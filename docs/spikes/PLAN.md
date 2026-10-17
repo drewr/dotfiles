@@ -133,3 +133,12 @@ parallel with the spikes.
 - 2026-10-17: User chose to pursue Unikraft despite blockers; keep `general-purpose`
   off the table. Nix-built userspace accepted as the definition of "NixOS-based".
   Spikes first; s6 tried before Kata-style approaches.
+- 2026-10-17: Build moves off Datum Compute to an EC2 box, because `d1-standard-2`
+  cannot build reliably (2 GiB container cgroup cap that silently recycles the
+  sandbox, issues #491/#492; fuse/no-xattr writable fs forcing BuildKit's root onto
+  tmpfs, which is unreclaimable and triggers that cap; intermittent IPv6 DNS,
+  issue #493). Instance `t3a.medium`, region **`us-east-2`**, profile
+  **`datum-sandbox-admin`**. Connect to BuildKit over iroh (`dumbpipe`), not an
+  open TCP port. Datum Compute's job is to *run* the unikernel, not build it.
+- 2026-10-17: The AWS provisioning and all subsequent work continue from the user's
+  other machine; see `docs/spikes/NEXT-STEPS.md`.
