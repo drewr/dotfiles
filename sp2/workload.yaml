@@ -1,0 +1,26 @@
+apiVersion: compute.datumapis.com/v1alpha
+kind: Workload
+metadata:
+  name: sp2init
+spec:
+  template:
+    spec:
+      runtime:
+        class: unikernel
+        resources:
+          instanceType: datumcloud/d1-standard-2
+        sandbox:
+          imagePullSecrets:
+            - name: ghcr-drewr-v2
+          containers:
+            - name: initprobe
+              image: ghcr.io/drewr/sp2-initprobe:dev
+      networkInterfaces:
+        - network:
+            name: default
+  placements:
+    - name: dallas
+      locations:
+        - name: us-central-1
+      scaleSettings:
+        minReplicas: 1
