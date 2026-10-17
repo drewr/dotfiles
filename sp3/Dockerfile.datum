@@ -1,0 +1,3 @@
+FROM scratch
+COPY rootfs/ /
+ENTRYPOINT ["/bin/sh", "/init"]
