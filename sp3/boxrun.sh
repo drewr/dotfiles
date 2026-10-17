@@ -87,9 +87,11 @@ command -v runc >/dev/null 2>&1 || $NIX profile install "nixpkgs#runc" >/dev/nul
 export PATH=/root/.nix-profile/bin:$PATH
 pkill buildkitd 2>/dev/null || true
 sleep 2
-rm -rf /dev/shm/buildkit /run/buildkit
-mkdir -p /dev/shm/buildkit /run/buildkit
-nohup buildkitd --root /dev/shm/buildkit --addr unix:///run/buildkit/buildkitd.sock > /tmp/buildkitd.log 2>&1 &
+# BuildKit's root MUST live on disk, not tmpfs. tmpfs pages are unreclaimable and
+# count fully against the container's 2 GiB cgroup limit (see Datum issue #492),
+# so /dev/shm pushes the container into an OOM that silently recreates it.
+mkdir -p /var/lib/buildkit /run/buildkit
+nohup buildkitd --root /var/lib/buildkit --addr unix:///run/buildkit/buildkitd.sock > /tmp/buildkitd.log 2>&1 &
 sleep 12
 grep -q 'running server' /tmp/buildkitd.log && echo buildkitd_up || { echo buildkitd_FAILED; tail -5 /tmp/buildkitd.log; exit 1; }
 
