@@ -4,6 +4,11 @@ Date: 2026-10-17. Prices from the public AWS pricing API for `us-east-1`,
 `Linux`/`Shared`/on-demand, retrieved 2026-10-17. Prices change; re-check before
 buying.
 
+**Target environment (decided 2026-10-17):** profile `datum-sandbox-admin`,
+region **`us-east-2`**. The prices below are `us-east-1`; `us-east-2` is normally
+within a few percent, and the ordering of candidates does not change. Re-query
+for `us-east-2` before provisioning if the exact figure matters.
+
 ## What the build has to do
 
 `datumctl compute build --buildkit-host tcp://HOST:PORT` builds the unikernel

@@ -59,9 +59,17 @@ push to GHCR, then `datumctl compute deploy`. See `docs/datum-build-box-ec2.md`.
   BuildKit's TCP listener is unauthenticated. Wiring is in
   `docs/datum-build-box-ec2.md`.
 
+### Environment (decided)
+
+- **Account/profile: `datum-sandbox-admin`** (SSO — session must be refreshed on the
+  machine that runs the provisioning).
+- **Region: `us-east-2`.** Prices below were read from `us-east-1`; re-check
+  `us-east-2` before provisioning, but the ordering of candidates is the same.
+
 ### Steps
 
-1. Provision `t3a.medium` (`us-east-1`), 16 GB gp3, x86_64.
+1. Provision `t3a.medium` in **`us-east-2`** under **`datum-sandbox-admin`**,
+   16 GB gp3, x86_64.
 2. Install: `nix`, `buildkit`, `runc`, `docker` (for context handling), `crane`.
 3. Start `buildkitd --addr tcp://127.0.0.1:1234 --root /var/lib/buildkit`
    (root on disk, not tmpfs).
