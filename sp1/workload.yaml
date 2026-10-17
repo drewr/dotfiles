@@ -1,0 +1,31 @@
+apiVersion: compute.datumapis.com/v1alpha
+kind: Workload
+metadata:
+  name: vforktest
+spec:
+  template:
+    spec:
+      networkInterfaces:
+        - ipFamilies:
+            - IPv6
+          name: eth0
+          network:
+            name: default
+          reclaimPolicy: Delete
+      runtime:
+        class: unikernel
+        resources:
+          instanceType: datumcloud/d1-standard-2
+        sandbox:
+          imagePullSecrets:
+            - name: ghcr-drewr
+          containers:
+            - name: vforktest
+              image: ghcr.io/drewr/vforktest-uk:spike1
+  placements:
+    - name: default
+      locations:
+        - name: us-central-1
+      scaleSettings:
+        instanceManagementPolicy: OrderedReady
+        minReplicas: 1

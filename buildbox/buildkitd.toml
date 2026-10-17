@@ -1,0 +1,8 @@
+[worker.oci]
+  enabled = true
+  snapshotter = "native"
+  # Avoid xattr-dependent diff generation on filesystems that do not support xattrs.
+  rootless = false
+
+[worker.containerd]
+  enabled = false

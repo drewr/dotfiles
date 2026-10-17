@@ -1,0 +1,4 @@
+FROM scratch
+COPY vforktest /vforktest
+COPY spikeecho /bin/spikeecho
+ENTRYPOINT ["/vforktest"]
