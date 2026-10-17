@@ -20,11 +20,15 @@ Status as of 2026-10-17. Branch `datum-unikraft-sessions`. Continues
 - **`/proc`, signals, PTYs** (`setsid`, `/dev/ptmx`) all work — the primitives a
   TUI over SSH needs.
 
+- **Node runs (H6 passed).** Spike 3: Node v24 starts on the unikernel tier and
+  `spawnSync`/`execSync` work. See `sp3/RESULTS.md`.
+
 ### Still open
 
-- **H6 — does Node run?** Spike 3 is blocked before the run step. The Node rootfs
-  assembles (153 MB), but building the image inside Datum fails.
 - **Spike 4 — transport.** Not started.
+- **EC2 build box:** defined in `buildbox/ec2/` (NixOS config, provision script,
+  client script) but not provisioned yet. The H6 image was built ad hoc; from here
+  on, builds go through the box.
 
 ### Why Spike 3 is blocked
 
@@ -46,7 +50,7 @@ needs its root on **tmpfs** — and tmpfs pages are unreclaimable, so they count
 full against the 2 GiB cap. The two requirements are in direct conflict on Datum.
 That is the core reason the build cannot succeed there reliably.
 
-## Immediate next step: build on EC2, not on Datum
+## Build on EC2, not on Datum (implemented in `buildbox/ec2/`)
 
 Datum Compute should **run** the unikernel, not **build** it. Build off-platform,
 push to GHCR, then `datumctl compute deploy`. See `docs/datum-build-box-ec2.md`.

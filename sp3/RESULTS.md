@@ -61,3 +61,33 @@ comfortably in 2 GiB of RAM. So the architecture that works is:
 
 * Report the IPv6 DNS instability on Compute instances (separate from #491/#492).
 * Decide the build host: a remote BuildKit, or build on the Mac and push.
+
+## H6 result: PASS (2026-10-17)
+
+Built off-platform (x86_64 Linux host, then `sp3/flake.nix`), pushed to
+`ghcr.io/drewr/sp3-node:dev`, and deployed `sp3/workload.yaml` as a `unikernel`
+workload in `us-central-1`. Instance logs:
+
+```
+[sp3] starting node probe
+[node] hello from node v24.21.0 pid 410
+[node] platform linux arch x64
+[node] readdir / = ["bin","dev","etc","init","lib","lib64","probe","proc","root","sys","tmp","uk"]
+[node] spawnSync status= 0 stdout= "spawn-child-ok\n" err= undefined
+[node] execSync out= "exec-ok\n"
+[node] done
+Application exited with 0x0 (exit code: 0)
+```
+
+Node starts, and both `spawnSync` and `execSync` (shell via busybox `sh`) work.
+The probe exits, so the workload restart-loops; it was deleted after reading logs.
+
+## Reproducible build
+
+`sp3/flake.nix` makes the rootfs a pure derivation, with nixpkgs pinned by
+`sp3/flake.lock` (same rev as the dotfiles lock). `Dockerfile.datum` runs that
+nix build inside BuildKit from a digest-pinned `nixos/nix` base, so wherever
+BuildKit runs, it builds the same rootfs. Two builds of the earlier
+single-stage version produced the identical index digest
+`sha256:ba655b8ca30a4befab5127f1ee5bed067642ddb618158e6b61442a459dc5fb8e`.
+Builds run on the EC2 build box (`buildbox/ec2/`).
