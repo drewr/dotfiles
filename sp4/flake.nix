@@ -29,7 +29,7 @@
 
       cp ${./init.sh} $R/init
       cp ${busybox}/bin/busybox $R/bin/busybox
-      for a in sh ls cat echo mkdir sleep ps grep head tail env tr uname id \
+      for a in sh ls cat echo mkdir sleep ps grep head tail env tr uname id sed \
                hostname ip ifconfig nslookup wget mount tty stty clear vi; do
         ln -s /bin/busybox $R/bin/$a
       done
