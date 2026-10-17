@@ -1,6 +1,8 @@
 # Plan: Datum Compute + Unikraft for opencode/claude sessions
 
-Status: research complete for Spike 0 (runtime/build capability). Spikes 1–4 pending.
+Status: Spikes 1, 2, 2b PASSED on Datum's unikernel tier. Spike 3 blocked before the
+run step (build host), Spike 4 pending. Build is moving to an EC2 box; see
+`docs/spikes/NEXT-STEPS.md` for the current state and next actions.
 
 ## Goal
 
