@@ -104,14 +104,67 @@ storage   16 GB gp3, 20 h  = $0.09
 
 ## Wiring it up
 
+BuildKit's TCP listener is **unauthenticated** — anyone who reaches the port can
+run builds and read the cache. Do not expose port 1234 publicly. Carry the
+connection over **iroh** instead, which gives a QUIC-authenticated, encrypted
+tunnel between two endpoint keys with no open inbound port and no certificate
+management.
+
+### Preferred: `dumbpipe` (n0-computer)
+
+`dumbpipe` listens on a TCP socket locally, exposes it as an iroh endpoint, and
+prints a ticket. The peer uses the ticket to get a local TCP port that forwards
+to the remote service. This is exactly the shape BuildKit needs.
+
+```sh
+# on the build box: buildkitd on a loopback-only TCP port
+buildkitd --addr tcp://127.0.0.1:1234 --root /var/lib/buildkit &
+
+# on the build box: expose it over iroh (prints a ticket)
+dumbpipe listen-tcp --host localhost:1234
+#   -> dumbpipe connect-tcp --addr 127.0.0.1:1234 <ticket> ...
+
+# locally: bring the remote BuildKit to a local port
+dumbpipe connect-tcp --addr 127.0.0.1:1234 <ticket>
+
+# locally: build through it
+datumctl compute build --buildkit-host tcp://127.0.0.1:1234 \
+  --push --output ghcr.io/drewr/IMAGE:TAG .
 ```
+
+No inbound port is opened on the build box, and only a holder of the ticket can
+reach BuildKit.
+
+### Alternative: Datum Connect project-less tunnel
+
+The plan already requires `datumctl connect` for SSH into agent instances
+(Spike 4), so the same mechanism can carry BuildKit:
+
+```sh
 # on the build box
-BUILDKIT_HOST=tcp://0.0.0.0:1234 buildkitd --addr tcp://0.0.0.0:1234 &
-
+datumctl connect local --port 1234        # prints a pairing ticket
 # locally
-datumctl compute build --buildkit-host tcp://BUILD_BOX:1234 \
-  --push --output ghcr.io/drewr/sp3-node:dev .
+datumctl connect dial <TICKET> --bind 1234
+datumctl compute build --buildkit-host tcp://127.0.0.1:1234 --push --output ...
 ```
 
-BuildKit's TCP listener is unauthenticated; restrict it with a security group
-that allows port 1234 only from your address, or tunnel it over SSH.
+This uses the `feat/projectless-local-tunnel` branch and needs no login,
+project, or gateway — consistent with the Spike 4 constraint.
+
+### Not preferred
+
+- Raw `tcp://0.0.0.0:1234` plus a security group: workable, but exposes an
+  unauthenticated builder to anyone who can reach the port and IP.
+- `datum-cloud/iroh-gateway`: built for Datum Connect's edge (HTTP/CONNECT proxy
+  into the Connect network). Heavier than needed for a single tunnel.
+
+### Also note: the build box removes two Datum-side constraints
+
+Building on EC2 rather than a `d1-standard-2` instance removes:
+
+1. The **2 GiB container cgroup cap** (issue #492) that silently recycled the
+   Datum build box.
+2. The **fuse, no-xattr writable filesystem** that forced BuildKit's root onto
+   tmpfs (`buildbox/README.md` gotcha 2) — which is what pushed the container
+   over its memory cap in the first place. On EC2, BuildKit's root and snapshotter
+   can live on a normal ext4 volume.
