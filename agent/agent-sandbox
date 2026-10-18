@@ -1,0 +1,217 @@
+#!/usr/bin/env bash
+# Spawn and reach claude-code sandboxes on Datum Compute (unikernel class).
+#
+#   agent-sandbox new NAME [--key PUBKEY_FILE]   create a session and wait for SSH
+#   agent-sandbox ssh NAME [ssh args...]         connect (interactive by default)
+#   agent-sandbox ls                             list sessions
+#   agent-sandbox logs NAME [logs args...]       instance logs
+#   agent-sandbox rm NAME                        delete workload, secret, local state
+#
+# Each session gets a fresh iroh secret and SSH host key generated here, stored
+# in a per-session Datum Secret and under $AGENT_SANDBOX_STATE/NAME. The client
+# derives the iroh ticket from the secret and pins the host key, so nothing is
+# read from instance logs and there is no trust-on-first-use. If
+# ANTHROPIC_API_KEY is set locally it is copied into the session's Secret;
+# otherwise run `claude /login` inside the session.
+#
+# Needs: datumctl (logged in), ssh, ssh-keygen, openssl, and dumbpipe (falls back
+# to `nix build nixpkgs#dumbpipe`).
+set -euo pipefail
+
+HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+STATE=${AGENT_SANDBOX_STATE:-${XDG_STATE_HOME:-$HOME/.local/state}/agent-sandbox}
+IMAGE=${AGENT_SANDBOX_IMAGE:-$(cat "$HERE/image.ref" 2>/dev/null || true)}
+PULL_SECRET=${AGENT_SANDBOX_PULL_SECRET:-ghcr-drewr-v2}
+LOCATION=${AGENT_SANDBOX_LOCATION:-us-central-1}
+INSTANCE_TYPE=${AGENT_SANDBOX_INSTANCE_TYPE:-datumcloud/d1-standard-2}
+# The relay us-central-1 instances have chosen as home in every run so far.
+RELAY=${AGENT_SANDBOX_RELAY:-https://use1-1.relay.n0.iroh.link./}
+
+die() { echo "agent-sandbox: $*" >&2; exit 1; }
+usage() { sed -n '2,8p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 2; }
+
+dumbpipe_bin() {
+  command -v dumbpipe 2>/dev/null && return
+  echo "$(nix build --no-link --print-out-paths nixpkgs#dumbpipe)/bin/dumbpipe"
+}
+
+session_dir() {
+  [[ $1 =~ ^[a-z0-9]([a-z0-9-]{0,38}[a-z0-9])?$ ]] \
+    || die "name must be lowercase letters, digits and '-', at most 40 chars"
+  echo "$STATE/$1"
+}
+
+# iroh endpoint public key (hex) for a hex ed25519 secret on stdin.
+endpoint_pubhex() {
+  { printf '302e020100300506032b657004220420'; cat; } | xxd -r -p \
+    | openssl pkey -inform DER -pubout -outform DER | tail -c 32 | xxd -p -c 64
+}
+
+# z-base-32 label for iroh's DNS discovery name _iroh.<label>.dns.iroh.link.
+endpoint_z32() {
+  local hex bits='' i n out='' alpha=ybndrfg8ejkmcpqxot1uwisza345h769
+  hex=$(endpoint_pubhex)
+  for ((i = 0; i < ${#hex}; i++)); do
+    n=$((16#${hex:i:1}))
+    bits+=$(( (n >> 3) & 1 ))$(( (n >> 2) & 1 ))$(( (n >> 1) & 1 ))$(( n & 1 ))
+  done
+  while (( ${#bits} % 5 )); do bits+='0'; done
+  for ((i = 0; i < ${#bits}; i += 5)); do out+=${alpha:$((2#${bits:i:5})):1}; done
+  echo "$out"
+}
+
+# An iroh endpoint ticket that carries the relay URL, so the client dials the
+# relay directly instead of depending on DNS discovery, which instances have
+# failed to publish to (sp4/RESULTS.md, agent/README.md). Wire format, as
+# decoded from dumbpipe tickets: 00 | pubkey(32) | n_addrs | 00 len url.
+endpoint_ticket() {
+  local relay=$1 urlhex
+  urlhex=$(printf '%s' "$relay" | xxd -p -c 256)
+  (( ${#relay} < 128 )) || die "relay URL too long"
+  { printf '00%s0100%02x%s' "$(endpoint_pubhex)" "${#relay}" "$urlhex"; } | xxd -r -p \
+    | base32 -w0 | tr '[:upper:]' '[:lower:]' | tr -d '=' | sed 's/^/endpoint/'
+}
+
+authorized_keys() {
+  if [ -n "${1:-}" ]; then cat "$1"; return; fi
+  if ssh-add -L 2>/dev/null | grep -q '^ssh-'; then ssh-add -L; return; fi
+  for f in "$HOME"/.ssh/id_ed25519.pub "$HOME"/.ssh/id_ecdsa.pub "$HOME"/.ssh/id_rsa.pub; do
+    [ -f "$f" ] && { cat "$f"; return; }
+  done
+  die "no public key: load one into ssh-agent or pass --key FILE"
+}
+
+cmd_new() {
+  local name=${1:?usage: agent-sandbox new NAME [--key FILE]}; shift
+  local key=
+  while [ $# -gt 0 ]; do
+    case $1 in --key) key=$2; shift 2 ;; *) die "unknown option $1" ;; esac
+  done
+  [ -n "$IMAGE" ] || die "no image: set AGENT_SANDBOX_IMAGE or write $HERE/image.ref"
+  local dir; dir=$(session_dir "$name")
+  [ -e "$dir" ] && die "session $name exists locally ($dir); rm it first"
+
+  mkdir -p "$dir"; chmod 700 "$dir"
+  (
+    umask 077
+    openssl rand -hex 32 > "$dir/iroh_secret"
+    endpoint_ticket "$RELAY" < "$dir/iroh_secret" > "$dir/ticket"
+    ssh-keygen -q -t ed25519 -N '' -C "agent-$name" -f "$dir/host_key"
+    echo "agent-$name $(cut -d' ' -f1,2 "$dir/host_key.pub")" > "$dir/known_hosts"
+    authorized_keys "$key" > "$dir/authorized_keys"
+    # A --key FILE.pub with its private key beside it is also the identity.
+    if [ -n "$key" ] && [ -f "${key%.pub}" ] && [ "${key%.pub}" != "$key" ]; then
+      realpath "${key%.pub}" > "$dir/identity"
+    fi
+  )
+  grep -q '^endpoint' "$dir/ticket" || die "could not derive the iroh ticket"
+
+  local api_env=''
+  {
+    printf 'apiVersion: v1\nkind: Secret\nmetadata:\n  name: agent-%s\ntype: Opaque\nstringData:\n' "$name"
+    printf '  IROH_SECRET: "%s"\n' "$(cat "$dir/iroh_secret")"
+    printf '  AUTHORIZED_KEYS_B64: "%s"\n' "$(base64 -w0 < "$dir/authorized_keys")"
+    printf '  SSH_HOST_KEY_B64: "%s"\n' "$(base64 -w0 < "$dir/host_key")"
+    if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+      printf '  ANTHROPIC_API_KEY: "%s"\n' "$ANTHROPIC_API_KEY"
+    fi
+  } | datumctl apply -f - >/dev/null
+  if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+    api_env=$(printf '                - name: ANTHROPIC_API_KEY\n                  valueFrom:\n                    secretKeyRef: { name: agent-%s, key: ANTHROPIC_API_KEY }\n' "$name")
+  fi
+
+  datumctl apply -f - >/dev/null <<EOF
+apiVersion: compute.datumapis.com/v1alpha
+kind: Workload
+metadata:
+  name: agent-$name
+  labels:
+    agent-sandbox: "true"
+spec:
+  template:
+    spec:
+      runtime:
+        class: unikernel
+        resources:
+          instanceType: $INSTANCE_TYPE
+        sandbox:
+          imagePullSecrets:
+            - name: $PULL_SECRET
+          containers:
+            - name: agent
+              image: $IMAGE
+              env:
+                - name: SESSION_NAME
+                  value: $name
+                - name: ENDPOINT_DNS
+                  value: _iroh.$(endpoint_z32 < "$dir/iroh_secret").dns.iroh.link
+                - name: IROH_SECRET
+                  valueFrom:
+                    secretKeyRef: { name: agent-$name, key: IROH_SECRET }
+                - name: AUTHORIZED_KEYS_B64
+                  valueFrom:
+                    secretKeyRef: { name: agent-$name, key: AUTHORIZED_KEYS_B64 }
+                - name: SSH_HOST_KEY_B64
+                  valueFrom:
+                    secretKeyRef: { name: agent-$name, key: SSH_HOST_KEY_B64 }
+$api_env
+      networkInterfaces:
+        - network:
+            name: default
+  placements:
+    - name: default
+      locations:
+        - name: $LOCATION
+      scaleSettings:
+        minReplicas: 1
+EOF
+  echo "created agent-$name ($IMAGE); waiting for SSH..." >&2
+  local t0=$SECONDS
+  # Subshell: cmd_ssh execs ssh.
+  until (cmd_ssh "$name" -o ConnectTimeout=20 -o BatchMode=yes true) 2>/dev/null; do
+    [ $((SECONDS - t0)) -lt 300 ] || die "no SSH after 5 min; try: agent-sandbox logs $name"
+    sleep 10
+  done
+  echo "ready after $((SECONDS - t0))s: agent-sandbox ssh $name" >&2
+}
+
+cmd_ssh() {
+  local name=${1:?usage: agent-sandbox ssh NAME [ssh args...]}; shift
+  local dir; dir=$(session_dir "$name")
+  [ -f "$dir/ticket" ] || die "no local state for $name"
+  local dp; dp=$(dumbpipe_bin)
+  # Options must precede the destination; anything after "--" is the command.
+  local opts=() cmd=()
+  [ -f "$dir/identity" ] && opts+=(-i "$(cat "$dir/identity")" -o IdentitiesOnly=yes)
+  while [ $# -gt 0 ]; do
+    case $1 in --) shift; cmd=("$@"); break ;; -o|-L|-R|-D|-i) opts+=("$1" "$2"); shift 2 ;;
+      -*) opts+=("$1"); shift ;; *) cmd=("$@"); break ;; esac
+  done
+  exec ssh -o "ProxyCommand=$dp connect $(cat "$dir/ticket") 2>/dev/null" \
+    -o "UserKnownHostsFile=$dir/known_hosts" -o "HostKeyAlias=agent-$name" \
+    -o StrictHostKeyChecking=yes -o ServerAliveInterval=30 \
+    "${opts[@]}" "root@agent-$name" "${cmd[@]}"
+}
+
+cmd_ls() {
+  echo "== workloads"; datumctl compute workloads 2>/dev/null | awk 'NR==1 || /^agent-/'
+  echo "== local state ($STATE)"; ls -1 "$STATE" 2>/dev/null || true
+}
+
+cmd_logs() {
+  local name=${1:?usage: agent-sandbox logs NAME}; shift
+  datumctl compute logs "agent-$name" "$@"
+}
+
+cmd_rm() {
+  local name=${1:?usage: agent-sandbox rm NAME}
+  local dir; dir=$(session_dir "$name")
+  datumctl delete workload "agent-$name" 2>&1 | tail -1 || true
+  datumctl delete secret "agent-$name" 2>&1 | tail -1 || true
+  rm -rf "$dir"
+}
+
+case ${1:-} in
+  new|ssh|ls|logs|rm) c=$1; shift; "cmd_$c" "$@" ;;
+  *) usage ;;
+esac
