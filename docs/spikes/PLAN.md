@@ -2,7 +2,9 @@
 
 Status: Spikes 1, 2, 2b, 3, 4, 5A PASSED on Datum's unikernel tier: Node and the
 claude-code Bun binary start, and interactive SSH over iroh works with no
-gateway. Remaining: 5B (API + tool call, needs a key), then the spawn tool. Builds run on the EC2 box in `buildbox/ec2/`; see
+gateway. The spawn tool exists: `agent/agent-sandbox new NAME` gives a working
+claude-code session over SSH in ~10 s (`agent/README.md`). Remaining: 5B (API +
+tool call, needs a key), persistence, and wiring the tool into home-manager. Builds run on the EC2 box in `buildbox/ec2/`; see
 `docs/spikes/NEXT-STEPS.md`.
 
 ## Goal
@@ -158,3 +160,7 @@ parallel with the spikes.
   as a Secret, so the client knows the ticket in advance. Observed: the guest
   runs a Linux 6.12 kernel with kernel threads (`kthreadd`, `kworker`), so it
   is likely a Linux microVM, unconfirmed.
+- 2026-10-18: `agent/` combines Spikes 4 and 5 into an agent image, plus the
+  `agent-sandbox` spawn tool. Instances fail to publish to iroh DNS discovery
+  (IPv4 path to dns.iroh.link is unreachable from the IPv6-only network), so
+  the client builds tickets that carry the relay URL.
