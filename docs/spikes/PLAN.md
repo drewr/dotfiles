@@ -168,3 +168,7 @@ parallel with the spikes.
   the build box over iroh) works correctly across sessions, but git is
   ~150–500x slower than RAM because of the 51 ms Dallas→Virginia relay→Ohio
   metadata round trip. Options recorded in `docs/spikes/sp6-shared-home.md`.
+- 2026-10-19: Persistence: hybrid (user decision; nothing exposed). The
+  shared JuiceFS home holds ~/.claude and dotfiles live; repos are `ws`
+  workspaces in RAM with locks, autosave and save-on-rm. The direct iroh path
+  to the metadata host stays (no inbound rule needed).

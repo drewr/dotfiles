@@ -22,7 +22,7 @@
     claude = llm-agents.packages.${system}.claude-code;
     busybox = pkgs.pkgsStatic.busybox;
     # Linked into /bin ahead of busybox applets of the same name.
-    tools = with pkgs; [ claude bashInteractive gitMinimal ripgrep dropbear dumbpipe juicefs ];
+    tools = with pkgs; [ claude bashInteractive gitMinimal ripgrep dropbear dumbpipe juicefs rsync ];
     closure = pkgs.closureInfo { rootPaths = tools ++ [ pkgs.cacert ]; };
 
     rootfs = pkgs.runCommand "agent-rootfs" { } ''
@@ -41,6 +41,7 @@
         [ -e $R/bin/$a ] || [ -L $R/bin/$a ] || ln -s /bin/busybox $R/bin/$a
       done
       cp ${./init.sh} $R/init
+      cp ${./ws} $R/bin/ws
 
       ln -s ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt $R/etc/ssl/certs/ca-certificates.crt
       echo 'root:x:0:0:root:/root:/bin/bash' > $R/etc/passwd
@@ -49,7 +50,7 @@
       echo 'hosts: files dns' > $R/etc/nsswitch.conf
 
       chmod -R u+w $R
-      chmod 0555 $R/bin/busybox $R/init
+      chmod 0555 $R/bin/busybox $R/init $R/bin/ws
       chmod 0700 $R/root
       chmod 1777 $R/tmp
     '';

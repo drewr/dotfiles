@@ -147,3 +147,18 @@ IAD to AWS us-east-1 should be well under 1 ms, so most of the remaining ~2 ms
 is iroh/dumbpipe overhead (userspace QUIC plus a TCP hop on each side). The
 next lever, if wanted, is Redis over TLS straight to the host's IPv6, with an
 inbound rule for Datum's prefix.
+
+## Decision and round 5 (2026-10-19): hybrid, nothing exposed
+
+Chosen: shared home for `~/.claude` and dotfiles, repos in RAM as `ws`
+workspaces (agent/README.md). No inbound rules anywhere; everything stays on
+outbound iroh.
+
+Verified on production us-east-1:
+
+* `ws clone` in w1, uncommitted edits, `ws save` (0.8 s); `git status` 0.007 s.
+* w3: `ws open` refused while w1 held the lock; `--force` took over in 7.7 s;
+  w1's uncommitted files were present; `git status` 0.007 s.
+* Deleting a workload directly (no `agent-sandbox rm`) does **not** deliver
+  SIGTERM to init: the shutdown trap never ran and an unsaved file was lost.
+  Hence autosave every 2 minutes, and `agent-sandbox rm` saving over SSH first.

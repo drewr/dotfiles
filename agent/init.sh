@@ -56,8 +56,10 @@ if [ -n "$META_TICKET" ] && [ -n "$META_URL" ]; then
   if AWS_USE_DUALSTACK_ENDPOINT=true /bin/juicefs mount --background --cache-dir /tmp/jfs-cache --cache-size 256 \
        --buffer-size 128 --log /tmp/juicefs.log $JFS_MOUNT_OPTS "$META_URL" /home/agent; then
     AGENT_HOME=/home/agent
-    mkdir -p /home/agent/work
+    mkdir -p /home/agent/work /work
     log "shared home mounted at /home/agent"
+    # Repos live in RAM under /work and persist to ~/work via ws (agent/ws).
+    (HOME=/home/agent /bin/ws autosave) &
   else
     log "shared home mount FAILED; using /root ($(tail -3 /tmp/juicefs.log 2>/dev/null | tr '\n' ' '))"
   fi
@@ -73,8 +75,18 @@ unset META_URL META_TICKET AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
   echo 'export DISABLE_AUTOUPDATER=1'
   [ -n "$ANTHROPIC_API_KEY" ] && echo "export ANTHROPIC_API_KEY='$ANTHROPIC_API_KEY'"
 } > /root/.agent-env
-# shellcheck disable=SC2016  # expanded by the login shell, not here
-printf '. /root/.agent-env\nmkdir -p "$HOME/work"; cd "$HOME/work"\n' > /root/.bash_profile
+cat > /root/.bash_profile <<'PROFILE'
+. /root/.agent-env
+# ws open/clone print the RAM path of the workspace; land the shell there.
+ws() {
+  case ${1:-} in
+    open|clone) local d; d=$(command ws "$@") && cd "$d" ;;
+    close) command ws "$@" && case $PWD/ in /work/"$2"/*) cd ;; esac ;;
+    *) command ws "$@" ;;
+  esac
+}
+cd
+PROFILE
 cp /root/.bash_profile /root/.profile
 unset AUTHORIZED_KEYS_B64 SSH_HOST_KEY_B64 ANTHROPIC_API_KEY
 
@@ -98,28 +110,20 @@ for a in $(/bin/nslookup dns.iroh.link 2>/dev/null | /bin/awk '/^Address: /{prin
   log "dns.iroh.link $a:443 $r"
 done
 
-# Watchdog: if our discovery record is missing, restart dumbpipe so it publishes
-# again. ENDPOINT_DNS is _iroh.<z32 id>.dns.iroh.link, from agent-sandbox.
-(
-  [ -n "$ENDPOINT_DNS" ] || exit 0
-  sleep 30
-  miss=0
-  while :; do
-    if /bin/nslookup -type=TXT "$ENDPOINT_DNS" 2>/dev/null | /bin/grep -q 'relay='; then
-      [ $miss -gt 0 ] && log "discovery record present"
-      miss=0
-    else
-      miss=$((miss + 1))
-      log "discovery record missing ($miss)"
-      [ $miss -ge 2 ] && { /bin/pkill -x dumbpipe; miss=0; }
-    fi
-    sleep 30
-  done
-) &
+# On shutdown, copy every workspace from RAM to the shared home first.
+shutdown() {
+  log "stopping: saving workspaces"
+  [ "$AGENT_HOME" = /home/agent ] && HOME=/home/agent /bin/ws save --all 2>&1 | head -20
+  log "stopped"
+  exit 0
+}
+trap shutdown TERM INT
 
 sleep 1
 while :; do
-  /bin/dumbpipe listen-tcp --host 127.0.0.1:2222 2>&1 | /bin/grep -v -e 'endpoint[a-z0-9]\{20\}'
+  # Background + wait, so a signal runs the trap now rather than after dumbpipe.
+  /bin/dumbpipe listen-tcp --host 127.0.0.1:2222 2>&1 | /bin/grep -v -e 'endpoint[a-z0-9]\{20\}' &
+  wait $!
   log "dumbpipe exited; restarting"
   sleep 5
 done

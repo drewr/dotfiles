@@ -6,7 +6,8 @@
 #   agent-sandbox ssh NAME [ssh args...]         connect (interactive by default)
 #   agent-sandbox ls                             list sessions
 #   agent-sandbox logs NAME [logs args...]       instance logs
-#   agent-sandbox rm NAME                        delete workload, secret, local state
+#   agent-sandbox rm NAME                        save workspaces, then delete workload,
+#                                                secret and local state
 #
 # Each session gets a fresh iroh secret and SSH host key generated here, stored
 # in a per-session Datum Secret and under $AGENT_SANDBOX_STATE/NAME. The client
@@ -240,6 +241,13 @@ cmd_logs() {
 cmd_rm() {
   local name=${1:?usage: agent-sandbox rm NAME}
   local dir; dir=$(session_dir "$name")
+  # Persist RAM workspaces (/work) to the shared home and release their locks
+  # before the instance goes, so another session can open them right away.
+  if [ -f "$dir/ticket" ]; then
+    (cmd_ssh "$name" -o BatchMode=yes -o ConnectTimeout=20 -- \
+       'HOME=/home/agent; [ -d /work ] && ws close --all') 2>/dev/null \
+      && echo "workspaces saved" >&2 || echo "agent-sandbox: could not save workspaces of $name" >&2
+  fi
   datumctl delete workload "agent-$name" 2>&1 | tail -1 || true
   datumctl delete secret "agent-$name" 2>&1 | tail -1 || true
   rm -rf "$dir"
