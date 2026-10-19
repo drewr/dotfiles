@@ -1,6 +1,7 @@
 { lib, pkgs, ... }:
 let
   port = 6379;
+  irohPort = 7842;
   state = "/var/lib/agent-meta";
   bucket = "agent-home-007091975061-use1";
   metaUrl = "redis://:$(cat ${state}/redis.pass)@127.0.0.1:${toString port}/1";
@@ -62,10 +63,16 @@ in
       IROH_SECRET=$(cat ${state}/iroh.secret)
       export IROH_SECRET
       dumbpipe generate-ticket > ${state}/ticket
-      exec dumbpipe listen-tcp --host 127.0.0.1:${toString port}
+      exec dumbpipe listen-tcp --host 127.0.0.1:${toString port} \
+        --ipv6-addr '[::]:${toString irohPort}' --ipv4-addr 0.0.0.0:${toString irohPort}
     '';
     serviceConfig.Restart = "always";
   };
+
+  # A fixed iroh UDP port, so sandboxes (IPv6-only on Datum) can reach this host
+  # directly over its public IPv6 instead of through the n0 relay. The NixOS
+  # firewall would otherwise drop it even when the security group allows it.
+  networking.firewall.allowedUDPPorts = [ irohPort ];
 
   # Nightly metadata dump to S3 (the instance role may write meta-backup/ only).
   # With the S3 data, a dump restores the whole filesystem: juicefs load.
