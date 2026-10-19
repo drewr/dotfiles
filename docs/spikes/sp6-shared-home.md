@@ -65,3 +65,29 @@ with `env -u IROH_SECRET`.
    open, periodically, and on exit), plus a per-repo lock. git runs at local
    speed and work persists and resumes elsewhere, but two sessions can't edit
    the same repo at once.
+
+## Round 2 (2026-10-19): Ashburn, EC2 baseline, dual-stack S3
+
+| | RAM | EC2 us-east-2, local Redis | Datum us-east-1 (IAD) | Datum us-central-1 (DFW) |
+| - | -: | -: | -: | -: |
+| Redis round trip | — | 0.1 ms | 15 ms | 51 ms |
+| `git clone` | 0.4 s | 5.6 s | 70 s | 292 s |
+| `git status` (2nd) | 0.05 s | 0.13 s | 8.4 s | 33 s |
+| `rg` over tree | 0.02 s | 0.07 s | 8.4 s | 29 s |
+| write 200 small files | 0.002 s | 4.8 s | 41 s | 129 s |
+| `git add` + commit | 0.15 s | 7.0 s | 154 s | (timed out) |
+
+Speed tracks the metadata round trip; with Redis local (EC2) JuiceFS is close
+to disk for reads. Next: move Redis and the bucket to AWS us-east-1 (same metro
+as Datum IAD, ~1–2 ms).
+
+Staging findings (staging is not a dependency; sessions now target production):
+
+* Staging us-east-1 has **no IPv4 egress**: plain resolvers instead of DNS64,
+  and no NAT64 (`64:ff9b::/96` unreachable). GitHub and IPv4-only S3 endpoints
+  are unreachable. Dallas has DNS64 and NAT64.
+* JuiceFS rewrites the bucket URL to the IPv4-only S3 endpoint ("no addresses
+  to dial"). `AWS_USE_DUALSTACK_ENDPOINT=true` on the mount fixes it in any
+  location.
+* Staging's `default` network never got a us-east-1 VPC identifier
+  (`NetworkFailedToCreate`); a freshly created network worked.

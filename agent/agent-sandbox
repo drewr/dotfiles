@@ -27,10 +27,17 @@ set -euo pipefail
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 STATE=${AGENT_SANDBOX_STATE:-${XDG_STATE_HOME:-$HOME/.local/state}/agent-sandbox}
 IMAGE=${AGENT_SANDBOX_IMAGE:-$(cat "$HERE/image.ref" 2>/dev/null || true)}
-PULL_SECRET=${AGENT_SANDBOX_PULL_SECRET:-ghcr-drewr-v2}
-LOCATION=${AGENT_SANDBOX_LOCATION:-us-central-1}
+# Datum production (api.datum.net), project drewr-y4nd1b. Sessions depend only
+# on features in production; staging differs (no IPv4 egress in us-east-1, and
+# a default network whose us-east-1 VPC never provisioned).
+# Session names are email@api-host. An explicit DATUM_SESSION wins, so
+# `DATUM_SESSION=… agent-sandbox rm NAME` acts where the caller expects.
+export DATUM_SESSION=${AGENT_SANDBOX_DATUM_SESSION:-${DATUM_SESSION:-aaraines@gmail.com@api.datum.net}}
+PULL_SECRET=${AGENT_SANDBOX_PULL_SECRET:-ghcr-drewr}
+LOCATION=${AGENT_SANDBOX_LOCATION:-us-east-1}
+NETWORK=${AGENT_SANDBOX_NETWORK:-default}
 INSTANCE_TYPE=${AGENT_SANDBOX_INSTANCE_TYPE:-datumcloud/d1-standard-2}
-# The relay us-central-1 instances have chosen as home in every run so far.
+# The relay instances have chosen as home in every run so far (n0 use1, Virginia).
 RELAY=${AGENT_SANDBOX_RELAY:-https://use1-1.relay.n0.iroh.link./}
 HOME_SECRET=${AGENT_SANDBOX_HOME_SECRET:-agent-home}
 
@@ -180,7 +187,7 @@ $api_env
 $home_env
       networkInterfaces:
         - network:
-            name: default
+            name: $NETWORK
   placements:
     - name: default
       locations:
