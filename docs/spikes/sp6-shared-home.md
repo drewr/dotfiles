@@ -121,3 +121,29 @@ sandbox → n0 relay → metadata host, not directly.
 
 `--writeback` stages writes in the RAM cache and uploads in the background, so
 an instance lost before upload loses those writes.
+
+## Round 4 (2026-10-19): direct iroh path to the metadata host
+
+Gave the metadata host public IPv6 (`provision.sh ipv6`; VPC block
+`2600:1f18:4a26:af00::/56`) and a fixed iroh port (UDP 7842, opened in the NixOS
+firewall). The security group still has **no inbound rule**: hole punching
+works through its stateful tracking. From a sandbox, the first connection
+starts on the relay and switches to
+`Ip(fd20:0:1:1:0:1:: -> [2600:1f18:4a26:af03:…]:7842)`; later connections are
+direct from the start.
+
+| | RAM | Relay (round 3) | Direct, default caches | Direct, tuned |
+| - | -: | -: | -: | -: |
+| request round trip through the tunnel | — | 3.2 ms | 2.1 ms | 3.2 ms |
+| `git clone` (GitHub) | 0.30 s | 19.0 s | 14.4 s | 11.3 s |
+| `git status` (2nd) | 0.014 s | 1.3 s | 0.81 s | 1.08 s |
+| `rg` over tree | 0.006 s | 1.7 s | 1.04 s | 1.36 s |
+| write 200 small files | 0.002 s | 12.5 s | 10.1 s | 7.0 s |
+| `git add` + commit | 0.04 s | 36.4 s | 24.0 s | 25.6 s |
+
+Round trip measured as 300 sequential Redis `PING`s over the tunnel. The tuned
+session may have still been on the relay; the init tunnel's path isn't logged.
+IAD to AWS us-east-1 should be well under 1 ms, so most of the remaining ~2 ms
+is iroh/dumbpipe overhead (userspace QUIC plus a TCP hop on each side). The
+next lever, if wanted, is Redis over TLS straight to the host's IPv6, with an
+inbound rule for Datum's prefix.
