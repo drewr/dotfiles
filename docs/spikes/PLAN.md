@@ -164,3 +164,7 @@ parallel with the spikes.
   `agent-sandbox` spawn tool. Instances fail to publish to iroh DNS discovery
   (IPv4 path to dns.iroh.link is unreachable from the IPv6-only network), so
   the client builds tickets that carry the relay URL.
+- 2026-10-19: Spike 6a (shared live home on JuiceFS; S3 data, Redis metadata on
+  the build box over iroh) works correctly across sessions, but git is
+  ~150–500x slower than RAM because of the 51 ms Dallas→Virginia relay→Ohio
+  metadata round trip. Options recorded in `docs/spikes/sp6-shared-home.md`.

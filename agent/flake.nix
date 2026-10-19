@@ -22,7 +22,7 @@
     claude = llm-agents.packages.${system}.claude-code;
     busybox = pkgs.pkgsStatic.busybox;
     # Linked into /bin ahead of busybox applets of the same name.
-    tools = with pkgs; [ claude bashInteractive gitMinimal ripgrep dropbear dumbpipe ];
+    tools = with pkgs; [ claude bashInteractive gitMinimal ripgrep dropbear dumbpipe juicefs ];
     closure = pkgs.closureInfo { rootPaths = tools ++ [ pkgs.cacert ]; };
 
     rootfs = pkgs.runCommand "agent-rootfs" { } ''
