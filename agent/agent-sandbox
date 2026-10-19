@@ -40,6 +40,8 @@ INSTANCE_TYPE=${AGENT_SANDBOX_INSTANCE_TYPE:-datumcloud/d1-standard-2}
 # The relay instances have chosen as home in every run so far (n0 use1, Virginia).
 RELAY=${AGENT_SANDBOX_RELAY:-https://use1-1.relay.n0.iroh.link./}
 HOME_SECRET=${AGENT_SANDBOX_HOME_SECRET:-agent-home}
+# Extra `juicefs mount` options for the shared home (passed as JFS_MOUNT_OPTS).
+JFS_OPTS=${AGENT_SANDBOX_JFS_OPTS:-}
 
 die() { echo "agent-sandbox: $*" >&2; exit 1; }
 usage() { sed -n '2,8p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 2; }
@@ -172,6 +174,8 @@ spec:
               env:
                 - name: SESSION_NAME
                   value: $name
+                - name: JFS_MOUNT_OPTS
+                  value: "$JFS_OPTS"
                 - name: ENDPOINT_DNS
                   value: _iroh.$(endpoint_z32 < "$dir/iroh_secret").dns.iroh.link
                 - name: IROH_SECRET

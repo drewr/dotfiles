@@ -12,6 +12,7 @@
 #   META_TICKET          dumbpipe ticket for the JuiceFS metadata Redis
 #   META_URL             redis://:<password>@127.0.0.1:6379/1, through that tunnel
 #   AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY   bucket-scoped key for JuiceFS data
+#   JFS_MOUNT_OPTS       extra `juicefs mount` options (word-split), from agent-sandbox
 # Programs run by absolute path: Unikraft's execve does no PATH search (H14).
 export PATH=/bin
 export HOME=/root
@@ -51,8 +52,9 @@ if [ -n "$META_TICKET" ] && [ -n "$META_URL" ]; then
   # Cache lives in RAM (the root overlay is RAM-backed), so keep it bounded.
   # Dual-stack S3: some locations (staging us-east-1) have no IPv4 egress at
   # all, and JuiceFS rewrites the bucket URL to the IPv4-only endpoint.
+  # shellcheck disable=SC2086  # JFS_MOUNT_OPTS is a list of options
   if AWS_USE_DUALSTACK_ENDPOINT=true /bin/juicefs mount --background --cache-dir /tmp/jfs-cache --cache-size 256 \
-       --buffer-size 128 --log /tmp/juicefs.log "$META_URL" /home/agent; then
+       --buffer-size 128 --log /tmp/juicefs.log $JFS_MOUNT_OPTS "$META_URL" /home/agent; then
     AGENT_HOME=/home/agent
     mkdir -p /home/agent/work
     log "shared home mounted at /home/agent"

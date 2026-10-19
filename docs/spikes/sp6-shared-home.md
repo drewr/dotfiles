@@ -91,3 +91,33 @@ Staging findings (staging is not a dependency; sessions now target production):
   location.
 * Staging's `default` network never got a us-east-1 VPC identifier
   (`NetworkFailedToCreate`); a freshly created network worked.
+
+## Round 3 (2026-10-19): production us-east-1, metadata host in AWS us-east-1
+
+Datum **production** (`api.datum.net`, project `drewr-y4nd1b`), `us-east-1`
+(IAD). Metadata moved to a permanent NixOS host in AWS us-east-1
+(`meta/ec2/`), and data to bucket `agent-home-007091975061-use1`
+(dual-stack endpoint). The us-east-2 bucket and the build box's ad hoc Redis
+were deleted.
+
+Production us-east-1 has DNS64 and NAT64 (GitHub reachable over
+`64:ff9b::/96`), and its `default` network works. Neither staging problem
+exists there.
+
+| | RAM | JuiceFS, default caches | JuiceFS, 30 s caches + `--writeback` |
+| - | -: | -: | -: |
+| Redis round trip | — | 3.2 ms | 3.2 ms |
+| `git clone` (from GitHub) | 0.30 s | 19.0 s | 11.8 s |
+| `git status` (2nd) | 0.014 s | 1.3 s | 1.15 s |
+| `rg` over tree | 0.006 s | 1.7 s | 1.35 s |
+| write 200 small files | 0.002 s | 12.5 s | 7.3 s |
+| `git add` + commit | 0.04 s | 36.4 s | 27.1 s |
+
+From Dallas to here, clone went from 292 s to 12 s and status from 33 s to
+1.2 s, but the shared home is still about 100x slower than RAM for git. Longer
+caches barely help `git status`: about 400 metadata calls at about 3 ms each
+is still about 1.2 s. The remaining cost is the round trip itself, which goes
+sandbox → n0 relay → metadata host, not directly.
+
+`--writeback` stages writes in the RAM cache and uploads in the background, so
+an instance lost before upload loses those writes.
