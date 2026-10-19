@@ -23,6 +23,38 @@ agent-sandbox rm work
 - **Needs locally:** `datumctl` (logged in), `ssh`, `ssh-keygen`, `openssl`,
   `xxd`, `base32`, and `dumbpipe` (falls back to `nix build nixpkgs#dumbpipe`).
 
+## Workspaces: repos in RAM, persisted to the shared home
+
+`~` is the shared home (JuiceFS), live across all sessions: `~/.claude`
+(conversations, `claude --resume`), dotfiles, settings. Repos don't run there,
+because git over JuiceFS is about 100x slower than RAM (see
+`docs/spikes/sp6-shared-home.md`). Each repo is instead a **workspace**: it
+lives in RAM at `/work/NAME` while a session holds it, and persists to
+`~/work/NAME`.
+
+```sh
+ws clone https://github.com/you/repo.git   # into /work/repo; you land there
+ws open repo                               # resume a workspace from any session
+ws save                                    # also automatic every 2 min
+ws close repo                              # save, release the lock, free the RAM
+ws ls                                      # workspaces and who holds them
+```
+
+- **One session at a time per workspace.** A lock in `~/.ws/locks` with a
+  heartbeat. `ws open` on a held workspace names the holder. After 15 minutes
+  without a heartbeat, or with `--force`, it takes over, and the old holder
+  stops saving that workspace.
+- **Same path everywhere** (`/work/NAME`), so Claude Code's per-project history
+  lines up across sessions.
+- **When work is saved:** `ws save`, autosave every 2 minutes, `ws close`, and
+  `agent-sandbox rm`, which runs `ws close --all` over SSH before deleting.
+  Deleting a workload by other means stops it **without** SIGTERM (tested), so
+  that loses up to the last 2 minutes of changes.
+
+Measured on production us-east-1 (dotfiles repo, 328 files): `git status` in a
+workspace 0.007 s, against 0.8–1.3 s directly on the shared home. Incremental
+save 0.8 s. First `ws open` of the repo 7.7 s; first `ws clone` plus save 15 s.
+
 ## How a session is wired
 
 `new` generates three things locally, under `~/.local/state/agent-sandbox/NAME/`:

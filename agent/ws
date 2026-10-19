@@ -1,0 +1,144 @@
+#!/bin/bash
+# ws: workspaces for agent sandboxes. Repos live in RAM under /work/NAME while
+# a session works on them (git at local speed) and persist in the shared home
+# under ~/work/NAME (JuiceFS), so any session can resume them. One session
+# holds a workspace at a time; the lock lives in the shared home.
+#
+#   ws ls                      workspaces in the shared home, and their holders
+#   ws clone URL [NAME]        clone into /work/NAME, take the lock, save
+#   ws open NAME [--force]     take the lock and copy NAME into /work/NAME
+#   ws save [NAME | --all]     copy RAM -> shared home (default: the current one)
+#   ws close NAME | --all      save, release the lock, drop the RAM copy
+#   ws autosave                loop: save everything held, every $WS_INTERVAL s
+#
+# A lock whose heartbeat is older than $WS_STALE seconds can be taken over by
+# `ws open`; --force takes it regardless. A session that lost its lock stops
+# saving that workspace, so it never overwrites the new holder's work.
+set -euo pipefail
+
+RAM=/work
+SHARED=${WS_SHARED:-$HOME/work}
+LOCKS=${WS_LOCKS:-$HOME/.ws/locks}
+ME=$(hostname)
+STALE=${WS_STALE:-900}
+INTERVAL=${WS_INTERVAL:-120}
+
+die() { echo "ws: $*" >&2; exit 1; }
+log() { echo "ws: $*" >&2; }
+
+check_name() {
+  [[ $1 =~ ^[A-Za-z0-9._-]+$ && $1 != .* ]] || die "bad workspace name: $1"
+}
+
+holder() { cat "$LOCKS/$1/owner" 2>/dev/null || true; }
+held_by_me() { [ "$(holder "$1")" = "$ME" ]; }
+
+age() {  # seconds since the lock's last heartbeat
+  local t; t=$(stat -c %Y "$LOCKS/$1/heartbeat" 2>/dev/null || echo 0)
+  echo $(( $(date +%s) - t ))
+}
+
+lock() {  # lock NAME [force]
+  local n=$1 force=${2:-}
+  mkdir -p "$LOCKS"
+  if mkdir "$LOCKS/$n" 2>/dev/null; then
+    echo "$ME" > "$LOCKS/$n/owner"
+  elif held_by_me "$n"; then
+    :
+  else
+    local h a; h=$(holder "$n"); a=$(age "$n")
+    if [ -z "$force" ] && [ "$a" -lt "$STALE" ]; then
+      die "$n is held by ${h:-?} (heartbeat ${a}s ago); wait, or ws open $n --force"
+    fi
+    log "taking $n from ${h:-?} (heartbeat ${a}s ago)"
+    echo "$ME" > "$LOCKS/$n/owner"
+  fi
+  touch "$LOCKS/$n/heartbeat"
+}
+
+unlock() { held_by_me "$1" && rm -rf "${LOCKS:?}/$1"; }
+
+save_one() {
+  local n=$1
+  [ -d "$RAM/$n" ] || return 0
+  if ! held_by_me "$n"; then
+    log "not saving $n: now held by $(holder "$n")"
+    return 1
+  fi
+  mkdir -p "$SHARED/$n"
+  # --delete mirrors deletions; RAM is the source of truth while we hold it.
+  rsync -a --delete "$RAM/$n/" "$SHARED/$n/"
+  touch "$LOCKS/$n/heartbeat"
+}
+
+current() {  # the workspace containing $PWD, if any
+  case $PWD/ in "$RAM"/*/*) local r=${PWD#"$RAM"/}; echo "${r%%/*}" ;; *) return 1 ;; esac
+}
+
+cmd_ls() {
+  local d n h
+  for d in "$SHARED"/*/; do
+    [ -d "$d" ] || continue
+    n=$(basename "$d"); h=$(holder "$n")
+    printf '%-24s %s%s\n' "$n" "${h:-free}" "${h:+ ($(age "$n")s ago)}"
+  done
+}
+
+cmd_clone() {
+  local url=${1:?usage: ws clone URL [NAME]} n=${2:-}
+  [ -n "$n" ] || { n=$(basename "$url"); n=${n%.git}; }
+  check_name "$n"
+  [ -e "$SHARED/$n" ] && die "$n already exists in the shared home; ws open $n"
+  lock "$n"
+  mkdir -p "$RAM"
+  git clone "$url" "$RAM/$n"
+  save_one "$n"
+  echo "$RAM/$n"
+}
+
+cmd_open() {
+  local n=${1:?usage: ws open NAME [--force]} force=
+  [ "${2:-}" = --force ] && force=1
+  check_name "$n"
+  [ -d "$SHARED/$n" ] || die "no workspace $n in $SHARED"
+  lock "$n" "$force"
+  mkdir -p "$RAM/$n"
+  rsync -a --delete "$SHARED/$n/" "$RAM/$n/"
+  echo "$RAM/$n"
+}
+
+cmd_save() {
+  local rc=0 n
+  case ${1:-} in
+    --all) for n in "$RAM"/*/; do [ -d "$n" ] && { save_one "$(basename "$n")" || rc=1; }; done ;;
+    "") n=$(current) || die "not in a workspace; ws save NAME or --all"; save_one "$n" ;;
+    *) check_name "$1"; save_one "$1" ;;
+  esac
+  return $rc
+}
+
+cmd_close() {
+  local n=${1:?usage: ws close NAME | --all}
+  if [ "$n" = --all ]; then
+    local d rc=0
+    for d in "$RAM"/*/; do [ -d "$d" ] && { cmd_close "$(basename "$d")" || rc=1; }; done
+    return $rc
+  fi
+  check_name "$n"
+  save_one "$n"
+  unlock "$n"
+  case $PWD/ in "$RAM/$n"/*) cd / ;; esac
+  rm -rf "${RAM:?}/$n"
+}
+
+cmd_autosave() {
+  while :; do
+    sleep "$INTERVAL"
+    cmd_save --all >/dev/null 2>&1 || true
+  done
+}
+
+case ${1:-} in
+  ls|clone|open|save|close|autosave) c=$1; shift; "cmd_$c" "$@" ;;
+  *) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+esac
