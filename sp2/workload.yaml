@@ -19,8 +19,8 @@ spec:
         - network:
             name: default
   placements:
-    - name: dallas
+    - name: ashburn
       locations:
-        - name: us-central-1
+        - name: us-east-1
       scaleSettings:
         minReplicas: 1

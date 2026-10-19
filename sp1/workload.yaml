@@ -25,7 +25,7 @@ spec:
   placements:
     - name: default
       locations:
-        - name: us-central-1
+        - name: us-east-1
       scaleSettings:
         instanceManagementPolicy: OrderedReady
         minReplicas: 1

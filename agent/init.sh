@@ -49,7 +49,9 @@ if [ -n "$META_TICKET" ] && [ -n "$META_URL" ]; then
   mkdir -p /home/agent /tmp/jfs-cache
   for _ in $(seq 30); do /bin/nc -z 127.0.0.1 6379 2>/dev/null && break; sleep 1; done
   # Cache lives in RAM (the root overlay is RAM-backed), so keep it bounded.
-  if /bin/juicefs mount --background --cache-dir /tmp/jfs-cache --cache-size 256 \
+  # Dual-stack S3: some locations (staging us-east-1) have no IPv4 egress at
+  # all, and JuiceFS rewrites the bucket URL to the IPv4-only endpoint.
+  if AWS_USE_DUALSTACK_ENDPOINT=true /bin/juicefs mount --background --cache-dir /tmp/jfs-cache --cache-size 256 \
        --buffer-size 128 --log /tmp/juicefs.log "$META_URL" /home/agent; then
     AGENT_HOME=/home/agent
     mkdir -p /home/agent/work
