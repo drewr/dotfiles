@@ -1,18 +1,24 @@
 #!/usr/bin/env bash
-# Provision the EC2 build box. Idempotent for the security group and IAM role;
-# launches a new instance each run, so check `status` first.
+# Provision a NixOS EC2 box whose config lives in this repo: the build box by
+# default, or the JuiceFS metadata host (meta/ec2/provision.sh sets the
+# variables below). Idempotent for the security group and IAM role; launches a
+# new instance each run, so check `status` first.
 #
 #   buildbox/ec2/provision.sh launch [REV]   # REV defaults to origin's HEAD of this branch
 #   buildbox/ec2/provision.sh ticket         # print the dumbpipe ticket (via SSM)
 #   buildbox/ec2/provision.sh start|stop|status|terminate
 #
-# REV must be pushed: the box fetches its config from github:drewr/dotfiles/REV.
+# REV must be pushed: the box fetches its config from
+# github:drewr/dotfiles/REV?dir=$CONFIG#$ATTR.
 set -euo pipefail
 export AWS_PROFILE=${AWS_PROFILE:-datum-sandbox-admin}
 export AWS_REGION=${AWS_REGION:-us-east-2}
-NAME=datum-buildbox
+NAME=${NAME:-datum-buildbox}
 TYPE=${TYPE:-t3a.medium}
 DISK_GB=${DISK_GB:-16}
+CONFIG=${CONFIG:-buildbox/ec2}
+ATTR=${ATTR:-buildbox}
+TICKET_FILE=${TICKET_FILE:-/var/lib/dumbpipe/ticket}
 NIXOS_AMI_OWNER=427812963091   # official NixOS AMIs
 
 instance_id() {
@@ -31,7 +37,7 @@ ensure_sg() {
             --query 'Vpcs[0].VpcId' --output text)
     # No ingress rules: everything reaches the box over iroh or SSM.
     sg=$(aws ec2 create-security-group --group-name "$NAME" --vpc-id "$vpc" \
-           --description "Datum build box, no inbound" --query GroupId --output text)
+           --description "$NAME, no inbound" --query GroupId --output text)
   fi
   echo "$sg"
 }
@@ -66,9 +72,9 @@ launch() {
   trap 'rm -f "$userdata"' RETURN
   cat > "$userdata" <<EOF
 #!/bin/sh
-# Apply the build box config pinned to $rev. Re-runs on every boot as a no-op.
+# Apply the $ATTR config pinned to $rev. Re-runs on every boot as a no-op.
 nixos-rebuild switch --option experimental-features 'nix-command flakes' \\
-  --flake 'github:drewr/dotfiles/$rev?dir=buildbox/ec2#buildbox'
+  --flake 'github:drewr/dotfiles/$rev?dir=$CONFIG#$ATTR'
 EOF
   aws ec2 run-instances --image-id "$ami" --instance-type "$TYPE" \
     --security-group-ids "$sg" --iam-instance-profile "Name=$NAME" \
@@ -83,7 +89,7 @@ ticket() {
   local id cmd
   id=$(instance_id)
   cmd=$(aws ssm send-command --instance-ids "$id" --document-name AWS-RunShellScript \
-          --parameters 'commands=["cat /var/lib/dumbpipe/ticket"]' \
+          --parameters "commands=[\"cat $TICKET_FILE\"]" \
           --query Command.CommandId --output text)
   aws ssm wait command-executed --command-id "$cmd" --instance-id "$id"
   aws ssm get-command-invocation --command-id "$cmd" --instance-id "$id" \
