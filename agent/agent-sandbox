@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Spawn and reach claude-code sandboxes on Datum Compute (unikernel class).
 #
-#   agent-sandbox new NAME [--key PUBKEY_FILE]   create a session and wait for SSH
+#   agent-sandbox new NAME [--key PUBKEY_FILE] [--no-home]
+#                                                create a session and wait for SSH
 #   agent-sandbox ssh NAME [ssh args...]         connect (interactive by default)
 #   agent-sandbox ls                             list sessions
 #   agent-sandbox logs NAME [logs args...]       instance logs
@@ -13,6 +14,11 @@
 # read from instance logs and there is no trust-on-first-use. If
 # ANTHROPIC_API_KEY is set locally it is copied into the session's Secret;
 # otherwise run `claude /login` inside the session.
+#
+# Shared home: if the Datum Secret agent-home exists (JuiceFS metadata ticket
+# and URL plus a bucket-scoped S3 key), every session mounts the same JuiceFS
+# volume as HOME, so ~/.claude and ~/work are shared live across sessions, as
+# on one laptop. --no-home gives a session a private, ephemeral HOME instead.
 #
 # Needs: datumctl (logged in), ssh, ssh-keygen, openssl, and dumbpipe (falls back
 # to `nix build nixpkgs#dumbpipe`).
@@ -26,6 +32,7 @@ LOCATION=${AGENT_SANDBOX_LOCATION:-us-central-1}
 INSTANCE_TYPE=${AGENT_SANDBOX_INSTANCE_TYPE:-datumcloud/d1-standard-2}
 # The relay us-central-1 instances have chosen as home in every run so far.
 RELAY=${AGENT_SANDBOX_RELAY:-https://use1-1.relay.n0.iroh.link./}
+HOME_SECRET=${AGENT_SANDBOX_HOME_SECRET:-agent-home}
 
 die() { echo "agent-sandbox: $*" >&2; exit 1; }
 usage() { sed -n '2,8p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 2; }
@@ -83,10 +90,18 @@ authorized_keys() {
 
 cmd_new() {
   local name=${1:?usage: agent-sandbox new NAME [--key FILE]}; shift
-  local key=
+  local key='' home=1
   while [ $# -gt 0 ]; do
-    case $1 in --key) key=$2; shift 2 ;; *) die "unknown option $1" ;; esac
+    case $1 in
+      --key) key=$2; shift 2 ;;
+      --no-home) home=0; shift ;;
+      *) die "unknown option $1" ;;
+    esac
   done
+  if [ $home = 1 ] && ! datumctl get secret "$HOME_SECRET" >/dev/null 2>&1; then
+    echo "agent-sandbox: no Secret $HOME_SECRET; this session's HOME is ephemeral" >&2
+    home=0
+  fi
   [ -n "$IMAGE" ] || die "no image: set AGENT_SANDBOX_IMAGE or write $HERE/image.ref"
   local dir; dir=$(session_dir "$name")
   [ -e "$dir" ] && die "session $name exists locally ($dir); rm it first"
@@ -116,6 +131,13 @@ cmd_new() {
       printf '  ANTHROPIC_API_KEY: "%s"\n' "$ANTHROPIC_API_KEY"
     fi
   } | datumctl apply -f - >/dev/null
+  local home_env=''
+  if [ $home = 1 ]; then
+    for k in META_TICKET META_URL AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+      home_env+=$(printf '                - name: %s\n                  valueFrom:\n                    secretKeyRef: { name: %s, key: %s }\n' "$k" "$HOME_SECRET" "$k")
+      home_env+=$'\n'
+    done
+  fi
   if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
     api_env=$(printf '                - name: ANTHROPIC_API_KEY\n                  valueFrom:\n                    secretKeyRef: { name: agent-%s, key: ANTHROPIC_API_KEY }\n' "$name")
   fi
@@ -155,6 +177,7 @@ spec:
                   valueFrom:
                     secretKeyRef: { name: agent-$name, key: SSH_HOST_KEY_B64 }
 $api_env
+$home_env
       networkInterfaces:
         - network:
             name: default
