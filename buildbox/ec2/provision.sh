@@ -17,8 +17,8 @@ set -euo pipefail
 export AWS_PROFILE=${AWS_PROFILE:-datum-sandbox-admin}
 export AWS_REGION=${AWS_REGION:-us-east-2}
 NAME=${NAME:-datum-buildbox}
-TYPE=${TYPE:-t3a.medium}
-DISK_GB=${DISK_GB:-16}
+TYPE=${TYPE:-t3a.large}   # 8 GB: the bigger harness images wedged a 4 GB box
+DISK_GB=${DISK_GB:-64}   # the agent image (six harnesses) is ~4 GB, staged 3-4 times
 CONFIG=${CONFIG:-buildbox/ec2}
 ATTR=${ATTR:-buildbox}
 TICKET_FILE=${TICKET_FILE:-/var/lib/dumbpipe/ticket}

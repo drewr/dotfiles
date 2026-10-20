@@ -16,6 +16,11 @@ in
 {
   system.stateVersion = "26.05";
 
+  # Compressed swap in RAM. Without any swap, a large image (nix copy plus
+  # BuildKit export) thrashed the page cache until the box stopped responding,
+  # with no OOM kill, which wedged builds of the bigger harness images.
+  zramSwap.enable = true;
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Access is through SSM Session Manager (amazon-image enables the agent); the
