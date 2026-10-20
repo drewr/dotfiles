@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Spawn and reach claude-code sandboxes on Datum Compute (unikernel class).
+# Spawn and reach agent sandboxes on Datum Compute (unikernel class). Each
+# session runs one harness's image: claude, gemini, codex, opencode, pi, hermes.
 #
-#   agent-sandbox new NAME [--key PUBKEY_FILE] [--no-home]
+#   agent-sandbox new NAME [--agent HARNESS] [--key PUBKEY_FILE] [--no-home]
 #                                                create a session and wait for SSH
 #   agent-sandbox ssh NAME [ssh args...]         connect (interactive by default)
 #   agent-sandbox ls                             list sessions
@@ -12,22 +13,30 @@
 # Each session gets a fresh iroh secret and SSH host key generated here, stored
 # in a per-session Datum Secret and under $AGENT_SANDBOX_STATE/NAME. The client
 # derives the iroh ticket from the secret and pins the host key, so nothing is
-# read from instance logs and there is no trust-on-first-use. If
-# ANTHROPIC_API_KEY is set locally it is copied into the session's Secret;
-# otherwise run `claude /login` inside the session.
+# read from instance logs and there is no trust-on-first-use.
+#
+# Model providers: every key in the Datum Secret agent-providers (e.g.
+# ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY, TOKENROUTER_API_KEY) is
+# passed to the session as a variable of the same name. Only the key names are
+# read here; the values go straight from the Secret to the instance. OAuth
+# logins inside a session (claude /login, codex login, ...) persist in the
+# shared home. See agent/providers and agent-providers for routers such as
+# tokenrouter and subconscious.
 #
 # Shared home: if the Datum Secret agent-home exists (JuiceFS metadata ticket
 # and URL plus a bucket-scoped S3 key), every session mounts the same JuiceFS
 # volume as HOME, so ~/.claude and ~/work are shared live across sessions, as
 # on one laptop. --no-home gives a session a private, ephemeral HOME instead.
 #
-# Needs: datumctl (logged in), ssh, ssh-keygen, openssl, and dumbpipe (falls back
-# to `nix build nixpkgs#dumbpipe`).
+# Needs: datumctl (logged in), ssh, ssh-keygen, openssl, jq, and dumbpipe (falls
+# back to `nix build nixpkgs#dumbpipe`).
 set -euo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 STATE=${AGENT_SANDBOX_STATE:-${XDG_STATE_HOME:-$HOME/.local/state}/agent-sandbox}
-IMAGE=${AGENT_SANDBOX_IMAGE:-$(cat "$HERE/image.ref" 2>/dev/null || true)}
+# Pinned image per harness: "harness image-ref" lines (agent/images).
+IMAGES=${AGENT_SANDBOX_IMAGES:-$HERE/images}
+HARNESS=${AGENT_SANDBOX_AGENT:-claude}
 # Datum production (api.datum.net), project drewr-y4nd1b. Sessions depend only
 # on features in production; staging differs (no IPv4 egress in us-east-1, and
 # a default network whose us-east-1 VPC never provisioned).
@@ -41,6 +50,7 @@ INSTANCE_TYPE=${AGENT_SANDBOX_INSTANCE_TYPE:-datumcloud/d1-standard-2}
 # The relay instances have chosen as home in every run so far (n0 use1, Virginia).
 RELAY=${AGENT_SANDBOX_RELAY:-https://use1-1.relay.n0.iroh.link./}
 HOME_SECRET=${AGENT_SANDBOX_HOME_SECRET:-agent-home}
+PROVIDERS_SECRET=${AGENT_SANDBOX_PROVIDERS_SECRET:-agent-providers}
 # Extra `juicefs mount` options for the shared home (passed as JFS_MOUNT_OPTS).
 JFS_OPTS=${AGENT_SANDBOX_JFS_OPTS:-}
 
@@ -89,6 +99,13 @@ endpoint_ticket() {
     | base32 -w0 | tr '[:upper:]' '[:lower:]' | tr -d '=' | sed 's/^/endpoint/'
 }
 
+# Key names in the providers Secret that are valid variable names. Values are
+# never read here.
+provider_key_names() {
+  datumctl get secret "$PROVIDERS_SECRET" -o json 2>/dev/null \
+    | jq -r '.data // {} | keys[]' | grep -E '^[A-Za-z_][A-Za-z0-9_]*$' || true
+}
+
 authorized_keys() {
   if [ -n "${1:-}" ]; then cat "$1"; return; fi
   if ssh-add -L 2>/dev/null | grep -q '^ssh-'; then ssh-add -L; return; fi
@@ -99,10 +116,11 @@ authorized_keys() {
 }
 
 cmd_new() {
-  local name=${1:?usage: agent-sandbox new NAME [--key FILE]}; shift
-  local key='' home=1
+  local name=${1:?usage: agent-sandbox new NAME [--agent HARNESS] [--key FILE] [--no-home]}; shift
+  local key='' home=1 harness=$HARNESS
   while [ $# -gt 0 ]; do
     case $1 in
+      --agent) harness=$2; shift 2 ;;
       --key) key=$2; shift 2 ;;
       --no-home) home=0; shift ;;
       *) die "unknown option $1" ;;
@@ -112,7 +130,9 @@ cmd_new() {
     echo "agent-sandbox: no Secret $HOME_SECRET; this session's HOME is ephemeral" >&2
     home=0
   fi
-  [ -n "$IMAGE" ] || die "no image: set AGENT_SANDBOX_IMAGE or write $HERE/image.ref"
+  local image=${AGENT_SANDBOX_IMAGE:-}
+  [ -n "$image" ] || image=$(awk -v h="$harness" '$1 == h {print $2}' "$IMAGES" 2>/dev/null)
+  [ -n "$image" ] || die "no image for harness '$harness' in $IMAGES (have: $(awk '!/^#/ && NF {printf "%s ", $1}' "$IMAGES" 2>/dev/null))"
   local dir; dir=$(session_dir "$name")
   [ -e "$dir" ] && die "session $name exists locally ($dir); rm it first"
 
@@ -131,15 +151,11 @@ cmd_new() {
   )
   grep -q '^endpoint' "$dir/ticket" || die "could not derive the iroh ticket"
 
-  local api_env=''
   {
     printf 'apiVersion: v1\nkind: Secret\nmetadata:\n  name: agent-%s\ntype: Opaque\nstringData:\n' "$name"
     printf '  IROH_SECRET: "%s"\n' "$(cat "$dir/iroh_secret")"
     printf '  AUTHORIZED_KEYS_B64: "%s"\n' "$(base64 -w0 < "$dir/authorized_keys")"
     printf '  SSH_HOST_KEY_B64: "%s"\n' "$(base64 -w0 < "$dir/host_key")"
-    if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
-      printf '  ANTHROPIC_API_KEY: "%s"\n' "$ANTHROPIC_API_KEY"
-    fi
   } | datumctl apply -f - >/dev/null
   local home_env=''
   if [ $home = 1 ]; then
@@ -148,9 +164,13 @@ cmd_new() {
       home_env+=$'\n'
     done
   fi
-  if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
-    api_env=$(printf '                - name: ANTHROPIC_API_KEY\n                  valueFrom:\n                    secretKeyRef: { name: agent-%s, key: ANTHROPIC_API_KEY }\n' "$name")
-  fi
+  # One secretKeyRef per provider key (the unikernel class has no envFrom).
+  local provider_env='' provider_keys='' k
+  for k in $(provider_key_names); do
+    provider_env+=$(printf '                - name: %s\n                  valueFrom:\n                    secretKeyRef: { name: %s, key: %s }\n' "$k" "$PROVIDERS_SECRET" "$k")
+    provider_env+=$'\n'
+    provider_keys+="$k "
+  done
 
   datumctl apply -f - >/dev/null <<EOF
 apiVersion: compute.datumapis.com/v1alpha
@@ -159,6 +179,7 @@ metadata:
   name: agent-$name
   labels:
     agent-sandbox: "true"
+    agent-harness: $harness
 spec:
   template:
     spec:
@@ -171,7 +192,7 @@ spec:
             - name: $PULL_SECRET
           containers:
             - name: agent
-              image: $IMAGE
+              image: $image
               env:
                 - name: SESSION_NAME
                   value: $name
@@ -188,7 +209,9 @@ spec:
                 - name: SSH_HOST_KEY_B64
                   valueFrom:
                     secretKeyRef: { name: agent-$name, key: SSH_HOST_KEY_B64 }
-$api_env
+                - name: PROVIDER_KEYS
+                  value: "${provider_keys% }"
+$provider_env
 $home_env
       networkInterfaces:
         - network:
@@ -200,7 +223,8 @@ $home_env
       scaleSettings:
         minReplicas: 1
 EOF
-  echo "created agent-$name ($IMAGE); waiting for SSH..." >&2
+  echo "$harness" > "$dir/harness"
+  echo "created agent-$name ($harness: $image); waiting for SSH..." >&2
   local t0=$SECONDS
   # Subshell: cmd_ssh execs ssh.
   until (cmd_ssh "$name" -o ConnectTimeout=20 -o BatchMode=yes true) 2>/dev/null; do
@@ -229,8 +253,14 @@ cmd_ssh() {
 }
 
 cmd_ls() {
+  local d n
   echo "== workloads"; datumctl compute workloads 2>/dev/null | awk 'NR==1 || /^agent-/'
-  echo "== local state ($STATE)"; ls -1 "$STATE" 2>/dev/null || true
+  echo "== local sessions ($STATE)"
+  for d in "$STATE"/*/; do
+    [ -d "$d" ] || continue
+    n=$(basename "$d")
+    printf '%-20s %s\n' "$n" "$(cat "$d/harness" 2>/dev/null || echo '?')"
+  done
 }
 
 cmd_logs() {
