@@ -3,3 +3,5 @@
 !flake.lock
 !init.sh
 !ws
+!agent-providers
+!providers

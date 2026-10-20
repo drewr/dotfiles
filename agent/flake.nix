@@ -1,14 +1,18 @@
 {
-  # Agent sandbox image for Datum Compute (unikernel class): claude-code plus a
-  # login environment, reachable only by SSH over iroh. Combines what Spikes 4
-  # and 5 proved: dropbear on loopback exposed by dumbpipe, and the claude-code
-  # Bun binary shipped with its wrapBuddy store paths.
+  # Agent sandbox images for Datum Compute (unikernel class): one image per
+  # harness from the dotfiles (claude-code, gemini-cli, codex, opencode, pi,
+  # hermes-agent), each with the same login environment, reachable only by SSH
+  # over iroh. Providers beyond each
+  # harness's native ones come from ./providers via agent-providers. Combines
+  # what Spikes 4 and 5 proved: dropbear on loopback exposed by dumbpipe, and
+  # Bun executables shipped with their wrapBuddy store paths.
   #
   # Every tool ships as its full nix closure at the original /nix/store paths:
   # no patchelf (it can corrupt Bun executables), and wrapBuddy's hardcoded
-  # loader and glibc paths resolve as built. Built on the EC2 box:
-  #   buildbox/ec2/build.sh agent ghcr.io/drewr/agent-sandbox:dev
-  description = "Datum Compute agent sandbox (claude-code over SSH/iroh)";
+  # loader and glibc paths resolve as built. Built on the EC2 box, one per
+  # harness (packages.<harness>; Dockerfile.datum's HARNESS build arg):
+  #   buildbox/ec2/build.sh agent ghcr.io/drewr/agent-claude:dev --build-arg HARNESS=claude
+  description = "Datum Compute agent sandboxes, one image per harness (SSH/iroh)";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -19,15 +23,33 @@
   let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
-    claude = llm-agents.packages.${system}.claude-code;
+    agents = llm-agents.packages.${system};
+    # The same harnesses the dotfiles install (d/.config/home-manager/flake.nix),
+    # from the same pinned llm-agents rev; opencode2 is also exposed as opencode.
+    opencode = pkgs.symlinkJoin {
+      name = "opencode";
+      paths = [ agents.opencode2 ];
+      postBuild = "ln -s ${agents.opencode2}/bin/opencode2 $out/bin/opencode";
+    };
+    # Image name -> harness package.
+    harnesses = {
+      claude = agents.claude-code;
+      gemini = agents.gemini-cli;
+      codex = agents.codex;
+      inherit opencode;
+      pi = agents.pi;
+      hermes = agents.hermes-agent;
+    };
     busybox = pkgs.pkgsStatic.busybox;
-    # Linked into /bin ahead of busybox applets of the same name.
-    tools = with pkgs; [ claude bashInteractive gitMinimal ripgrep dropbear dumbpipe juicefs rsync ];
-    closure = pkgs.closureInfo { rootPaths = tools ++ [ pkgs.cacert ]; };
+    base = with pkgs; [ bashInteractive gitMinimal ripgrep curl jq dropbear dumbpipe juicefs rsync ];
 
-    rootfs = pkgs.runCommand "agent-rootfs" { } ''
+    mkRootfs = name: harness: let
+      # Linked into /bin ahead of busybox applets of the same name.
+      tools = [ harness ] ++ base;
+      closure = pkgs.closureInfo { rootPaths = tools ++ [ pkgs.cacert ]; };
+    in pkgs.runCommand "agent-rootfs-${name}" { } ''
       R=$out
-      mkdir -p $R/bin $R/etc/ssl/certs $R/root $R/tmp $R/run $R/nix/store
+      mkdir -p $R/bin $R/etc/ssl/certs $R/root $R/tmp $R/run $R/nix/store $R/etc/agent
 
       for p in $(cat ${closure}/store-paths); do cp -a $p $R/nix/store/; done
       for t in ${pkgs.lib.concatStringsSep " " (map toString tools)}; do
@@ -42,6 +64,10 @@
       done
       cp ${./init.sh} $R/init
       cp ${./ws} $R/bin/ws
+      cp ${./agent-providers} $R/bin/agent-providers
+      ln -s agent-providers $R/bin/with-provider
+      cp ${./providers} $R/etc/agent/providers
+      echo ${name} > $R/etc/agent/harness
 
       ln -s ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt $R/etc/ssl/certs/ca-certificates.crt
       echo 'root:x:0:0:root:/root:/bin/bash' > $R/etc/passwd
@@ -50,14 +76,11 @@
       echo 'hosts: files dns' > $R/etc/nsswitch.conf
 
       chmod -R u+w $R
-      chmod 0555 $R/bin/busybox $R/init $R/bin/ws
+      chmod 0555 $R/bin/busybox $R/init $R/bin/ws $R/bin/agent-providers
       chmod 0700 $R/root
       chmod 1777 $R/tmp
     '';
   in {
-    packages.${system} = {
-      inherit rootfs;
-      default = rootfs;
-    };
+    packages.${system} = builtins.mapAttrs mkRootfs harnesses;
   };
 }

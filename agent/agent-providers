@@ -1,0 +1,136 @@
+#!/bin/bash
+# Model providers for the agent harnesses in this sandbox.
+#
+#   agent-providers ls                 providers, and whether their key is set
+#   agent-providers env NAME           print exports that point harnesses at NAME
+#   agent-providers sync               regenerate the opencode provider config
+#   with-provider NAME CMD [ARGS...]   run CMD with NAME's base URLs and key
+#
+# with-provider sets the standard variables:
+#   OPENAI_BASE_URL + OPENAI_API_KEY         (hermes, OpenAI SDKs)
+#   ANTHROPIC_BASE_URL + ANTHROPIC_AUTH_TOKEN (claude), when the provider has an
+#                                             Anthropic-compatible endpoint
+# and for codex, which ignores those, passes the provider as -c overrides
+# (Responses API; the provider must serve /v1/responses).
+# opencode and pi ignore those variables for custom endpoints, so sync also
+# writes their configs: $OPENCODE_CONFIG (generated, every provider whose key is
+# set) and pi's models.json (a provider is added only if no entry of that name
+# exists, so your own entries stay as they are). Models come from /v1/models.
+set -euo pipefail
+
+REGISTRY=${AGENT_PROVIDERS_FILE:-/etc/agent/providers}
+OPENCODE_OUT=${OPENCODE_CONFIG:-/etc/agent/opencode.json}
+
+die() { echo "agent-providers: $*" >&2; exit 1; }
+
+entries() { grep -v '^\s*#' "$REGISTRY" | awk 'NF >= 4'; }
+
+lookup() {  # sets KEY OPENAI_URL ANTHROPIC_URL for provider $1
+  local line
+  line=$(entries | awk -v n="$1" '$1 == n') || true
+  [ -n "$line" ] || die "unknown provider $1 (see: agent-providers ls)"
+  read -r _ KEY OPENAI_URL ANTHROPIC_URL <<< "$line"
+}
+
+cmd_ls() {
+  local n k o a
+  printf '%-14s %-24s %-5s %s\n' PROVIDER KEY SET ENDPOINTS
+  while read -r n k o a; do
+    printf '%-14s %-24s %-5s %s%s\n' "$n" "$k" "$([ -n "${!k:-}" ] && echo yes || echo no)" \
+      "${o/#-/}" "$([ "$a" != - ] && echo " (anthropic: $a)")"
+  done < <(entries)
+}
+
+cmd_env() {
+  lookup "${1:?usage: agent-providers env NAME}"
+  [ -n "${!KEY:-}" ] || die "$KEY is not set (add it to the Datum Secret agent-providers)"
+  if [ "$OPENAI_URL" != - ]; then
+    printf 'export OPENAI_BASE_URL=%q OPENAI_API_KEY=%q\n' "$OPENAI_URL" "${!KEY}"
+  fi
+  if [ "$ANTHROPIC_URL" != - ]; then
+    printf 'export ANTHROPIC_BASE_URL=%q ANTHROPIC_AUTH_TOKEN=%q\nunset ANTHROPIC_API_KEY\n' \
+      "$ANTHROPIC_URL" "${!KEY}"
+  fi
+}
+
+json_str() { local s=${1//\\/\\\\}; s=${s//\"/\\\"}; printf '"%s"' "$s"; }
+
+model_ids() {  # model_ids BASE_URL KEY: one model id per line, from BASE_URL/models
+  curl -fsS -m 15 -H "Authorization: Bearer $2" "$1/models" 2>/dev/null \
+    | grep -o '"id" *: *"[^"]*"' | sed 's/.*: *"//; s/"$//' | sort -u || true
+}
+
+# pi: add registry providers to its models.json, leaving existing entries alone.
+sync_pi() {
+  command -v pi >/dev/null || return 0
+  local f=${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/models.json n k o a models
+  mkdir -p "$(dirname "$f")"
+  [ -s "$f" ] || echo '{"providers": {}}' > "$f"
+  while read -r n k o a; do
+    [ "$o" != - ] && [ -n "${!k:-}" ] || continue
+    if jq -e --arg n "$n" '.providers[$n] != null' "$f" >/dev/null 2>&1; then
+      echo "agent-providers: pi: $n already in $f; left as is" >&2
+      continue
+    fi
+    models=$(model_ids "$o" "${!k}" | jq -R -s 'split("\n") | map(select(length > 0) | {id: .})')
+    jq --arg n "$n" --arg u "$o" --arg k "\$$k" --argjson m "$models" \
+      '.providers[$n] = {baseUrl: $u, api: "openai-completions", apiKey: $k, models: $m}' \
+      "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+    echo "agent-providers: pi: added $n ($(jq length <<< "$models") models)" >&2
+  done < <(entries)
+}
+
+cmd_sync() {
+  local n k o a first=1 models m mfirst
+  mkdir -p "$(dirname "$OPENCODE_OUT")"
+  {
+    # shellcheck disable=SC2016  # "$schema" is a literal JSON key
+    printf '{\n  "$schema": "https://opencode.ai/config.json",\n  "provider": {'
+    while read -r n k o a; do
+      [ "$o" != - ] && [ -n "${!k:-}" ] || continue
+      models=$(model_ids "$o" "${!k}")
+      [ $first = 1 ] || printf ','
+      first=0
+      printf '\n    %s: {\n      "npm": "@ai-sdk/openai-compatible",\n      "name": %s,\n' \
+        "$(json_str "$n")" "$(json_str "$n")"
+      printf '      "options": { "baseURL": %s, "apiKey": "{env:%s}" },\n      "models": {' \
+        "$(json_str "$o")" "$k"
+      mfirst=1
+      while read -r m; do
+        [ -n "$m" ] || continue
+        [ $mfirst = 1 ] || printf ','
+        mfirst=0
+        printf '\n        %s: {}' "$(json_str "$m")"
+      done <<< "$models"
+      printf '\n      }\n    }'
+      echo "agent-providers: opencode: $n ($(grep -c . <<< "$models") models)" >&2
+    done < <(entries)
+    printf '\n  }\n}\n'
+  } > "$OPENCODE_OUT.tmp"
+  mv "$OPENCODE_OUT.tmp" "$OPENCODE_OUT"
+  sync_pi
+}
+
+case $(basename "$0") in
+  with-provider)
+    [ $# -ge 2 ] || die "usage: with-provider NAME CMD [ARGS...]"
+    exports=$(cmd_env "$1") || exit 1
+    eval "$exports"
+    lookup "$1"   # KEY and OPENAI_URL in this shell (cmd_env ran in a subshell)
+    name=$1
+    shift
+    # codex ignores OPENAI_BASE_URL for custom endpoints and only speaks the
+    # Responses API, so define the provider with -c overrides instead of
+    # touching ~/.codex/config.toml.
+    if [ "$(basename "$1")" = codex ] && [ "$OPENAI_URL" != - ]; then
+      cmd=$1; shift
+      exec "$cmd" -c "model_provider=$name" \
+        -c "model_providers.$name={name=\"$name\",base_url=\"$OPENAI_URL\",env_key=\"$KEY\",wire_api=\"responses\"}" "$@"
+    fi
+    exec "$@" ;;
+esac
+
+case ${1:-} in
+  ls|env|sync) c=$1; shift; "cmd_$c" "$@" ;;
+  *) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+esac

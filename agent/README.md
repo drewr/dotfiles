@@ -1,13 +1,16 @@
 # Agent sandboxes on Datum Compute
 
-`agent-sandbox` spawns a claude-code session on Datum Compute's `unikernel` class
-and connects to it by SSH over iroh. There is no inbound port, no Connect
+`agent-sandbox` spawns an agent session on Datum Compute's `unikernel` class and
+connects to it by SSH over iroh. Each session runs **one** harness from the
+dotfiles, in its own image: `claude` (default), `gemini`, `codex`, `opencode`,
+`pi` or `hermes`. There is no inbound port, no Connect
 gateway, and no login or project on the iroh side.
 
 ```sh
-agent-sandbox new work            # about 10 s to a working SSH session
+agent-sandbox new work            # about 10 s to a working SSH session (claude)
+agent-sandbox new oc --agent opencode
 agent-sandbox ssh work            # interactive shell; then run `claude`
-agent-sandbox ssh work -- claude  # or straight into the TUI
+agent-sandbox ssh work -- claude  # or straight into a harness
 agent-sandbox ls
 agent-sandbox rm work
 ```
@@ -15,13 +18,66 @@ agent-sandbox rm work
 - **Keys:** `new` authorizes the keys in your ssh-agent, or `~/.ssh/id_*.pub`, or
   `--key FILE.pub`. If the private key sits next to `FILE.pub`, it is also used
   as the identity.
-- **API key:** if `ANTHROPIC_API_KEY` is set locally, it is copied into the
-  session's Secret. Otherwise run `claude /login` inside the session.
-- **Image:** `image.ref` (digest-pinned). Rebuild on the EC2 box with
-  `buildbox/ec2/build.sh agent ghcr.io/drewr/agent-sandbox:dev`, then write the
-  printed digest to `image.ref`.
+- **Providers:** see "Model providers" below.
+- **Images:** one per harness, pinned by digest in `images`. Rebuild one on the
+  EC2 box with `buildbox/ec2/build.sh agent ghcr.io/drewr/agent-HARNESS:dev
+  --build-arg HARNESS=HARNESS`, then replace that line in `images` with the
+  printed digest.
 - **Needs locally:** `datumctl` (logged in), `ssh`, `ssh-keygen`, `openssl`,
   `xxd`, `base32`, and `dumbpipe` (falls back to `nix build nixpkgs#dumbpipe`).
+
+## Model providers
+
+Keys live in **one** Datum Secret, `agent-providers`, which every session
+reads. `agent-sandbox new` lists its key names and wires each one in as a
+variable of the same name (the unikernel class has no `envFrom`). Values never
+pass through the client. Add any keys you use:
+
+```sh
+DATUM_SESSION=aaraines@gmail.com@api.datum.net datumctl apply -f - <<'EOF'
+apiVersion: v1
+kind: Secret
+metadata: { name: agent-providers }
+type: Opaque
+stringData:
+  ANTHROPIC_API_KEY: "..."     # claude (or use `claude /login`)
+  OPENAI_API_KEY: "..."        # codex, opencode, pi, hermes
+  GEMINI_API_KEY: "..."        # gemini
+  OPENROUTER_API_KEY: "..."    # opencode, pi, hermes
+  TOKENROUTER_API_KEY: "..."   # via agent/providers
+  SUBCONSCIOUS_API_KEY: "..."  # via agent/providers
+EOF
+```
+
+New sessions pick up the current set of keys. OAuth logins (`claude /login`,
+`codex login`, `gemini`'s Google login, `opencode auth login`) need no keys:
+their tokens live in the shared home and carry over to every session.
+
+Routers and other OpenAI- or Anthropic-compatible providers are listed in
+`agent/providers` (name, key variable, base URLs); add a line to add one. Each
+harness takes custom endpoints differently, so the wiring differs:
+
+| Harness | How a registry provider reaches it | Verified (dummy key, provider's own 401) |
+| - | - | - |
+| claude | `with-provider subconscious claude` (Anthropic-compatible base URL + token) | subconscious |
+| opencode | automatic: generated `$OPENCODE_CONFIG` (`/etc/agent/opencode.json`) | subconscious |
+| pi | automatic: `agent-providers sync` adds the provider to `~/.pi/agent/models.json` unless an entry with that name exists | subconscious |
+| codex | `with-provider NAME codex …` passes the provider as `-c` overrides; codex only speaks the Responses API, so the provider must serve `/v1/responses` | subconscious (TokenRouter: unknown) |
+| hermes | `with-provider NAME hermes` (`OPENAI_BASE_URL`, which hermes reads first) | not yet: no hermes image |
+| gemini | Google only (`GEMINI_API_KEY` or Google login) | — |
+
+```sh
+agent-providers ls          # providers and whether their key is set
+agent-providers sync        # regenerate opencode/pi provider config (also runs at boot)
+with-provider subconscious claude
+with-provider subconscious codex exec 'fix the tests'
+```
+
+Notes from testing: pi and codex ignore `OPENAI_BASE_URL` for custom
+endpoints (both went to api.openai.com), hence the per-harness config. Your own
+`~/.config/opencode`, `~/.codex/config.toml` and existing pi entries are left
+alone. With an invalid key, claude retries the 401 with backoff and looks hung
+for a minute or more.
 
 ## Workspaces: repos in RAM, persisted to the shared home
 
@@ -83,8 +139,12 @@ set `AGENT_SANDBOX_RELAY` to match.
 
 ## Image contents (`flake.nix`)
 
-claude-code (llm-agents.nix, pinned to the dotfiles rev), bash, git, ripgrep,
-dropbear, dumbpipe, CA certificates, and static busybox for everything else.
+`packages.<harness>`: one harness from llm-agents.nix at the dotfiles' pinned
+rev (claude-code, gemini-cli, codex, opencode, pi or hermes-agent), plus the
+same base in every image: bash, git, ripgrep, curl, rsync, juicefs, dropbear,
+dumbpipe, `ws`, `agent-providers`, CA certificates, and static busybox for
+everything else. `Dockerfile.datum` picks the harness with the `HARNESS` build
+argument.
 Each is shipped as its full nix closure at the original `/nix/store` paths
 (the image is ~480 MB). This keeps wrapBuddy's hardcoded paths valid and needs
 no patchelf. About 1.83 GiB of the instance's memory is free with a session

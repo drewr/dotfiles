@@ -6,7 +6,11 @@
 #   IROH_SECRET          iroh endpoint secret key; the client derives the ticket
 #   AUTHORIZED_KEYS_B64  base64 authorized_keys for root
 #   SSH_HOST_KEY_B64     base64 OpenSSH ed25519 host key; the client pins it
-#   ANTHROPIC_API_KEY    optional; otherwise run `claude /login` in the session
+#   PROVIDER_KEYS        names of the provider keys (from the shared Secret
+#                        agent-providers) passed in as variables of those names,
+#                        e.g. "ANTHROPIC_API_KEY TOKENROUTER_API_KEY"; optional.
+#                        OAuth logins (claude /login, codex login, ...) persist
+#                        in the shared home instead.
 #   SESSION_NAME         hostname
 # Shared home (optional; all from the shared Secret agent-home):
 #   META_TICKET          dumbpipe ticket for the JuiceFS metadata Redis
@@ -47,16 +51,20 @@ if [ -n "$META_TICKET" ] && [ -n "$META_URL" ]; then
       sleep 2
     done
   ) &
-  mkdir -p /home/agent /tmp/jfs-cache
+  # Mount at /mnt/agent-fs and use its home/ subdirectory as HOME: JuiceFS puts
+  # virtual control files (.config, .stats, .accesslog, .trash) at the mount
+  # root, and ~/.config being a JuiceFS file broke every XDG program.
+  mkdir -p /mnt/agent-fs /home /tmp/jfs-cache
   for _ in $(seq 30); do /bin/nc -z 127.0.0.1 6379 2>/dev/null && break; sleep 1; done
   # Cache lives in RAM (the root overlay is RAM-backed), so keep it bounded.
   # Dual-stack S3: some locations (staging us-east-1) have no IPv4 egress at
   # all, and JuiceFS rewrites the bucket URL to the IPv4-only endpoint.
   # shellcheck disable=SC2086  # JFS_MOUNT_OPTS is a list of options
   if AWS_USE_DUALSTACK_ENDPOINT=true /bin/juicefs mount --background --cache-dir /tmp/jfs-cache --cache-size 256 \
-       --buffer-size 128 --log /tmp/juicefs.log $JFS_MOUNT_OPTS "$META_URL" /home/agent; then
+       --buffer-size 128 --log /tmp/juicefs.log $JFS_MOUNT_OPTS "$META_URL" /mnt/agent-fs; then
+    mkdir -p /mnt/agent-fs/home/work /work
+    ln -sfn /mnt/agent-fs/home /home/agent
     AGENT_HOME=/home/agent
-    mkdir -p /home/agent/work /work
     log "shared home mounted at /home/agent"
     # Repos live in RAM under /work and persist to ~/work via ws (agent/ws).
     (HOME=/home/agent /bin/ws autosave) &
@@ -73,7 +81,15 @@ unset META_URL META_TICKET AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
   echo 'export PATH=/bin'
   echo 'export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt'
   echo 'export DISABLE_AUTOUPDATER=1'
-  [ -n "$ANTHROPIC_API_KEY" ] && echo "export ANTHROPIC_API_KEY='$ANTHROPIC_API_KEY'"
+  echo 'export OPENCODE_CONFIG=/etc/agent/opencode.json'
+  echo "export AGENT_HARNESS=$(cat /etc/agent/harness 2>/dev/null)"
+  for k in $PROVIDER_KEYS; do
+    case $k in ''|[0-9]*|*[!A-Za-z0-9_]*) continue ;; esac   # names reach eval
+    eval "v=\${$k:-}"
+    # Single-quote the value; escape any single quotes inside it.
+    # shellcheck disable=SC2154  # v is set by the eval above
+    [ -n "$v" ] && printf "export %s='%s'\n" "$k" "$(printf '%s' "$v" | sed "s/'/'\\\\''/g")"
+  done
 } > /root/.agent-env
 cat > /root/.bash_profile <<'PROFILE'
 . /root/.agent-env
@@ -88,10 +104,16 @@ ws() {
 cd
 PROFILE
 cp /root/.bash_profile /root/.profile
-unset AUTHORIZED_KEYS_B64 SSH_HOST_KEY_B64 ANTHROPIC_API_KEY
+# opencode provider config for the registry providers whose key is set (needs
+# the keys and the network, so it runs here in the background).
+# shellcheck disable=SC1091  # written above, at runtime
+( . /root/.agent-env && /bin/agent-providers sync >/dev/null 2>&1 ) &
+unset AUTHORIZED_KEYS_B64 SSH_HOST_KEY_B64
+for k in $PROVIDER_KEYS; do case $k in ''|[0-9]*|*[!A-Za-z0-9_]*) ;; *) unset "$k" ;; esac; done
 
 log "mem: $(grep MemAvailable /proc/meminfo | tr -s ' ')"
-log "keys: $(wc -l < /root/.ssh/authorized_keys) authorized; api key $(grep -q ANTHROPIC /root/.agent-env && echo set || echo unset)"
+log "harness: $(cat /etc/agent/harness 2>/dev/null)"
+log "keys: $(wc -l < /root/.ssh/authorized_keys) authorized; providers: $(echo "${PROVIDER_KEYS:-none}" | wc -w) key(s)"
 
 (
   while :; do

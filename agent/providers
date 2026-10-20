@@ -1,0 +1,14 @@
+# Model providers reachable through a generic API, for harnesses that don't
+# support them natively. One per line, whitespace-separated; "-" means none.
+#
+#   name          key variable           OpenAI-compatible base    Anthropic-compatible base
+#
+# Keys come from the Datum Secret agent-providers (agent/README.md). Providers
+# that harnesses support natively (Anthropic, OpenAI, Google Gemini,
+# OpenRouter) need only their usual variable there, e.g. OPENAI_API_KEY.
+#
+# tokenrouter: api.tokenrouter.com/v1/models answers with an OpenAI-style 401
+#   (checked 2026-10-20); no Anthropic-compatible endpoint confirmed.
+# subconscious: docs.subconscious.dev/ways-to-use/cloud-api lists both.
+tokenrouter   TOKENROUTER_API_KEY    https://api.tokenrouter.com/v1    -
+subconscious  SUBCONSCIOUS_API_KEY   https://api.subconscious.dev/v1   https://api.subconscious.dev
