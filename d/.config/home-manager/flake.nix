@@ -98,7 +98,6 @@
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
               (mkOpendcode2 pkgs llm-agents)
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
-              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hermes-agent
               (mkJoltPackage pkgs.stdenv.hostPlatform.system)
             ];
             home.username = username;
@@ -129,7 +128,6 @@
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
         (mkOpendcode2 pkgs llm-agents)
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
-        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hermes-agent
         (mkJoltPackage pkgs.stdenv.hostPlatform.system)
       ];
       _module.args.una = buildUna pkgs;
