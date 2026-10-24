@@ -41,12 +41,42 @@
       hermes = agents.hermes-agent;
     };
     busybox = pkgs.pkgsStatic.busybox;
-    base = with pkgs; [ bashInteractive gitMinimal ripgrep curl jq dropbear dumbpipe juicefs rsync ];
+    base = with pkgs; [ bashInteractive zsh gitMinimal ripgrep curl jq nix dropbear dumbpipe juicefs rsync ];
+
+    # The login user (SSH lands here, not root), whose HOME is the shared home.
+    user = { name = "drewr"; uid = 1000; };
+    # Only the locale the dotfiles' zshenv asks for (LC_ALL=en_US.UTF-8).
+    locales = pkgs.glibcLocales.override { allLocales = false; locales = [ "en_US.UTF-8/UTF-8" ]; };
+    # The dotfiles' zsh config (zshrc, zshenv, zprofile, zsh.d), copied into the
+    # build context by agent/build-image; absent when evaluating from the repo.
+    dotfilesZsh = if builtins.pathExists ./zsh then ./zsh else null;
+
+    # nix in the sandbox: a root nix-daemon (started by init) that the login user
+    # talks to, builds as root (the image has no build users), no build sandbox, flakes on, and nixpkgs pinned to the rev the images are
+    # built from, so `nix shell nixpkgs#tool` mostly hits cache.nixos.org and
+    # needs no global registry lookup. Store paths go to RAM (/nix is on the
+    # root overlay) and last for the session.
+    nixConf = pkgs.writeText "nix.conf" ''
+      experimental-features = nix-command flakes
+      build-users-group =
+      sandbox = false
+      trusted-users = root ${user.name}
+      flake-registry =
+      substituters = https://cache.nixos.org
+      trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+    '';
+    nixRegistry = pkgs.writeText "registry.json" (builtins.toJSON {
+      version = 2;
+      flakes = [{
+        from = { type = "indirect"; id = "nixpkgs"; };
+        to = { type = "github"; owner = "nixos"; repo = "nixpkgs"; rev = nixpkgs.rev; };
+      }];
+    });
 
     mkRootfs = name: harness: let
       # Linked into /bin ahead of busybox applets of the same name.
       tools = [ harness ] ++ base;
-      closure = pkgs.closureInfo { rootPaths = tools ++ [ pkgs.cacert ]; };
+      closure = pkgs.closureInfo { rootPaths = tools ++ [ pkgs.cacert locales ]; };
     in pkgs.runCommand "agent-rootfs-${name}" { } ''
       R=$out
       mkdir -p $R/bin $R/etc/ssl/certs $R/root $R/tmp $R/run $R/nix/store $R/etc/agent
@@ -64,19 +94,32 @@
       done
       cp ${./init.sh} $R/init
       cp ${./ws} $R/bin/ws
+      cp ${./nix-zsh-env} $R/bin/nix-zsh-env   # for the dotfiles' zsh prompt
       cp ${./agent-providers} $R/bin/agent-providers
       ln -s agent-providers $R/bin/with-provider
       cp ${./providers} $R/etc/agent/providers
       echo ${name} > $R/etc/agent/harness
+      # Store paths shipped in the image, for init to register with nix.
+      cp ${closure}/registration $R/etc/agent/nix-registration
+      mkdir -p $R/etc/nix $R/nix/var/nix
+      cp ${nixConf} $R/etc/nix/nix.conf
+      cp ${nixRegistry} $R/etc/nix/registry.json
+      # Static parts of the login environment; init adds the session's.
+      echo 'export LOCALE_ARCHIVE=${locales}/lib/locale/locale-archive' > $R/etc/agent/env.static
+      ${pkgs.lib.optionalString (dotfilesZsh != null) "cp -r ${dotfilesZsh} $R/etc/agent/zsh"}
+      # zsh and bash login shells load the session environment (/etc/agent/env).
+      echo '[ -r /etc/agent/env ] && . /etc/agent/env' > $R/etc/zshenv
+      cp $R/etc/zshenv $R/etc/profile
 
       ln -s ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt $R/etc/ssl/certs/ca-certificates.crt
-      echo 'root:x:0:0:root:/root:/bin/bash' > $R/etc/passwd
-      echo 'root:x:0:' > $R/etc/group
-      printf '/bin/bash\n/bin/sh\n' > $R/etc/shells
+      printf 'root:x:0:0:root:/root:/bin/bash\n${user.name}:x:${toString user.uid}:${toString user.uid}:${user.name}:/home/agent:/bin/zsh\n' > $R/etc/passwd
+      printf 'root:x:0:\n${user.name}:x:${toString user.uid}:\n' > $R/etc/group
+      printf '/bin/zsh\n/bin/bash\n/bin/sh\n' > $R/etc/shells
+      echo ${user.name} > $R/etc/agent/user
       echo 'hosts: files dns' > $R/etc/nsswitch.conf
 
       chmod -R u+w $R
-      chmod 0555 $R/bin/busybox $R/init $R/bin/ws $R/bin/agent-providers
+      chmod 0555 $R/bin/busybox $R/init $R/bin/ws $R/bin/agent-providers $R/bin/nix-zsh-env
       chmod 0700 $R/root
       chmod 1777 $R/tmp
     '';

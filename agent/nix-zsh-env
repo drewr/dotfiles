@@ -1,0 +1,22 @@
+#!/bin/sh
+# POSIX sh port of nix-zsh-env from github:drewr/zigutils, which the dotfiles'
+# zsh prompt (zsh.d/25-git) calls. zigutils can't be built from source now:
+# its pinned zig dev tarball is gone from ziglang.org.
+#
+# Prints the first five packages of $buildInputs (set inside nix develop /
+# nix-shell), without store hash or version, joined by ":"; nothing otherwise.
+[ -n "${buildInputs:-}" ] || exit 0
+out=
+n=0
+for p in $buildInputs; do
+  case $p in /nix/store/*-*) ;; *) continue ;; esac
+  name=${p#/nix/store/}
+  name=${name#*-}
+  # Stop at the first "-<digit>" or "-dev", as the original does.
+  name=$(printf '%s' "$name" | sed -E 's/-([0-9]|dev).*$//')
+  out=${out:+$out:}$name
+  n=$((n + 1))
+  [ $n -ge 5 ] && break
+done
+[ -n "$out" ] && printf '%s\n' "$out"
+exit 0

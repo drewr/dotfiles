@@ -4,7 +4,8 @@
 #
 #   agent-sandbox new NAME [--agent HARNESS] [--key PUBKEY_FILE] [--no-home]
 #                                                create a session and wait for SSH
-#   agent-sandbox ssh NAME [ssh args...]         connect (interactive by default)
+#   agent-sandbox ssh NAME [ssh args...]         connect as drewr (AGENT_SANDBOX_USER=root
+#                                                for root), interactive by default
 #   agent-sandbox ls                             list sessions
 #   agent-sandbox logs NAME [logs args...]       instance logs
 #   agent-sandbox rm NAME                        save workspaces, then delete workload,
@@ -37,6 +38,8 @@ STATE=${AGENT_SANDBOX_STATE:-${XDG_STATE_HOME:-$HOME/.local/state}/agent-sandbox
 # Pinned image per harness: "harness image-ref" lines (agent/images).
 IMAGES=${AGENT_SANDBOX_IMAGES:-$HERE/images}
 HARNESS=${AGENT_SANDBOX_AGENT:-claude}
+# Login user in the sandbox (the images' unprivileged user); root also works.
+SSH_USER=${AGENT_SANDBOX_USER:-drewr}
 # Datum production (api.datum.net), project drewr-y4nd1b. Sessions depend only
 # on features in production; staging differs (no IPv4 egress in us-east-1, and
 # a default network whose us-east-1 VPC never provisioned).
@@ -47,6 +50,10 @@ PULL_SECRET=${AGENT_SANDBOX_PULL_SECRET:-ghcr-drewr}
 LOCATION=${AGENT_SANDBOX_LOCATION:-us-east-1}
 NETWORK=${AGENT_SANDBOX_NETWORK:-default}
 INSTANCE_TYPE=${AGENT_SANDBOX_INSTANCE_TYPE:-datumcloud/d1-standard-2}
+# Runtime class: unikernel, or general-purpose for harnesses that don't run on
+# Unikraft. general-purpose gets the capabilities a FUSE mount (the shared home)
+# needs, as buildbox/workload.yaml does.
+CLASS=${AGENT_SANDBOX_CLASS:-unikernel}
 # The relay instances have chosen as home in every run so far (n0 use1, Virginia).
 RELAY=${AGENT_SANDBOX_RELAY:-https://use1-1.relay.n0.iroh.link./}
 HOME_SECRET=${AGENT_SANDBOX_HOME_SECRET:-agent-home}
@@ -164,6 +171,12 @@ cmd_new() {
       home_env+=$'\n'
     done
   fi
+  local caps=''
+  if [ "$CLASS" = general-purpose ]; then
+    caps='              securityContext:
+                capabilities:
+                  add: [SYS_ADMIN, MKNOD, CHOWN, DAC_OVERRIDE, FOWNER, FSETID, KILL, NET_BIND_SERVICE, SETFCAP, SETGID, SETPCAP, SETUID, SYS_CHROOT]'
+  fi
   # One secretKeyRef per provider key (the unikernel class has no envFrom).
   local provider_env='' provider_keys='' k
   for k in $(provider_key_names); do
@@ -184,7 +197,7 @@ spec:
   template:
     spec:
       runtime:
-        class: unikernel
+        class: $CLASS
         resources:
           instanceType: $INSTANCE_TYPE
         sandbox:
@@ -193,6 +206,7 @@ spec:
           containers:
             - name: agent
               image: $image
+$caps
               env:
                 - name: SESSION_NAME
                   value: $name
@@ -249,7 +263,7 @@ cmd_ssh() {
   exec ssh -o "ProxyCommand=$dp connect $(cat "$dir/ticket") 2>/dev/null" \
     -o "UserKnownHostsFile=$dir/known_hosts" -o "HostKeyAlias=agent-$name" \
     -o StrictHostKeyChecking=yes -o ServerAliveInterval=30 \
-    "${opts[@]}" "root@agent-$name" "${cmd[@]}"
+    "${opts[@]}" "$SSH_USER@agent-$name" "${cmd[@]}"
 }
 
 cmd_ls() {

@@ -19,12 +19,29 @@ agent-sandbox rm work
   `--key FILE.pub`. If the private key sits next to `FILE.pub`, it is also used
   as the identity.
 - **Providers:** see "Model providers" below.
-- **Images:** one per harness, pinned by digest in `images`. Rebuild one on the
-  EC2 box with `buildbox/ec2/build.sh agent ghcr.io/drewr/agent-HARNESS:dev
-  --build-arg HARNESS=HARNESS`, then replace that line in `images` with the
-  printed digest.
-- **Needs locally:** `datumctl` (logged in), `ssh`, `ssh-keygen`, `openssl`,
-  `xxd`, `base32`, and `dumbpipe` (falls back to `nix build nixpkgs#dumbpipe`).
+- **Images:** one per harness, pinned by digest in `images`. Rebuild with
+  `agent/build-image HARNESS...` (the EC2 build box must be running); it
+  updates `images`.
+- **Needs locally:** `datumctl` (logged in), `ssh` with a working
+  `SSH_AUTH_SOCK` (on this host: `export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock`),
+  `ssh-keygen`, `openssl`, `jq`, `xxd`, `base32`, and `dumbpipe` (falls back to
+  `nix build nixpkgs#dumbpipe`).
+
+## Inside a session
+
+- **You log in as `drewr`** (uid 1000) with zsh and the dotfiles' zsh config
+  (prompt included), linked from the image into the home
+  (`~/.zshrc -> /etc/agent/zsh/zshrc`, and so on) unless the home already has
+  its own. `AGENT_SANDBOX_USER=root agent-sandbox ssh NAME` gets root.
+- **`HOME` is the shared home** (`/home/agent`), owned by `drewr`.
+- **`nix`** works through a root `nix-daemon`; `nixpkgs` is pinned to the
+  images' rev. `nix shell nixpkgs#tool` takes ~25 s the first time in a session
+  (fetching nixpkgs), then about a second per tool. Installs live in RAM for the
+  session; add tools you always want to `base` in `flake.nix`.
+- **claude starts with Remote Control on:** init adds
+  `"remoteControlAtStartup": true` to `~/.claude/settings.json` unless that key
+  is already set. Log in once (`/login` in any session) and every session is
+  logged in, via the shared home.
 
 ## Model providers
 
@@ -141,10 +158,13 @@ set `AGENT_SANDBOX_RELAY` to match.
 
 `packages.<harness>`: one harness from llm-agents.nix at the dotfiles' pinned
 rev (claude-code, gemini-cli, codex, opencode, pi or hermes-agent), plus the
-same base in every image: bash, git, ripgrep, curl, rsync, juicefs, dropbear,
-dumbpipe, `ws`, `agent-providers`, CA certificates, and static busybox for
-everything else. `Dockerfile.datum` picks the harness with the `HARNESS` build
-argument.
+same base in every image: zsh, bash, git, ripgrep, curl, jq, nix, rsync,
+juicefs, dropbear, dumbpipe, `ws`, `agent-providers`, `nix-zsh-env` (a sh port
+of the zigutils tool, which no longer builds: its pinned zig dev tarball is
+gone), the en_US.UTF-8 locale, CA certificates, the dotfiles' zsh config, and
+static busybox for everything else. `Dockerfile.datum` picks the harness with
+the `HARNESS` build argument; `build-image` adds the zsh config to the build
+context.
 Each is shipped as its full nix closure at the original `/nix/store` paths
 (the image is ~480 MB). This keeps wrapBuddy's hardcoded paths valid and needs
 no patchelf. About 1.83 GiB of the instance's memory is free with a session
@@ -152,10 +172,8 @@ open.
 
 ## Known gaps
 
-- No persistence: an instance replace wipes `/root`. Push work somewhere.
-- The discovery watchdog in `init.sh` has not logged anything; the instance's
-  own DNS lookups may hang. It is harmless, because the relay ticket does not
-  need discovery.
+- Anything outside the shared home and `ws` workspaces (e.g. `nix shell`
+  installs, `/tmp`) is lost when the instance goes.
 - `datumctl connect local` (the project-less Connect tunnel) would replace
   dumbpipe once it ships.
 - Spike 5B (an API call and a Bash tool call) still needs an API key.

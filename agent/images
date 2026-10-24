@@ -1,8 +1,8 @@
 # One pinned image per harness, used by agent-sandbox new --agent HARNESS.
 # Rebuild: buildbox/ec2/build.sh agent ghcr.io/drewr/agent-HARNESS:dev --build-arg HARNESS=HARNESS
 # then replace that harness's line with the printed digest.
-pi        ghcr.io/drewr/agent-pi@sha256:2e30fa3d09bb30f030f74ed8bb1d7deb355a0391f5e399d0d73de05b985635c9
-opencode  ghcr.io/drewr/agent-opencode@sha256:1b0a535066ec00a6c1fb6a1c3ddb79811c6ca0ca889892525f40bf5b3f406928
-claude    ghcr.io/drewr/agent-claude@sha256:24878e9147f385b88d6942c864e6d8c67b81aa73745293f7bcdd3aabbce9b91f
-codex     ghcr.io/drewr/agent-codex@sha256:5507c657ae459ee4740b5a9aa7ef8215306d3ccd5a61d30ce1c18d8a2d77e433
-gemini    ghcr.io/drewr/agent-gemini@sha256:515d514d029ecc8c928a5e3a3e64f0292e7cabccaa13e2b11183279eac518c1c
+claude    ghcr.io/drewr/agent-claude@sha256:32e0d08958efff2e4f5be217298ac599336ce97c6868956b7653fe035660be51
+pi        ghcr.io/drewr/agent-pi@sha256:482de70a5c36169933a2c5d71c6a6bce85a0799f7676baa7327cab44b6701a58
+opencode  ghcr.io/drewr/agent-opencode@sha256:3aaa0982c405c6d6bed901c4c989ed9b6f330cb58faf5a88082c27815fda1ffd
+codex     ghcr.io/drewr/agent-codex@sha256:f3565c27ca2b2889cbb2ac25ce7c7ec31db3e8c4fd32059166794728f85fb9c5
+gemini    ghcr.io/drewr/agent-gemini@sha256:e198b201df40eb08279c8fd9e3e2585b1e524529a87deaceb00bd697e4e480af

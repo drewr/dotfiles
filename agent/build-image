@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Build agent images on the EC2 build box and pin them in agent/images.
+#
+#   agent/build-image claude [codex ...]     one image per harness named
+#
+# The build context is agent/ plus the dotfiles' zsh config (zshrc, zshenv,
+# zprofile, zsh.d from the repo root) under zsh/, which the flake bakes into
+# each image. Uses buildbox/ec2/build.sh, so the box must be running; its
+# ticket comes from $BUILDBOX_TICKET or ~/.local/state/agent-sandbox-build.
+set -euo pipefail
+HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+ROOT=$(cd "$HERE/.." && pwd)
+STATE=${XDG_STATE_HOME:-$HOME/.local/state}/agent-sandbox-build
+REGISTRY=${AGENT_IMAGE_REGISTRY:-ghcr.io/drewr}
+[ $# -gt 0 ] || { sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
+if [ -z "${BUILDBOX_TICKET:-}" ]; then
+  BUILDBOX_TICKET=$(cat "$STATE/buildbox-ticket" 2>/dev/null) \
+    || { echo "build-image: no BUILDBOX_TICKET (buildbox/ec2/provision.sh ticket)" >&2; exit 1; }
+fi
+export BUILDBOX_TICKET
+mkdir -p "$STATE/logs"
+command -v dumbpipe >/dev/null || PATH="$(nix build --no-link --print-out-paths nixpkgs#dumbpipe)/bin:$PATH"
+
+ctx=$(mktemp -d)
+trap 'rm -rf "$ctx"' EXIT
+cp -a "$HERE/." "$ctx/"
+mkdir -p "$ctx/zsh"
+cp "$ROOT/zshrc" "$ROOT/zshenv" "$ROOT/zprofile" "$ctx/zsh/"
+cp -a "$ROOT/zsh.d" "$ctx/zsh/"
+
+rc=0
+for h in "$@"; do
+  log="$STATE/logs/build-$h.log"
+  SECONDS=0
+  if "$ROOT/buildbox/ec2/build.sh" "$ctx" "$REGISTRY/agent-$h:dev" --build-arg "HARNESS=$h" > "$log" 2>&1; then
+    ref=$(grep -o "$REGISTRY/agent-$h@sha256:[0-9a-f]*" "$log" | tail -1)
+  else
+    ref=
+  fi
+  if [ -n "$ref" ]; then
+    sed -i "/^$h /d" "$HERE/images"
+    printf '%-9s %s\n' "$h" "$ref" >> "$HERE/images"
+    echo "$h: $ref (${SECONDS}s)"
+  else
+    echo "$h: FAILED after ${SECONDS}s: $(grep -iE 'error' "$log" | tail -1 | cut -c1-200) (log: $log)" >&2
+    rc=1
+  fi
+done
+exit $rc
