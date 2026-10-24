@@ -65,7 +65,12 @@ PROVIDERS_SECRET=${AGENT_SANDBOX_PROVIDERS_SECRET:-agent-providers}
 JFS_OPTS=${AGENT_SANDBOX_JFS_OPTS:-}
 
 die() { echo "agent-sandbox: $*" >&2; exit 1; }
-usage() { sed -n '2,8p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 2; }
+# The header comment through the command list (up to the second "#" line).
+usage() {
+  awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); if ($0 == "" && ++blank == 2) exit; print; next } { exit }' \
+    "${BASH_SOURCE[0]}"
+  exit "${1:-2}"
+}
 
 dumbpipe_bin() {
   command -v dumbpipe 2>/dev/null && return
@@ -303,5 +308,6 @@ cmd_rm() {
 
 case ${1:-} in
   new|ssh|ls|logs|rm) c=$1; shift; "cmd_$c" "$@" ;;
+  help|-h|--help) usage 0 ;;
   *) usage ;;
 esac
