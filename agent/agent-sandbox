@@ -40,6 +40,9 @@ IMAGES=${AGENT_SANDBOX_IMAGES:-$HERE/images}
 HARNESS=${AGENT_SANDBOX_AGENT:-claude}
 # Login user in the sandbox (the images' unprivileged user); root also works.
 SSH_USER=${AGENT_SANDBOX_USER:-drewr}
+# Forward the local SSH agent, so git over SSH in the sandbox uses your keys
+# while you're connected (any process there can use them meanwhile). 0: off.
+FORWARD_AGENT=${AGENT_SANDBOX_FORWARD_AGENT:-1}
 # Datum production (api.datum.net), project drewr-y4nd1b. Sessions depend only
 # on features in production; staging differs (no IPv4 egress in us-east-1, and
 # a default network whose us-east-1 VPC never provisioned).
@@ -256,6 +259,7 @@ cmd_ssh() {
   # Options must precede the destination; anything after "--" is the command.
   local opts=() cmd=()
   [ -f "$dir/identity" ] && opts+=(-i "$(cat "$dir/identity")" -o IdentitiesOnly=yes)
+  [ "$FORWARD_AGENT" = 1 ] && opts+=(-o ForwardAgent=yes)
   while [ $# -gt 0 ]; do
     case $1 in --) shift; cmd=("$@"); break ;; -o|-L|-R|-D|-i) opts+=("$1" "$2"); shift 2 ;;
       -*) opts+=("$1"); shift ;; *) cmd=("$@"); break ;; esac

@@ -6,4 +6,5 @@
 !agent-providers
 !providers
 !nix-zsh-env
+!ssh_known_hosts
 !zsh

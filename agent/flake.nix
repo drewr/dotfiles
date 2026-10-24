@@ -44,7 +44,7 @@
       pi = agents.pi;
     };
     busybox = pkgs.pkgsStatic.busybox;
-    base = with pkgs; [ bashInteractive zsh gitMinimal ripgrep curl jq nix dropbear dumbpipe juicefs rsync ];
+    base = with pkgs; [ bashInteractive zsh gitMinimal openssh ripgrep curl jq nix dropbear dumbpipe juicefs rsync ];
 
     # The login user (SSH lands here, not root), whose HOME is the shared home.
     user = { name = "drewr"; uid = 1000; };
@@ -101,6 +101,9 @@
       cp ${./agent-providers} $R/bin/agent-providers
       ln -s agent-providers $R/bin/with-provider
       cp ${./providers} $R/etc/agent/providers
+      # GitHub's published SSH host keys (gh api meta), so git over SSH needs no prompt.
+      mkdir -p $R/etc/ssh
+      cp ${./ssh_known_hosts} $R/etc/ssh/ssh_known_hosts
       echo ${name} > $R/etc/agent/harness
       # Store paths shipped in the image, for init to register with nix.
       cp ${closure}/registration $R/etc/agent/nix-registration

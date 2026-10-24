@@ -34,6 +34,11 @@ agent-sandbox rm work
   (`~/.zshrc -> /etc/agent/zsh/zshrc`, and so on) unless the home already has
   its own. `AGENT_SANDBOX_USER=root agent-sandbox ssh NAME` gets root.
 - **`HOME` is the shared home** (`/home/agent`), owned by `drewr`.
+- **git over SSH uses your keys:** `agent-sandbox ssh` forwards your SSH agent
+  (`AGENT_SANDBOX_FORWARD_AGENT=0` turns it off), and the images ship the
+  OpenSSH client and GitHub's host keys (`/etc/ssh/ssh_known_hosts`). While
+  you're connected, any process in the sandbox, an agent included, can use
+  the forwarded keys; nothing is stored there.
 - **`nix`** works through a root `nix-daemon`; `nixpkgs` is pinned to the
   images' rev. `nix shell nixpkgs#tool` takes ~25 s the first time in a session
   (fetching nixpkgs), then about a second per tool. Installs live in RAM for the
