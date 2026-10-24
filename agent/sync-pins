@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Pin agent/flake.lock's llm-agents and nixpkgs to the revisions the dotfiles
+# use (d/.config/home-manager/flake.lock), so the images carry the same
+# harness versions and nixpkgs as a laptop with these dotfiles. Run by
+# agent/build-image; prints what changed.
+set -euo pipefail
+HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+DOT="$HERE/../d/.config/home-manager/flake.lock"
+LOCK="$HERE/flake.lock"
+
+rev() {  # rev LOCKFILE INPUT: locked rev of a root input
+  jq -r --arg i "$2" '.nodes as $n | $n[$n.root.inputs[$i]].locked.rev' "$1"
+}
+
+want_agents=$(rev "$DOT" llm-agents)
+want_nixpkgs=$(rev "$DOT" nixpkgs)
+have_agents=$(rev "$LOCK" llm-agents)
+have_nixpkgs=$(rev "$LOCK" nixpkgs)
+if [ "$want_agents" = "$have_agents" ] && [ "$want_nixpkgs" = "$have_nixpkgs" ]; then
+  echo "sync-pins: already at the dotfiles' pins (llm-agents ${want_agents:0:7}, nixpkgs ${want_nixpkgs:0:7})"
+  exit 0
+fi
+nix --extra-experimental-features 'nix-command flakes' flake lock "$HERE" \
+  --override-input llm-agents "github:numtide/llm-agents.nix/$want_agents" \
+  --override-input nixpkgs "github:nixos/nixpkgs/$want_nixpkgs" 2>&1 | grep -v '^warning: Git tree' || true
+echo "sync-pins: llm-agents ${have_agents:0:7} -> ${want_agents:0:7}, nixpkgs ${have_nixpkgs:0:7} -> ${want_nixpkgs:0:7}"

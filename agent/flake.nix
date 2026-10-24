@@ -1,9 +1,10 @@
 {
   # Agent sandbox images for Datum Compute (unikernel class): one image per
-  # harness from the dotfiles (claude-code, gemini-cli, codex, opencode, pi,
-  # hermes-agent), each with the same login environment, reachable only by SSH
-  # over iroh. Providers beyond each
-  # harness's native ones come from ./providers via agent-providers. Combines
+  # harness from the dotfiles (claude-code, gemini-cli, codex, opencode, pi),
+  # each with the same login environment, reachable only by SSH over iroh.
+  # Providers beyond each harness's native ones come from ./providers via
+  # agent-providers. llm-agents and nixpkgs follow the dotfiles' pins
+  # (agent/sync-pins, run by agent/build-image). Combines
   # what Spikes 4 and 5 proved: dropbear on loopback exposed by dumbpipe, and
   # Bun executables shipped with their wrapBuddy store paths.
   #
@@ -16,6 +17,9 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # Same rev as the dotfiles (agent/sync-pins), but on llm-agents' own nixpkgs
+    # rather than following ours as the dotfiles do: the harness versions are
+    # the same, and only these builds are in cache.numtide.com.
     llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
@@ -38,7 +42,6 @@
       codex = agents.codex;
       inherit opencode;
       pi = agents.pi;
-      hermes = agents.hermes-agent;
     };
     busybox = pkgs.pkgsStatic.busybox;
     base = with pkgs; [ bashInteractive zsh gitMinimal ripgrep curl jq nix dropbear dumbpipe juicefs rsync ];

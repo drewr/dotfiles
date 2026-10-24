@@ -2,8 +2,8 @@
 
 `agent-sandbox` spawns an agent session on Datum Compute's `unikernel` class and
 connects to it by SSH over iroh. Each session runs **one** harness from the
-dotfiles, in its own image: `claude` (default), `gemini`, `codex`, `opencode`,
-`pi` or `hermes`. There is no inbound port, no Connect
+dotfiles, in its own image: `claude` (default), `gemini`, `codex`, `opencode`
+or `pi`. There is no inbound port, no Connect
 gateway, and no login or project on the iroh side.
 
 ```sh
@@ -58,9 +58,9 @@ metadata: { name: agent-providers }
 type: Opaque
 stringData:
   ANTHROPIC_API_KEY: "..."     # claude (or use `claude /login`)
-  OPENAI_API_KEY: "..."        # codex, opencode, pi, hermes
+  OPENAI_API_KEY: "..."        # codex, opencode, pi
   GEMINI_API_KEY: "..."        # gemini
-  OPENROUTER_API_KEY: "..."    # opencode, pi, hermes
+  OPENROUTER_API_KEY: "..."    # opencode, pi
   TOKENROUTER_API_KEY: "..."   # via agent/providers
   SUBCONSCIOUS_API_KEY: "..."  # via agent/providers
 EOF
@@ -80,7 +80,6 @@ harness takes custom endpoints differently, so the wiring differs:
 | opencode | automatic: generated `$OPENCODE_CONFIG` (`/etc/agent/opencode.json`) | subconscious |
 | pi | automatic: `agent-providers sync` adds the provider to `~/.pi/agent/models.json` unless an entry with that name exists | subconscious |
 | codex | `with-provider NAME codex …` passes the provider as `-c` overrides; codex only speaks the Responses API, so the provider must serve `/v1/responses` | subconscious (TokenRouter: unknown) |
-| hermes | `with-provider NAME hermes` (`OPENAI_BASE_URL`, which hermes reads first) | not yet: no hermes image |
 | gemini | Google only (`GEMINI_API_KEY` or Google login) | — |
 
 ```sh
@@ -157,7 +156,7 @@ set `AGENT_SANDBOX_RELAY` to match.
 ## Image contents (`flake.nix`)
 
 `packages.<harness>`: one harness from llm-agents.nix at the dotfiles' pinned
-rev (claude-code, gemini-cli, codex, opencode, pi or hermes-agent), plus the
+rev (claude-code, gemini-cli, codex, opencode or pi), plus the
 same base in every image: zsh, bash, git, ripgrep, curl, jq, nix, rsync,
 juicefs, dropbear, dumbpipe, `ws`, `agent-providers`, `nix-zsh-env` (a sh port
 of the zigutils tool, which no longer builds: its pinned zig dev tarball is

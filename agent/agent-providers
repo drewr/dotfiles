@@ -7,7 +7,7 @@
 #   with-provider NAME CMD [ARGS...]   run CMD with NAME's base URLs and key
 #
 # with-provider sets the standard variables:
-#   OPENAI_BASE_URL + OPENAI_API_KEY         (hermes, OpenAI SDKs)
+#   OPENAI_BASE_URL + OPENAI_API_KEY         (OpenAI-SDK-based tools)
 #   ANTHROPIC_BASE_URL + ANTHROPIC_AUTH_TOKEN (claude), when the provider has an
 #                                             Anthropic-compatible endpoint
 # and for codex, which ignores those, passes the provider as -c overrides

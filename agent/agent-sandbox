@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Spawn and reach agent sandboxes on Datum Compute (unikernel class). Each
-# session runs one harness's image: claude, gemini, codex, opencode, pi, hermes.
+# session runs one harness's image: claude, gemini, codex, opencode, pi.
 #
 #   agent-sandbox new NAME [--agent HARNESS] [--key PUBKEY_FILE] [--no-home]
 #                                                create a session and wait for SSH

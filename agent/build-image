@@ -3,6 +3,7 @@
 #
 #   agent/build-image claude [codex ...]     one image per harness named
 #
+# Pins llm-agents and nixpkgs to the dotfiles' revisions first (sync-pins).
 # The build context is agent/ plus the dotfiles' zsh config (zshrc, zshenv,
 # zprofile, zsh.d from the repo root) under zsh/, which the flake bakes into
 # each image. Uses buildbox/ec2/build.sh, so the box must be running; its
@@ -20,6 +21,9 @@ fi
 export BUILDBOX_TICKET
 mkdir -p "$STATE/logs"
 command -v dumbpipe >/dev/null || PATH="$(nix build --no-link --print-out-paths nixpkgs#dumbpipe)/bin:$PATH"
+
+# Same llm-agents and nixpkgs as the dotfiles.
+"$HERE/sync-pins"
 
 ctx=$(mktemp -d)
 trap 'rm -rf "$ctx"' EXIT
