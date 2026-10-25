@@ -43,6 +43,9 @@ if [ -s /etc/agent/nix-registration ] && [ ! -e /nix/var/nix/db/db.sqlite ]; the
 fi
 /bin/nix-daemon > /tmp/nix-daemon.log 2>&1 &
 
+# Unprivileged ICMP, so iputils ping works for the login user.
+echo "0 2147483647" > /proc/sys/net/ipv4/ping_group_range
+
 # lo is down with no addresses at boot (sp4/RESULTS.md).
 /bin/ip link set lo up
 /bin/ip addr add 127.0.0.1/8 dev lo

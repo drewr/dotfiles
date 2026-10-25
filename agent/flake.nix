@@ -44,7 +44,7 @@
       pi = agents.pi;
     };
     busybox = pkgs.pkgsStatic.busybox;
-    base = with pkgs; [ bashInteractive zsh gitMinimal openssh ripgrep curl jq nix dropbear dumbpipe juicefs rsync ];
+    base = with pkgs; [ bashInteractive zsh gitMinimal openssh iputils ripgrep curl jq nix dropbear dumbpipe juicefs rsync ];
 
     # The login user (SSH lands here, not root), whose HOME is the shared home.
     user = { name = "drewr"; uid = 1000; };
