@@ -42,11 +42,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792789689,
-        "narHash": "sha256-s9qSBeK3vZlzigCADv+dh0ZYkU4EhHIjgoFpLeZU5no=",
+        "lastModified": 1792885498,
+        "narHash": "sha256-rKIOV4fMx86ig/wPSSCsIEcW3/apKI9ap8zXdQMCPfM=",
         "owner": "datum-cloud",
         "repo": "datumctl",
-        "rev": "6805d159de258c3b46eb30d525fce9d8c7fad4a3",
+        "rev": "c2e4769bd444090e27d6219437805f41e7f2949d",
         "type": "github"
       },
       "original": {
@@ -119,11 +119,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792818371,
-        "narHash": "sha256-yhEZAzZRNvzYpoAlyFY3wM75V9BmkIXJIueof8S5gOg=",
+        "lastModified": 1792896866,
+        "narHash": "sha256-/0tELNnhdSnP+bHSdWiEe6KpfSwi6WrTnT9cm/jNkjA=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "2cd3234928f60bbff695a7ee56115ef7799c47cd",
+        "rev": "c216bf5a1f173b0481bd5c8c489ebe5595ecc68c",
         "type": "github"
       },
       "original": {
@@ -140,11 +140,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792636948,
-        "narHash": "sha256-Bb2BfFLkSTBgrdOJoR9ams0UlDvUb/K29rmtzDuyCj4=",
+        "lastModified": 1792885187,
+        "narHash": "sha256-80vVNjGuJNPpw7wCDgnpfG0z43PoI9DkCkB1MOJr7XM=",
         "ref": "refs/heads/main",
-        "rev": "75c8b6102452891bff8962b7c2c9e4d43ab06760",
-        "revCount": 4534,
+        "rev": "a170e3e974aea02ba6cae577525181b54590d1c6",
+        "revCount": 4588,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jolt-lang/jolt"
@@ -165,11 +165,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1792835552,
-        "narHash": "sha256-0EthGjCBH0UEPrU78omXpEbvRqKjCBZeC8fi+kIBy+o=",
+        "lastModified": 1792962201,
+        "narHash": "sha256-3J6CRLwFjxrc5gqec5/0PgI23w2cCHR8+6qi6C9mOd0=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "53a2d94ce3b88753200be9a0549d8978b031fa60",
+        "rev": "d7c27bbc1544974a9ea90bdfc27d281683fb69f6",
         "type": "github"
       },
       "original": {
@@ -197,11 +197,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1792502884,
-        "narHash": "sha256-IoNisKcGbUjdd45qCqywGMCYmZ5EnkxezvLII0FWwNA=",
+        "lastModified": 1792773339,
+        "narHash": "sha256-rZLrzrC6i+jnTAlvPZHogKDulY7WWDEv9hJeHieO7Zw=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "02c087f3fe673c9e317f206a627cb6b910336dbe",
+        "rev": "3ec636362e1816bc2f0888fa0fa2c69f1bc9e504",
         "type": "github"
       },
       "original": {
