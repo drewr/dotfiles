@@ -42,11 +42,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792885498,
-        "narHash": "sha256-rKIOV4fMx86ig/wPSSCsIEcW3/apKI9ap8zXdQMCPfM=",
+        "lastModified": 1792976673,
+        "narHash": "sha256-azJapWOQQ0CkY8KlKClr/L9Y388zrmqMwyf9Z2njot0=",
         "owner": "datum-cloud",
         "repo": "datumctl",
-        "rev": "c2e4769bd444090e27d6219437805f41e7f2949d",
+        "rev": "7dd2fc93b7326655cf2ff4c6e66465aca37d1f89",
         "type": "github"
       },
       "original": {
@@ -119,11 +119,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792896866,
-        "narHash": "sha256-/0tELNnhdSnP+bHSdWiEe6KpfSwi6WrTnT9cm/jNkjA=",
+        "lastModified": 1793028967,
+        "narHash": "sha256-tnjPgili0EcI9J/cH4ppRndxBPOK4lzQJD1M3/EFf8E=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "c216bf5a1f173b0481bd5c8c489ebe5595ecc68c",
+        "rev": "c842992fdae6630afe3420a2e07d605653642136",
         "type": "github"
       },
       "original": {
@@ -140,11 +140,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792885187,
-        "narHash": "sha256-80vVNjGuJNPpw7wCDgnpfG0z43PoI9DkCkB1MOJr7XM=",
+        "lastModified": 1792995198,
+        "narHash": "sha256-oLxt2W/4XYs0xxEc/Mnhr/S+YHDl3UG1BzpaCECF7tQ=",
         "ref": "refs/heads/main",
-        "rev": "a170e3e974aea02ba6cae577525181b54590d1c6",
-        "revCount": 4588,
+        "rev": "4fd288a24c93f6ff2b422ec30ed505feb02ee0c5",
+        "revCount": 4607,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jolt-lang/jolt"
@@ -165,11 +165,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1792962201,
-        "narHash": "sha256-3J6CRLwFjxrc5gqec5/0PgI23w2cCHR8+6qi6C9mOd0=",
+        "lastModified": 1793010890,
+        "narHash": "sha256-ey+//gYH5+xdurdQt3N/xYwTkbRsBni6LEFZuQo7pQk=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "d7c27bbc1544974a9ea90bdfc27d281683fb69f6",
+        "rev": "1bdd1bf023e9a0974f2b67c7ac1c144fd2702c29",
         "type": "github"
       },
       "original": {
