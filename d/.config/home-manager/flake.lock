@@ -42,11 +42,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792976673,
-        "narHash": "sha256-azJapWOQQ0CkY8KlKClr/L9Y388zrmqMwyf9Z2njot0=",
+        "lastModified": 1793036593,
+        "narHash": "sha256-QGd3SaR055VgZCILvR2peXWHDiXKM3KlQrhQb3xsJtk=",
         "owner": "datum-cloud",
         "repo": "datumctl",
-        "rev": "7dd2fc93b7326655cf2ff4c6e66465aca37d1f89",
+        "rev": "ef9d56eed81111423a60173dcf8feef29c118cb3",
         "type": "github"
       },
       "original": {
@@ -119,11 +119,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793029262,
-        "narHash": "sha256-CN3Y4hnAjOvvnHFbUE7ogKko0/hM3/ZWPobSpQn/qsQ=",
+        "lastModified": 1793124281,
+        "narHash": "sha256-KdGTOgYXgMDA/ymTV10yLMt9tOjz9EmTgnTvaD+bhe4=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "b256132d1134c8d73b99b3c33f6b8e6f7bf3727f",
+        "rev": "1e3ebeb683d055d1675d3f64e6d2b186cb2ee504",
         "type": "github"
       },
       "original": {
@@ -140,11 +140,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792995198,
-        "narHash": "sha256-oLxt2W/4XYs0xxEc/Mnhr/S+YHDl3UG1BzpaCECF7tQ=",
+        "lastModified": 1793104640,
+        "narHash": "sha256-8o6SpDt1Z5OAjFRAFrqtHtnpv+Slj/zyy2pZ2zZ50QM=",
         "ref": "refs/heads/main",
-        "rev": "4fd288a24c93f6ff2b422ec30ed505feb02ee0c5",
-        "revCount": 4607,
+        "rev": "8ba11735f581c458f0a8c8146c170de2e81a6d41",
+        "revCount": 4641,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jolt-lang/jolt"
@@ -165,11 +165,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1793010890,
-        "narHash": "sha256-ey+//gYH5+xdurdQt3N/xYwTkbRsBni6LEFZuQo7pQk=",
+        "lastModified": 1793103329,
+        "narHash": "sha256-YpKslbxJYK4aMcI+JjqbUUmd5iA9h7/sahVrdU8j4Rc=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "1bdd1bf023e9a0974f2b67c7ac1c144fd2702c29",
+        "rev": "b4356aceeec72ec5fd8aa4f24964ed70c95ec45a",
         "type": "github"
       },
       "original": {
@@ -329,11 +329,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791392852,
-        "narHash": "sha256-aXsnfr3HmDPRcpBfQxMUMviHUh3gyjRsyrqipClqxw0=",
+        "lastModified": 1793030288,
+        "narHash": "sha256-qTjnUzEfIMDOi7bI9LRSXGiYQ/eLYzPqCC0bLqbgBzo=",
         "owner": "drewr",
         "repo": "zigutils",
-        "rev": "8caa3d62bf7e0dc60ce8bf993ba3524ab919e6f9",
+        "rev": "12640068a9338b38d4775d37d3bf59b2c2a70d35",
         "type": "github"
       },
       "original": {
