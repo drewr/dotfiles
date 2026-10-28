@@ -86,11 +86,16 @@
 
   # opencode writes ~/.config/opencode/cli.json itself (the TUI settings dialog
   # and /themes persist to it), so it cannot be a read-only home.file symlink.
-  # Seed it from the repo on first use, then leave the user's copy alone.
+  # Merge repo defaults underneath the user's copy instead: new defaults reach
+  # existing installs while anything chosen in the TUI still wins.
   home.activation.bootstrapOpenCodeCli = lib.hm.dag.entryAfter ["writeBoundary"] ''
     defaults=${./d/opencode-cli.json}
     settings="$HOME/.config/opencode/cli.json"
-    if [ ! -f "$settings" ]; then
+    if [ -f "$settings" ]; then
+      tmp=$(${pkgs.coreutils}/bin/mktemp)
+      ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$defaults" "$settings" > "$tmp" \
+        && ${pkgs.coreutils}/bin/mv "$tmp" "$settings"
+    else
       ${pkgs.coreutils}/bin/install -Dm644 "$defaults" "$settings"
     fi
   '';
