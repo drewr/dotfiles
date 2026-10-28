@@ -94,6 +94,7 @@
     if [ -f "$settings" ]; then
       tmp=$(${pkgs.coreutils}/bin/mktemp)
       ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$defaults" "$settings" > "$tmp" \
+        && ${pkgs.coreutils}/bin/chmod 0644 "$tmp" \
         && ${pkgs.coreutils}/bin/mv "$tmp" "$settings"
     else
       ${pkgs.coreutils}/bin/install -Dm644 "$defaults" "$settings"
