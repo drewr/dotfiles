@@ -1,0 +1,58 @@
+#!/bin/sh
+
+# Prints a short opencode indicator for tmux's status-right, e.g.
+#   oc:*   a session is running
+#   oc:+   the service is up, nothing running
+#   oc:-   the service is not reachable
+#
+# tmux polls status-right every `status-interval` seconds (15 by default) and
+# runs each #() command in a fresh shell, so this must never block the status
+# bar. It therefore prints the last cached answer immediately and refreshes it
+# in the background at most once every TTL seconds.
+
+self=$(readlink -f "$0" 2>/dev/null || echo "$0")
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/opencode-status"
+ttl=60
+
+# The tmux server long outlives any one login, so its environment may have a
+# stale PATH. Prefer the nix profile opencode and fall back to PATH.
+oc=
+for c in "$HOME/.nix-profile/bin/opencode" "$HOME/.local/bin/opencode"; do
+  if [ -x "$c" ]; then oc=$c; break; fi
+done
+[ -n "$oc" ] || oc=$(command -v opencode 2>/dev/null)
+
+fresh() {
+  [ -f "$cache" ] && [ -n "$(find "$cache" -newermt "-${ttl} seconds" 2>/dev/null)" ]
+}
+
+if [ -z "$oc" ]; then
+  echo "oc:?"
+  exit 0
+fi
+
+if ! fresh; then
+  # Claim the refresh slot to avoid a stampede if tmux reruns us quickly.
+  mkdir -p "$(dirname "$cache")" 2>/dev/null
+  if mkdir "$cache.lock" 2>/dev/null; then
+    (
+      trap 'rmdir "$cache.lock" 2>/dev/null' EXIT
+      if active=$("$oc" api get /api/session/active 2>/dev/null); then
+        case $active in
+          *running*) state='oc:*' ;;
+          *)         state='oc:+' ;;
+        esac
+      else
+        state='oc:-'
+      fi
+      printf '%s\n' "$state" > "$cache.tmp" && mv "$cache.tmp" "$cache"
+    ) </dev/null >/dev/null 2>&1 &
+  fi
+fi
+
+if [ -f "$cache" ]; then
+  cat "$cache"
+else
+  echo "oc:?"
+  exit 0
+fi

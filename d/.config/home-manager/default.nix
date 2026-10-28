@@ -55,6 +55,7 @@
 
     "bin/gcp-env" = { source = ./d/bin/gcp-env; executable = true; };
     "bin/rand".source = ./d/bin/rand;
+    "bin/oc-status" = { source = ./d/bin/oc-status; executable = true; };
 
     ".npmrc".text = ''
     prefix=${config.home.homeDirectory}/.npm
@@ -80,6 +81,17 @@
       else
         ${pkgs.coreutils}/bin/install -Dm644 "$defaults" "$settings"
       fi
+    fi
+  '';
+
+  # opencode writes ~/.config/opencode/cli.json itself (the TUI settings dialog
+  # and /themes persist to it), so it cannot be a read-only home.file symlink.
+  # Seed it from the repo on first use, then leave the user's copy alone.
+  home.activation.bootstrapOpenCodeCli = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    defaults=${./d/opencode-cli.json}
+    settings="$HOME/.config/opencode/cli.json"
+    if [ ! -f "$settings" ]; then
+      ${pkgs.coreutils}/bin/install -Dm644 "$defaults" "$settings"
     fi
   '';
 
