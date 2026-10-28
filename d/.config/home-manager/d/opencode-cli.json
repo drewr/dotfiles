@@ -3,5 +3,8 @@
   "theme": {
     "name": "system",
     "mode": "system"
+  },
+  "keybinds": {
+    "session.background": ["ctrl+b", "<leader>B"]
   }
 }
