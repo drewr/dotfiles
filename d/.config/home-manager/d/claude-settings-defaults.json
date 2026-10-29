@@ -3,6 +3,7 @@
   "theme": "light",
   "attribution": {
     "commit": "",
-    "pr": ""
+    "pr": "",
+    "sessionUrl": false
   }
 }
