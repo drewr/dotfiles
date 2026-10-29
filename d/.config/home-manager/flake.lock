@@ -236,6 +236,7 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-haskell": "nixpkgs-haskell",
         "una-src": "una-src",
+        "yolo": "yolo",
         "zigutils": "zigutils"
       }
     },
@@ -318,6 +319,29 @@
       "original": {
         "owner": "jwiegley",
         "repo": "una",
+        "type": "github"
+      }
+    },
+    "yolo": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "zigutils": [
+          "zigutils"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793315204,
+        "narHash": "sha256-XaH2jgxpaa84gxE60fJtWUp7KdmGCb8OkltLosH1ukI=",
+        "owner": "drewr",
+        "repo": "yolo",
+        "rev": "cb23b3f02ca478b0642818d4c738558aaf68f42f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "drewr",
+        "repo": "yolo",
         "type": "github"
       }
     },

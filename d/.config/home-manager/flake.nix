@@ -30,6 +30,11 @@
       url = "github:datum-cloud/datumctl";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    yolo = {
+      url = "github:drewr/yolo";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.zigutils.follows = "zigutils";
+    };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -45,7 +50,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, datumctl, llm-agents, jolt }:
+  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, datumctl, yolo, llm-agents, jolt }:
   let
     homeModules = [
       ./default.nix
@@ -94,6 +99,7 @@
               zigutils.packages.${pkgs.stdenv.hostPlatform.system}.tmphttp
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code
               datumctl.packages.${pkgs.stdenv.hostPlatform.system}.default
+              yolo.packages.${pkgs.stdenv.hostPlatform.system}.default
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
               (mkOpendcode2 pkgs llm-agents)
@@ -124,6 +130,7 @@
         zigutils.packages.${pkgs.stdenv.hostPlatform.system}.tmphttp
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code
         datumctl.packages.${pkgs.stdenv.hostPlatform.system}.default
+        yolo.packages.${pkgs.stdenv.hostPlatform.system}.default
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
         (mkOpendcode2 pkgs llm-agents)
