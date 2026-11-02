@@ -7,7 +7,9 @@ home: install
 	zsh build-home-manager
 
 update:
-	nix flake update --flake d/.config/home-manager
+	# Lix requires flake-self-attrs explicitly for jolt's `inputs.self.submodules`.
+	NIX_CONFIG="extra-experimental-features = nix-command flakes flake-self-attrs" \
+		nix flake update --flake d/.config/home-manager
 
 # Derive the current machine's Home Manager config name (username@system) the
 # same way build-home-manager does, then pass it explicitly. `home-manager news`

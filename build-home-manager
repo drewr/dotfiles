@@ -19,7 +19,8 @@ echo BUILDING ${username}@${nix_arch}
 
   if [ "${UPDATE:-}" = "1" ]; then
     echo "Updating flake dependencies..."
-    nix flake update
+    NIX_CONFIG="extra-experimental-features = nix-command flakes flake-self-attrs" \
+      nix flake update
   fi
 
   nix_args=""
