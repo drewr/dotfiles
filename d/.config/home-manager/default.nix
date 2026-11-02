@@ -31,6 +31,7 @@
     pkgs.keychain
     pkgs.kubectl
     pkgs.gnumake
+    pkgs.mosh
     pkgs.nodejs
     pkgs.pandoc
     pkgs.ripgrep
