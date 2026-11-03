@@ -106,13 +106,15 @@ update_auth_sock() {
     TMUX_SOCK=$(echo $TMUX|cut -d , -f 1)
     NEW_SSH_AUTH_SOCK=$(tmux -S $TMUX_SOCK showenv 2>/dev/null|grep ^SSH_AUTH_SOCK|cut -d = -f 2)
     if [[ -n $NEW_SSH_AUTH_SOCK ]] && [[ -S $NEW_SSH_AUTH_SOCK ]]; then
-      SSH_AUTH_SOCK=$NEW_SSH_AUTH_SOCK
+      # export: assigning to an unset var leaves it shell-local, so children
+      # (git, ssh, ssh-keygen) would not see the agent.
+      export SSH_AUTH_SOCK=$NEW_SSH_AUTH_SOCK
       return
     fi
   fi
   # Stable symlink kept current by ~/.ssh/rc on each inbound SSH connection
   local stable=~/.ssh/ssh_auth_sock
-  [[ -S $stable ]] && SSH_AUTH_SOCK=$stable
+  [[ -S $stable ]] && export SSH_AUTH_SOCK=$stable
 }
 preexec_functions+=update_auth_sock
 
