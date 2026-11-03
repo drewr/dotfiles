@@ -1,0 +1,14 @@
+#!/bin/sh
+# Emit the git ssh signing key for gpg.ssh.defaultKeyCommand.
+#
+# git takes the first line of this command's output as the signing key and runs
+# it without a shell, so this cannot be an inline pipeline. Filtering matters:
+# a forwarded agent typically lists the RSA key first, and signing with it
+# produces a valid signature that allowed_signers rejects ("No principal
+# matched"). Only ed25519 is emitted because that is the key authorized in
+# ~/.ssh/allowed_signers.
+#
+# No agent (or no ed25519 in it) means no output, and git reports that
+# user.signingKey needs to be set -- the intended failure, since the private
+# key lives on another machine.
+ssh-add -L 2>/dev/null | grep -m1 '^ssh-ed25519 '

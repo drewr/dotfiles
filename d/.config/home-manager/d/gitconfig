@@ -1,13 +1,20 @@
 [user]
 name = Drew Raines
 email = drew@raines.me
-signingkey = ~/.ssh/id_ed25519.pub
+# signingkey is deliberately unset; gpg.ssh.defaultKeyCommand (below) resolves
+# the key from the agent, so signing works on hosts that hold only the public
+# half. Trade-off: signing now requires an agent everywhere. To go back to
+# signing from the local key (or its .pub through the agent), uncomment:
+# signingkey = ~/.ssh/id_ed25519.pub
 
 [gpg]
 format = ssh
 
 [gpg "ssh"]
 allowedsignersfile = ~/.ssh/allowed_signers
+# ssh-add -L lists the forwarded RSA key first, and git takes the first line,
+# so the helper pins the ed25519 key that allowed_signers authorizes.
+defaultKeyCommand = ssh-signing-key
 
 [github]
 user = drewr
