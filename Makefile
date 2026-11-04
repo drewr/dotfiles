@@ -8,8 +8,10 @@ home: install
 
 update:
 	# Lix requires flake-self-attrs explicitly for jolt's `inputs.self.submodules`.
+	# accept-flake-config makes nix apply the flake's own nixConfig (substituters
+	# + keys) instead of prompting for permission on every invocation.
 	NIX_CONFIG="extra-experimental-features = nix-command flakes flake-self-attrs" \
-		nix flake update --flake d/.config/home-manager
+		nix flake update --flake d/.config/home-manager --option accept-flake-config true
 
 # Derive the current machine's Home Manager config name (username@system) the
 # same way build-home-manager does, then pass it explicitly. `home-manager news`
