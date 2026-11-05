@@ -98,9 +98,12 @@ gitcb() {
 
 # ~/.ssh/rc (run by sshd before the shell starts) creates ~/.ssh/ssh_auth_sock
 # as a stable symlink to the real agent socket and updates tmux's session
-# environment. This function reads that state into the current shell. It runs
-# at shell startup (called from zshrc) and before every command (preexec), so
-# shells that were open before a new SSH connection landed also pick it up.
+# environment. This function reads that state into the current shell: tmux
+# sessions prefer tmux's own environment, everything else falls back to
+# ssh_auth_sock_pick (zshenv). It runs at shell startup (called from zshrc)
+# and before every command (preexec), so shells that were open before a new
+# SSH connection landed, and shells whose inherited socket died in between,
+# both re-resolve to a live agent.
 update_auth_sock() {
   if [[ -n $TMUX ]]; then
     TMUX_SOCK=$(echo $TMUX|cut -d , -f 1)
@@ -112,9 +115,12 @@ update_auth_sock() {
       return
     fi
   fi
-  # Stable symlink kept current by ~/.ssh/rc on each inbound SSH connection
-  local stable=~/.ssh/ssh_auth_sock
-  [[ -S $stable ]] && export SSH_AUTH_SOCK=$stable
+  # Otherwise delegate to zshenv's resolver, which verifies live sockets only:
+  # the stable symlink, sshd's per-session /tmp/ssh-*/agent.* sockets,
+  # or the keyring agent, and never leaves a dead inherited value behind.
+  # ssh_auth_sock_pick comes from ~/.zshenv, which every zsh runs before this
+  # file is loaded; guard for direct sourcing (zsh -f) where it wouldn't be.
+  (( $+functions[ssh_auth_sock_pick] )) && ssh_auth_sock_pick
 }
 preexec_functions+=update_auth_sock
 
