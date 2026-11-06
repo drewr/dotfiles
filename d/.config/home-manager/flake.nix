@@ -5,9 +5,6 @@
     extra-substituters = [
       "https://cache.numtide.com"
       "https://cache.nixos.org"
-      # oh-my-pi's flake declares this cache in its own nixConfig, but that
-      # doesn't apply when it's consumed as an input. Without it the first
-      # build compiles the bun + Rust toolchain closure from source.
       "https://nix-community.cachix.org"
     ];
     extra-trusted-public-keys = [
@@ -47,13 +44,6 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Only nixpkgs follows our pin; the rest of oh-my-pi's inputs (crane,
-    # bun2nix, nix-bun, rust-overlay, nixpkgs-darwin-x64) stay pinned as
-    # upstream declares them, since their build depends on those versions.
-    oh-my-pi = {
-      url = "github:can1357/oh-my-pi";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # Use the git scheme (not github:) because jolt's flake declares
     # `inputs.self.submodules = true`, which the github fetcher rejects
     # (NixOS/nix#13571). The git+https fetcher supports submodules.
@@ -65,7 +55,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, datumctl, yolo, llm-agents, jolt, oh-my-pi }:
+  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, datumctl, yolo, llm-agents, jolt }:
   let
     homeModules = [
       ./default.nix
@@ -118,8 +108,6 @@
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
               (mkOpendcode2 pkgs llm-agents)
-              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
-              oh-my-pi.packages.${pkgs.stdenv.hostPlatform.system}.omp
               (mkJoltPackage pkgs.stdenv.hostPlatform.system)
             ];
             home.username = username;
@@ -150,8 +138,6 @@
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
         (mkOpendcode2 pkgs llm-agents)
-        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
-        oh-my-pi.packages.${pkgs.stdenv.hostPlatform.system}.omp
         (mkJoltPackage pkgs.stdenv.hostPlatform.system)
       ];
       _module.args.una = buildUna pkgs;
