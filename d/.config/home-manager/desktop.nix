@@ -3,11 +3,11 @@
 {
   home.packages = [
     pkgs.ffmpeg
-    ## Won't stop rebuilding the entire world (swift, mainly), then
-    ## fails. We can just run it with `nix run` instead.
-    # pkgs.mpv
+    pkgs.jackett
+    pkgs.mpv
     pkgs.msmtp
     pkgs.python3Packages.grip
+    pkgs.qbittorrent
   ];
 
   home.file = {
