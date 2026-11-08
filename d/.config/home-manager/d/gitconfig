@@ -13,7 +13,7 @@ format = ssh
 [gpg "ssh"]
 allowedsignersfile = ~/.ssh/allowed_signers
 # ssh-add -L lists the forwarded RSA key first, and git takes the first line,
-# so the helper pins the ed25519 key that allowed_signers authorizes.
+# so the helper pins the ecdsa key that allowed_signers authorizes.
 defaultKeyCommand = ssh-signing-key
 
 [github]

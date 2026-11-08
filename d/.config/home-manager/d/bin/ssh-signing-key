@@ -5,10 +5,30 @@
 # it without a shell, so this cannot be an inline pipeline. Filtering matters:
 # a forwarded agent typically lists the RSA key first, and signing with it
 # produces a valid signature that allowed_signers rejects ("No principal
-# matched"). Only ed25519 is emitted because that is the key authorized in
-# ~/.ssh/allowed_signers.
+# matched"). Only the keys authorized in ~/.ssh/allowed_signers are considered:
+# ecdsa-sha2-nistp256 (preferred) and ssh-ed25519.
 #
-# No agent (or no ed25519 in it) means no output, and git reports that
-# user.signingKey needs to be set -- the intended failure, since the private
-# key lives on another machine.
-ssh-add -L 2>/dev/null | grep -m1 '^ssh-ed25519 '
+# Order:
+#   1. an authorized key held by the agent (ecdsa first, then ed25519), emitted
+#      as a literal public key so signing goes through the agent
+#   2. an authorized private key on disk (~/.ssh/id_ecdsa, then id_ed25519),
+#      emitted as a path so ssh-keygen signs with it directly
+#
+# Nothing found means no output, and git reports that user.signingKey needs to
+# be set.
+keys=$(ssh-add -L 2>/dev/null)
+
+for type in ecdsa-sha2-nistp256 ssh-ed25519; do
+	key=$(printf '%s\n' "$keys" | grep -m1 "^$type ")
+	if [ -n "$key" ]; then
+		printf '%s\n' "$key"
+		exit 0
+	fi
+done
+
+for f in "$HOME/.ssh/id_ecdsa" "$HOME/.ssh/id_ed25519"; do
+	if [ -f "$f" ]; then
+		printf '%s\n' "$f"
+		exit 0
+	fi
+done
