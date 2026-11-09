@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Prints the free space of a filesystem for tmux's status-right, e.g. "61G".
+# Usage: diskfree [mountpoint]
+#
+# tmux polls status-right every `status-interval` seconds and runs each #()
+# command in a fresh shell, so keep this cheap: one `df` and one awk pass, no
+# caching, no I/O beyond a statfs.
+
+mount=/
+if [ $# -gt 0 ]; then
+  mount=$1
+elif [ -d /System/Volumes/Data ]; then
+  # macOS (Big Sur+): / is a read-only system snapshot sharing an APFS
+  # container with the Data volume. Both report the same available space, but
+  # the Data volume also reports the container's real size/usage.
+  mount=/System/Volumes/Data
+fi
+
+# -P: POSIX output, one line per filesystem, on macOS and Linux alike.
+# -k: 1024-byte blocks, so the available column is plain KiB either way.
+free=$(df -Pk "$mount" 2>/dev/null | awk 'NR == 2 { print $4 }')
+
+case $free in
+  '' | *[!0-9]*) echo "disk:?"; exit 0 ;;
+esac
+
+awk -v k="$free" 'BEGIN {
+  if (k >= 1048576) printf "%.0fG\n", k / 1048576
+  else              printf "%.0fM\n", k / 1024
+}'

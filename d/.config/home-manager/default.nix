@@ -58,6 +58,7 @@
     "bin/gcp-env" = { source = ./d/bin/gcp-env; executable = true; };
     "bin/rand".source = ./d/bin/rand;
     "bin/oc-status" = { source = ./d/bin/oc-status; executable = true; };
+    "bin/diskfree" = { source = ./d/bin/diskfree; executable = true; };
 
     ".npmrc".text = ''
     prefix=${config.home.homeDirectory}/.npm
