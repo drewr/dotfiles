@@ -99,7 +99,7 @@
           {
             home.packages = builtins.filter (p: p != null) [
               unaPackage
-              zigutils.packages.${pkgs.stdenv.hostPlatform.system}.nix-zsh-env
+              zigutils.packages.${pkgs.stdenv.hostPlatform.system}.zsh-nix-env
               zigutils.packages.${pkgs.stdenv.hostPlatform.system}.gitclone
               zigutils.packages.${pkgs.stdenv.hostPlatform.system}.tmphttp
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code
@@ -129,7 +129,7 @@
       imports = homeModules;
       home.packages = builtins.filter (p: p != null) [
         (buildUna pkgs)
-        zigutils.packages.${pkgs.stdenv.hostPlatform.system}.nix-zsh-env
+        zigutils.packages.${pkgs.stdenv.hostPlatform.system}.zsh-nix-env
         zigutils.packages.${pkgs.stdenv.hostPlatform.system}.gitclone
         zigutils.packages.${pkgs.stdenv.hostPlatform.system}.tmphttp
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code

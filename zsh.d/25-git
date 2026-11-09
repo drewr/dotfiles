@@ -42,7 +42,7 @@ if not_in_cloud; then
     zstyle ":vcs_info:(sv[nk]|bzr):*" branchformat "%b%F{1}:%F{yellow}%r%{$reset_color%}"
     zstyle ":vcs_info:*" enable git svn bzr hg
     precmd () {
-      nix_info=$(nix-zsh-env)
+      nix_info=$(zsh-nix-env)
       if [[ -n $nix_info ]]; then
         nix_prompt="[%F{blue}${nix_info}%{$reset_color%}]"
       else
@@ -63,7 +63,7 @@ if not_in_cloud; then
     zstyle ":vcs_info:(sv[nk]|bzr):*" branchformat "%b:%r"
     zstyle ":vcs_info:*" enable git svn bzr hg
     precmd () {
-      nix_info=$(nix-zsh-env)
+      nix_info=$(zsh-nix-env)
       if [[ -n $nix_info ]]; then
         nix_prompt="[${nix_info}]"
       else
