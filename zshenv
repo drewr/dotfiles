@@ -50,8 +50,11 @@ ssh_auth_sock_pick() {
     return
   fi
   local s
+  # Glob only where sshd puts agent sockets instead of walking all of /tmp,
+  # which holds hundreds of thousands of Nix build files and took seconds.
+  # Qualifiers: N no match is fine, = sockets, U owned by us, om newest first.
   for s in $HOME/.ssh/ssh_auth_sock \
-           $(/bin/ls -t1 $(find /tmp -uid $UID -name 'agent.*' -type s 2>/dev/null) 2>/dev/null) \
+           /tmp/ssh-*/agent.*(N=Uom) \
            /run/user/$UID/keyring/.ssh
   do
     if [[ -n $s ]] && ssh_auth_sock_ok $s; then
