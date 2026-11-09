@@ -102,6 +102,7 @@
               zigutils.packages.${pkgs.stdenv.hostPlatform.system}.zsh-nix-env
               zigutils.packages.${pkgs.stdenv.hostPlatform.system}.gitclone
               zigutils.packages.${pkgs.stdenv.hostPlatform.system}.tmphttp
+              zigutils.packages.${pkgs.stdenv.hostPlatform.system}.zsh-hist
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code
               datumctl.packages.${pkgs.stdenv.hostPlatform.system}.default
               yolo.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -132,6 +133,7 @@
         zigutils.packages.${pkgs.stdenv.hostPlatform.system}.zsh-nix-env
         zigutils.packages.${pkgs.stdenv.hostPlatform.system}.gitclone
         zigutils.packages.${pkgs.stdenv.hostPlatform.system}.tmphttp
+        zigutils.packages.${pkgs.stdenv.hostPlatform.system}.zsh-hist
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code
         datumctl.packages.${pkgs.stdenv.hostPlatform.system}.default
         yolo.packages.${pkgs.stdenv.hostPlatform.system}.default
