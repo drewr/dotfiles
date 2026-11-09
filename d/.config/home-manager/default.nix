@@ -34,6 +34,7 @@
     pkgs.mosh
     pkgs.nodejs
     pkgs.pandoc
+    pkgs.podman
     pkgs.python3
     pkgs.ripgrep
     pkgs.simple-http-server
