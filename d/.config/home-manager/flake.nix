@@ -109,6 +109,7 @@
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
+              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi-acp
               (mkOpendcode2 pkgs llm-agents)
               (mkJoltPackage pkgs.stdenv.hostPlatform.system)
             ];
@@ -141,6 +142,7 @@
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
+        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi-acp
         (mkOpendcode2 pkgs llm-agents)
         (mkJoltPackage pkgs.stdenv.hostPlatform.system)
       ];
