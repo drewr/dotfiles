@@ -17,7 +17,6 @@
     pkgs.git
     pkgs.claude-agent-acp
     pkgs.codex-acp
-    pkgs.goose-cli
     (pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
       gke-gcloud-auth-plugin
       gsutil
