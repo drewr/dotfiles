@@ -111,6 +111,7 @@
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi-acp
+              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.herdr
               (mkOpendcode2 pkgs llm-agents)
               (mkJoltPackage pkgs.stdenv.hostPlatform.system)
             ];
@@ -144,6 +145,7 @@
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi-acp
+        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.herdr
         (mkOpendcode2 pkgs llm-agents)
         (mkJoltPackage pkgs.stdenv.hostPlatform.system)
       ];
