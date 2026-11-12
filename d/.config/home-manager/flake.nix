@@ -15,7 +15,11 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # Track the nixpkgs rev llm-agents pins, so every input shares one nixpkgs
+    # and llm-agents packages (codex, herdr, ...) come prebuilt from
+    # cache.numtide.com. codex doesn't build against newer nixpkgs (aws-lc
+    # dropped its openssl.pc compat file), so we deliberately lag a bit.
+    nixpkgs.follows = "llm-agents/nixpkgs";
     # Pinned to the rev where ghc-9.8.4 is in cache.nixos.org; do not bump
     # without verifying the new rev's ghc98 derivation is cached.
     nixpkgs-haskell.url = "github:nixos/nixpkgs/b12141ef619e0a9c1c84dc8c684040326f27cdcc";
@@ -40,10 +44,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.zigutils.follows = "zigutils";
     };
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    llm-agents.url = "github:numtide/llm-agents.nix";
     # Use the git scheme (not github:) because jolt's flake declares
     # `inputs.self.submodules = true`, which the github fetcher rejects
     # (NixOS/nix#13571). The git+https fetcher supports submodules.

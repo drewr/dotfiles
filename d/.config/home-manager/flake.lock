@@ -140,11 +140,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794442096,
-        "narHash": "sha256-fy5s3nSHpJoZhpGUAxeNZoDLDwxmuFKC/hos+m4gyDo=",
+        "lastModified": 1794525073,
+        "narHash": "sha256-g/ObaXyQf+JYaRPBhejV0OI36ChaCQ4giGyF0sxmdcQ=",
         "ref": "refs/heads/main",
-        "rev": "acbd745aa299a76feaf228ce0591d56185bc8d95",
-        "revCount": 5167,
+        "rev": "0f08ec2732a0078d7523f274a1507049c06bffe6",
+        "revCount": 5211,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jolt-lang/jolt"
@@ -158,18 +158,16 @@
       "inputs": {
         "bun2nix": "bun2nix",
         "flake-parts": "flake-parts",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
+        "nixpkgs": "nixpkgs",
         "systems": "systems_2",
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1794446492,
-        "narHash": "sha256-AIiEQTIvcYJZbIpJUEiZ/y6P2cIL7OVaZjncpv4FlLM=",
+        "lastModified": 1794493589,
+        "narHash": "sha256-XeiAGbzjdC0D7ekQZbufWyqeY8x8UItxjCP335lh4Eg=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "a4ef5bdd670dc14d115a2f4cd38a2955303254f3",
+        "rev": "90011236663d4116738fc2d63de6ab64523387b6",
         "type": "github"
       },
       "original": {
@@ -197,16 +195,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1794192123,
-        "narHash": "sha256-SvB8u5qaJAOwZZyZciqTVOg/rBoUs2w0sFTU6ED51AQ=",
-        "owner": "nixos",
+        "lastModified": 1793977579,
+        "narHash": "sha256-WrSODdZFVIs/Hh2NzC0bY+ROByi0bATg8WfePX8dPj8=",
+        "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "177d0540942fb205af6993b1d5fa0b57799e09f8",
+        "rev": "4fe25e12eb9f4c744966dd3de5a05246cf098601",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable",
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -233,7 +231,10 @@
         "home-manager": "home-manager",
         "jolt": "jolt",
         "llm-agents": "llm-agents",
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": [
+          "llm-agents",
+          "nixpkgs"
+        ],
         "nixpkgs-haskell": "nixpkgs-haskell",
         "una-src": "una-src",
         "yolo": "yolo",
