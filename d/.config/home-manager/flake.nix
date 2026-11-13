@@ -20,9 +20,6 @@
     # cache.numtide.com. codex doesn't build against newer nixpkgs (aws-lc
     # dropped its openssl.pc compat file), so we deliberately lag a bit.
     nixpkgs.follows = "llm-agents/nixpkgs";
-    # Pinned to the rev where ghc-9.8.4 is in cache.nixos.org; do not bump
-    # without verifying the new rev's ghc98 derivation is cached.
-    nixpkgs-haskell.url = "github:nixos/nixpkgs/b12141ef619e0a9c1c84dc8c684040326f27cdcc";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -56,7 +53,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-haskell, home-manager, una-src, zigutils, datumctl, yolo, llm-agents, jolt }:
+  outputs = { self, nixpkgs, home-manager, una-src, zigutils, datumctl, yolo, llm-agents, jolt }:
   let
     homeModules = [
       ./default.nix
@@ -66,7 +63,8 @@
       ./network.nix
     ];
 
-    buildUna = pkgs: nixpkgs-haskell.legacyPackages.${pkgs.stdenv.hostPlatform.system}.haskell.packages.ghc98.callCabal2nix "una" una-src {};
+    # ghc910 is nixpkgs' default GHC, so its libraries come from cache.nixos.org.
+    buildUna = pkgs: pkgs.haskell.packages.ghc910.callCabal2nix "una" una-src {};
     mkUnaPackage = system: buildUna nixpkgs.legacyPackages.${system};
 
     # OpenCode 2.x as eg opencode2; provide an `opencode` alias so existing

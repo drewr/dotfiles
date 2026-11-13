@@ -209,22 +209,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-haskell": {
-      "locked": {
-        "lastModified": 1776548001,
-        "narHash": "sha256-ZSK0NL4a1BwVbbTBoSnWgbJy9HeZFXLYQizjb2DPF24=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "datumctl": "datumctl",
@@ -235,7 +219,6 @@
           "llm-agents",
           "nixpkgs"
         ],
-        "nixpkgs-haskell": "nixpkgs-haskell",
         "una-src": "una-src",
         "yolo": "yolo",
         "zigutils": "zigutils"
