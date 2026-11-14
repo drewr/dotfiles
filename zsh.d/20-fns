@@ -108,16 +108,25 @@ update_auth_sock() {
   if [[ -n $TMUX ]]; then
     TMUX_SOCK=$(echo $TMUX|cut -d , -f 1)
     NEW_SSH_AUTH_SOCK=$(tmux -S $TMUX_SOCK showenv 2>/dev/null|grep ^SSH_AUTH_SOCK|cut -d = -f 2)
-    if [[ -n $NEW_SSH_AUTH_SOCK ]] && [[ -S $NEW_SSH_AUTH_SOCK ]]; then
+    # Same usability rule as zshenv: a socket that exists but holds no
+    # identities (gpg-agent, a dead forward) must not win over re-resolving.
+    if [[ -n $NEW_SSH_AUTH_SOCK ]]; then
+      if (( $+functions[ssh_auth_sock_ok] )); then
+        ssh_auth_sock_ok $NEW_SSH_AUTH_SOCK || NEW_SSH_AUTH_SOCK=
+      elif [[ ! -S $NEW_SSH_AUTH_SOCK ]]; then
+        NEW_SSH_AUTH_SOCK=
+      fi
+    fi
+    if [[ -n $NEW_SSH_AUTH_SOCK ]]; then
       # export: assigning to an unset var leaves it shell-local, so children
       # (git, ssh, ssh-keygen) would not see the agent.
       export SSH_AUTH_SOCK=$NEW_SSH_AUTH_SOCK
       return
     fi
   fi
-  # Otherwise delegate to zshenv's resolver, which verifies live sockets only:
-  # the stable symlink, sshd's per-session /tmp/ssh-*/agent.* sockets,
-  # or the keyring agent, and never leaves a dead inherited value behind.
+  # Otherwise delegate to zshenv's resolver, which verifies live sockets with
+  # identities only: the stable symlink and sshd's per-session
+  # /tmp/ssh-*/agent.* sockets, and never leaves a dead inherited value behind.
   # ssh_auth_sock_pick comes from ~/.zshenv, which every zsh runs before this
   # file is loaded; guard for direct sourcing (zsh -f) where it wouldn't be.
   (( $+functions[ssh_auth_sock_pick] )) && ssh_auth_sock_pick

@@ -67,6 +67,14 @@
     ".config/home-manager/current-config".text = ''
       hoping to put in \$\{config.home\} at some point
     '';
+  } // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+    # gpg-agent's ssh socket is advertised in the systemd user environment at
+    # boot (ExecStartPost=systemctl --user set-environment) even though it
+    # holds no identities, so non-zsh consumers inherit a keyless agent and
+    # git signing silently fails. Mask the socket; remove this file if GPG
+    # ssh keys are ever added.
+    ".config/systemd/user/gpg-agent-ssh.socket".source =
+      config.lib.file.mkOutOfStoreSymlink "/dev/null";
   };
 
   home.sessionVariables = {

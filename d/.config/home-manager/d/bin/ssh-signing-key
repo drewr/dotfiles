@@ -7,47 +7,69 @@
 # ecdsa keys never do), so every key is emitted with the "key::" prefix. A file
 # path is rejected with "succeeded but returned no keys".
 #
-# Filtering matters: a forwarded agent typically lists the RSA key first, and
-# signing with it produces a valid signature that allowed_signers rejects ("No
-# principal matched"). Only the keys authorized in ~/.ssh/allowed_signers are
-# considered: ecdsa-sha2-nistp256 (preferred) and ssh-ed25519.
+# This machine holds no private keys: signing goes through whatever agent
+# SSH_AUTH_SOCK points at, which in practice is a forwarded agent from the
+# connected device (laptop or phone). With no device connected nothing can
+# sign, and that is intentional.
 #
-# Order:
-#   1. an authorized key already held by the agent (ecdsa first, then ed25519)
-#   2. otherwise, load an authorized private key from disk (~/.ssh/id_ecdsa,
-#      then id_ed25519) into the running agent with ssh-add, then use it as in 1
+# Only keys authorized in ~/.ssh/allowed_signers are emitted. A forwarded
+# agent typically lists the RSA key first, and signing with an unauthorized
+# key produces a signature allowed_signers rejects ("No principal matched").
+# A second device whose agent key is not listed here would fail the same way,
+# so this prints the agent's key list to stderr instead of guessing.
 #
-# Signing always goes through the agent: git hands ssh-keygen the public key
-# and ssh-keygen asks the agent to sign. With no reachable agent nothing can
-# sign, so this prints the reason to stderr and emits nothing, and git reports
-# that user.signingKey needs to be set.
+# Order: ecdsa-sha2-nistp256 (preferred) then ssh-ed25519, first authorized
+# match wins.
 
-agent_key() {
-	keys=$(ssh-add -L 2>/dev/null)
-	for type in ecdsa-sha2-nistp256 ssh-ed25519; do
-		key=$(printf '%s\n' "$keys" | grep -m1 "^$type ")
-		if [ -n "$key" ]; then
-			printf 'key::%s\n' "$key"
-			return 0
-		fi
-	done
-	return 1
+# Print the base64 blob of every key in allowed_signers. The format is
+#   principal [options] keytype base64 [comment]
+# so the keytype -- the first field after the principal that looks like an
+# algorithm name -- is followed by the blob.
+authorized_blobs() {
+	awk '
+		/^[[:space:]]*#/ { next }
+		{
+			for (i = 2; i < NF; i++)
+				if ($i ~ /^(ssh-|ecdsa-|sk-)/) { print $(i + 1); next }
+		}
+	' "$HOME/.ssh/allowed_signers" 2>/dev/null
 }
 
-agent_key && exit 0
+agent_key() {
+	keys=$(ssh-add -L 2>/dev/null) || return 1
+	[ -n "$keys" ] || return 1
+	allowed=$(authorized_blobs)
+	[ -n "$allowed" ] || return 1
+	printf '%s\n' "$keys" | allowed="$allowed" awk '
+		BEGIN {
+			n = split(ENVIRON["allowed"], a, "\n")
+			for (i = 1; i <= n; i++) ok[a[i]] = 1
+		}
+		($1 == "ecdsa-sha2-nistp256" || $1 == "ssh-ed25519") && ($2 in ok) {
+			if ($1 == "ecdsa-sha2-nistp256" && !ecdsa) ecdsa = $1 " " $2
+			else if ($1 == "ssh-ed25519" && !ed25519) ed25519 = $1 " " $2
+		}
+		END {
+			if (ecdsa) print "key::" ecdsa
+			else if (ed25519) print "key::" ed25519
+		}
+	'
+}
+
+out=$(agent_key)
+if [ -n "$out" ]; then
+	printf '%s\n' "$out"
+	exit 0
+fi
 
 # ssh-add exits 2 when it cannot reach an agent at all.
 ssh-add -l >/dev/null 2>&1
 if [ $? -eq 2 ]; then
 	echo "ssh-signing-key: no ssh agent reachable (SSH_AUTH_SOCK=${SSH_AUTH_SOCK:-unset})" >&2
+	echo "ssh-signing-key: signing needs a live forwarded ssh session from your device" >&2
 	exit 1
 fi
 
-for f in "$HOME/.ssh/id_ecdsa" "$HOME/.ssh/id_ed25519"; do
-	if [ -f "$f" ] && ssh-add -q "$f" </dev/null 2>/dev/null; then
-		agent_key && exit 0
-	fi
-done
-
-echo "ssh-signing-key: no authorized signing key in the agent or ~/.ssh" >&2
+echo "ssh-signing-key: no agent key is listed in ~/.ssh/allowed_signers; agent holds:" >&2
+ssh-add -l 2>&1 | sed 's/^/  /' >&2
 exit 1
