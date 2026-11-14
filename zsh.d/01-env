@@ -2,31 +2,31 @@
 
 # Move these from zshenv because /etc/zprofile will overwrite.
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
-if [[ -d ${HOME_}/.rbenv ]]; then
-  PATH=${HOME_}/.rbenv/bin:${HOME_}/.rbenv/shims:$PATH
+if [[ -d $HOME/.rbenv ]]; then
+  PATH=$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH
   rbenv init - >/tmp/rbenvinit.zsh; source /tmp/rbenvinit.zsh
 fi
 
-[[ -d ${HOME_}/.cabal ]] && PATH=${HOME_}/.cabal/bin:$PATH
-[[ -d ${HOME_}/.local ]] && PATH=${HOME_}/.local/bin:$PATH
-[[ -d ${HOME_}/.cargo ]] && PATH=${HOME_}/.cargo/bin:$PATH
+[[ -d $HOME/.cabal ]] && PATH=$HOME/.cabal/bin:$PATH
+[[ -d $HOME/.local ]] && PATH=$HOME/.local/bin:$PATH
+[[ -d $HOME/.cargo ]] && PATH=$HOME/.cargo/bin:$PATH
 
-[[ -s ${HOME_}/.gvm/scripts/gvm ]] && . ${HOME_}/.gvm/scripts/gvm
+[[ -s $HOME/.gvm/scripts/gvm ]] && . $HOME/.gvm/scripts/gvm
 
-VOLTA_HOME=${HOME_}/.volta
+VOLTA_HOME=$HOME/.volta
 [[ -d $VOLTA_HOME/bin ]] && PATH=$VOLTA_HOME/bin:$PATH
 
-[[ -d ${HOME_}/perl5 ]] && . ${HOME_}/perl5/perlbrew/etc/bashrc
+[[ -d $HOME/perl5 ]] && . $HOME/perl5/perlbrew/etc/bashrc
 
-CLOJURESCRIPT_HOME=${HOME_}/src/clojure/clojurescript; export CLOJURESCRIPT_HOME
+CLOJURESCRIPT_HOME=$HOME/src/clojure/clojurescript; export CLOJURESCRIPT_HOME
 [[ -d $CLOJURESCRIPT_HOME ]] && PATH=$CLOJURESCRIPT_HOME/bin:$PATH
 
-if [[ -f ${HOME_}/.gcloud/path.zsh.inc ]]; then
-  source ${HOME_}/.gcloud/path.zsh.inc
-  source ${HOME_}/.gcloud/completion.zsh.inc
+if [[ -f $HOME/.gcloud/path.zsh.inc ]]; then
+  source $HOME/.gcloud/path.zsh.inc
+  source $HOME/.gcloud/completion.zsh.inc
 fi
 
-GOPATH=${HOME_}/go; export GOPATH
+GOPATH=$HOME/go; export GOPATH
 PATH=${GOPATH}/bin:$PATH
 [[ -d $GOPATH ]] || echo warning: $GOPATH not found
 
@@ -34,22 +34,22 @@ if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
   . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 fi
 
-if [[ -d ${HOME_}/.nix-profile ]]; then
-  if [[ -f ${HOME_}/.nix-profile/etc/profile.d/nix.sh ]]; then
-    . ${HOME_}/.nix-profile/etc/profile.d/nix.sh
+if [[ -d $HOME/.nix-profile ]]; then
+  if [[ -f $HOME/.nix-profile/etc/profile.d/nix.sh ]]; then
+    . $HOME/.nix-profile/etc/profile.d/nix.sh
   else
-    PATH=${HOME_}/.nix-profile/bin:$PATH
+    PATH=$HOME/.nix-profile/bin:$PATH
   fi
-  if [[ -d ${HOME_}/.nix-profile/lib/locale ]]; then
+  if [[ -d $HOME/.nix-profile/lib/locale ]]; then
     LOCALE_ARCHIVE="$(readlink ~/.nix-profile/lib/locale)/locale-archive"
     export LOCALE_ARCHIVE
   fi
 fi
 
-NIMPATH=${HOME_}/.nimble/bin
+NIMPATH=$HOME/.nimble/bin
 [[ -d $NIMPATH ]] && PATH=$NIMPATH:$PATH
 
-PATH=${HOME_}/bin:$PATH
+PATH=$HOME/bin:$PATH
 
 if [[ $TERM == "dumb" ]]; then
   ## To help with the ^[[?2004h business in emacs-shell
@@ -66,16 +66,16 @@ else
 fi
 
 ## Requires `nix-env -i opam && opam init`
-OPAM=${HOME_}/.opam
+OPAM=$HOME/.opam
 if [[ -r $OPAM/opam-init/init.zsh ]]; then
   . $OPAM/opam-init/init.zsh
 fi
 
-JANET=${HOME_}/.janet
+JANET=$HOME/.janet
 if [[ -r ${JANET}/bin/janet ]]; then
   PATH=${JANET}/bin:$PATH
 fi
 
-NPMPATH=${HOME_}/.npm
+NPMPATH=$HOME/.npm
 [[ -d ${NPMPATH}/bin ]] && PATH=${NPMPATH}/bin:$PATH
 
