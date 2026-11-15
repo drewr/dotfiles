@@ -133,12 +133,22 @@ update_auth_sock() {
 }
 preexec_functions+=update_auth_sock
 
-# A dropped ssh/mosh session can't tell the terminal to stop reporting the
-# mouse, so every pointer move then arrives as ^[[<35;80;20M text at the
-# prompt. Nothing should hold mouse or focus reporting at a prompt, so turn
-# it all off before each one.
+# Whatever drops a session (ssh, mosh, autossh, a dead pty) can't tell the
+# terminal to stop reporting the mouse, so every pointer move arrives as
+# ^[[<35;80;20M text. Nothing should hold mouse or focus reporting at a
+# prompt, so turn it all off before each one. Reports sent while the
+# connection hung are already queued on the tty, so also discard those,
+# handing any real typeahead back to the line editor.
 reset_mouse_reporting() {
-  [[ -t 1 ]] && printf '\e[?1000l\e[?1002l\e[?1003l\e[?1006l\e[?1015l\e[?1004l'
+  [[ -t 0 && -t 1 ]] || return
+  setopt local_options extendedglob
+  printf '\e[?1000l\e[?1002l\e[?1003l\e[?1006l\e[?1015l\e[?1004l'
+  local c buf=
+  while read -rsk1 -t 0 c; do buf+=$c; done
+  buf=${buf//$'\e'\[<[0-9;]##[Mm]/}
+  buf=${buf//$'\e'\[[IO]/}
+  [[ -n $buf ]] && print -rz -- "$buf"
+  return 0
 }
 precmd_functions+=reset_mouse_reporting
 
