@@ -133,6 +133,15 @@ update_auth_sock() {
 }
 preexec_functions+=update_auth_sock
 
+# A dropped ssh/mosh session can't tell the terminal to stop reporting the
+# mouse, so every pointer move then arrives as ^[[<35;80;20M text at the
+# prompt. Nothing should hold mouse or focus reporting at a prompt, so turn
+# it all off before each one.
+reset_mouse_reporting() {
+  [[ -t 1 ]] && printf '\e[?1000l\e[?1002l\e[?1003l\e[?1006l\e[?1015l\e[?1004l'
+}
+precmd_functions+=reset_mouse_reporting
+
 enumerate_huh() {
   # This *should* be the same as the following function.  But it
   # doesn't work right.
