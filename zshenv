@@ -38,7 +38,14 @@ LANG=en_US.UTF-8; export LANG
 # usable. Setting SSH_AUTH_SOCK explicitly reuses this for any candidate.
 ssh_auth_sock_has_keys() {
   [[ -n $1 ]] || return 1
-  SSH_AUTH_SOCK=$1 ssh-add -l >/dev/null 2>&1
+  # A forwarded socket whose ssh connection is half-dead accepts connections
+  # but never answers, so ssh-add -l would block every shell start forever.
+  # Bound it where a timeout command exists (coreutils, or gtimeout on macOS).
+  local t
+  for t in timeout gtimeout; do
+    (( $+commands[$t] )) && { SSH_AUTH_SOCK=$1 $t 3 ssh-add -l >/dev/null 2>&1 </dev/null; return; }
+  done
+  SSH_AUTH_SOCK=$1 ssh-add -l >/dev/null 2>&1 </dev/null
 }
 
 ssh_auth_sock_ok() {
