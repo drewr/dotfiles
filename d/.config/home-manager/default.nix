@@ -52,6 +52,7 @@
   home.file = {
     ".claude/settings.defaults.json".source = ./d/claude-settings-defaults.json;
     ".gitconfig".source = ./d/gitconfig;
+    ".gitconfig-datum".source = ./d/gitconfig-datum;
     ".tmux.conf".source = ./d/tmux.conf;
     ".ssh/allowed_signers".source = ./d/ssh-allowed-signers;
 

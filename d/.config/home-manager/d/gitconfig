@@ -60,3 +60,9 @@ gpgsign = true
 
 [init]
 defaultBranch = main
+
+# Datum work uses the Datum address; everything else keeps the one above.
+[includeIf "gitdir:~/src/datum-cloud/"]
+path = ~/.gitconfig-datum
+[includeIf "gitdir:~/src/datum-labs/"]
+path = ~/.gitconfig-datum
