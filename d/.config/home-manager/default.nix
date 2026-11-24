@@ -15,6 +15,7 @@
     pkgs.gh
     pkgs.hut
     pkgs.git
+    pkgs.git-crypt
     pkgs.claude-agent-acp
     pkgs.codex-acp
     (pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
