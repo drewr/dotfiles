@@ -14,6 +14,69 @@ LC_CTYPE=en_US.UTF-8; export LC_CTYPE
 LC_ALL=en_US.UTF-8; export LC_ALL
 LANG=en_US.UTF-8; export LANG
 
+# PATH and tool environment. This lives here, not in zshrc, because
+# non-interactive shells (`ssh host cmd`, cron, editors, agent harnesses) read
+# only this file, and they need to find the same programs a prompt would.
+# Nothing in this file may print: output breaks scp, rsync and git over ssh.
+#
+# Each step prepends, so later entries win. -U drops duplicates, keeping the
+# first occurrence, so re-prepending a directory moves it to the front.
+typeset -U path PATH manpath MANPATH
+
+_zshenv_prepend() {
+  local d
+  for d; do [[ -d $d ]] && path=($d $path); done
+}
+
+_zshenv_prepend /usr/local/sbin /usr/local/bin
+_zshenv_prepend $HOME/.rbenv/shims $HOME/.rbenv/bin
+_zshenv_prepend $HOME/.cabal/bin $HOME/.local/bin $HOME/.cargo/bin
+
+[[ -s $HOME/.gvm/scripts/gvm ]] && . $HOME/.gvm/scripts/gvm
+
+VOLTA_HOME=$HOME/.volta; export VOLTA_HOME
+_zshenv_prepend $VOLTA_HOME/bin
+
+[[ -r $HOME/perl5/perlbrew/etc/bashrc ]] && . $HOME/perl5/perlbrew/etc/bashrc
+
+CLOJURESCRIPT_HOME=$HOME/src/clojure/clojurescript; export CLOJURESCRIPT_HOME
+_zshenv_prepend $CLOJURESCRIPT_HOME/bin
+
+[[ -r $HOME/.gcloud/path.zsh.inc ]] && . $HOME/.gcloud/path.zsh.inc
+
+GOPATH=$HOME/go; export GOPATH
+_zshenv_prepend $GOPATH/bin
+
+# The Nix scripts also export NIX_PROFILES, NIX_SSL_CERT_FILE and
+# XDG_DATA_DIRS. They skip themselves when a parent shell already ran them,
+# so add the bin directories explicitly too, in case that parent's PATH was
+# reset (sudo, systemd) while the guard variable survived.
+if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+fi
+[[ -f $HOME/.nix-profile/etc/profile.d/nix.sh ]] && . $HOME/.nix-profile/etc/profile.d/nix.sh
+_zshenv_prepend /nix/var/nix/profiles/default/bin $HOME/.nix-profile/bin
+if [[ -d $HOME/.nix-profile/lib/locale ]]; then
+  LOCALE_ARCHIVE="$(readlink $HOME/.nix-profile/lib/locale)/locale-archive"
+  export LOCALE_ARCHIVE
+fi
+
+_zshenv_prepend $HOME/.nimble/bin $HOME/bin
+
+# Requires `nix-env -i opam && opam init`. Its init.zsh loads completion and
+# the precmd env hook only when the shell is interactive.
+[[ -r $HOME/.opam/opam-init/init.zsh ]] && . $HOME/.opam/opam-init/init.zsh
+
+_zshenv_prepend $HOME/.janet/bin $HOME/.npm/bin
+[[ $OS == Darwin ]] && _zshenv_prepend /opt/local/sbin /opt/local/bin
+
+unfunction _zshenv_prepend
+export PATH
+
+# On macOS, /etc/zprofile runs path_helper in login shells, which moves the
+# system directories ahead of everything above. ~/.zprofile restores this.
+_zshenv_path=($path)
+
 # Every zsh reads this file, including non-interactive ones that never load
 # zshrc (cron, editors, agent harnesses), so agent-forwarded git signing must
 # resolve SSH_AUTH_SOCK here, not only in update_auth_sock. Forwarding is the
