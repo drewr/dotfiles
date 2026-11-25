@@ -16,9 +16,10 @@
 
   inputs = {
     # Track the nixpkgs rev llm-agents pins, so every input shares one nixpkgs
-    # and llm-agents packages (herdr, ...) come prebuilt from
-    # cache.numtide.com. codex (since removed) did not build against newer nixpkgs (aws-lc
-    # dropped its openssl.pc compat file), so we deliberately lag a bit.
+    # and llm-agents packages (codex, herdr, ...) come prebuilt from
+    # cache.numtide.com. Keep the nixpkgs pin aligned with llm-agents: codex
+    # uses aws-lc, and newer nixpkgs dropped its openssl.pc compat file, so a
+    # nixpkgs rev newer than llm-agents' breaks the build.
     nixpkgs.follows = "llm-agents/nixpkgs";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -106,6 +107,7 @@
               datumctl.packages.${pkgs.stdenv.hostPlatform.system}.default
               yolo.packages.${pkgs.stdenv.hostPlatform.system}.default
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
+              llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi-acp
               llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.herdr
@@ -139,6 +141,7 @@
         datumctl.packages.${pkgs.stdenv.hostPlatform.system}.default
         yolo.packages.${pkgs.stdenv.hostPlatform.system}.default
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
+        llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi-acp
         llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.herdr
