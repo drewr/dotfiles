@@ -41,9 +41,11 @@ ssh_auth_sock_has_keys() {
   # A forwarded socket whose ssh connection is half-dead accepts connections
   # but never answers, so ssh-add -l would block every shell start forever.
   # Bound it where a timeout command exists (coreutils, or gtimeout on macOS).
+  # A live agent answers in one round trip, so 2s leaves room for a slow
+  # mobile link while keeping a hung socket from stalling every shell.
   local t
   for t in timeout gtimeout; do
-    (( $+commands[$t] )) && { SSH_AUTH_SOCK=$1 $t 3 ssh-add -l >/dev/null 2>&1 </dev/null; return; }
+    (( $+commands[$t] )) && { SSH_AUTH_SOCK=$1 $t 2 ssh-add -l >/dev/null 2>&1 </dev/null; return; }
   done
   SSH_AUTH_SOCK=$1 ssh-add -l >/dev/null 2>&1 </dev/null
 }
@@ -58,21 +60,46 @@ ssh_auth_sock_ok() {
   ssh_auth_sock_has_keys $1
 }
 
+# Set after a scan finds no usable agent: the candidate list it saw, and when.
+# update_auth_sock runs this before every command, and with no device
+# connected each hung candidate costs the full ssh-add timeout. Skip the
+# rescan while the candidates are unchanged, but only briefly: an agent that
+# was empty can gain keys (ssh-add on the device) without any socket changing.
+typeset -g _ssh_auth_sock_miss _ssh_auth_sock_miss_at
+zmodload -F zsh/datetime p:EPOCHSECONDS 2>/dev/null
+
 ssh_auth_sock_pick() {
-  if ssh_auth_sock_ok $SSH_AUTH_SOCK; then
-    return
-  fi
   local s
+  local -a candidates
+  local -A seen
   # Glob only where sshd puts agent sockets instead of walking all of /tmp,
   # which holds hundreds of thousands of Nix build files and took seconds.
   # Qualifiers: N no match is fine, = sockets, U owned by us, om newest first.
-  for s in $HOME/.ssh/ssh_auth_sock \
-           /tmp/ssh-*/agent.*(N=Uom)
-  do
-    if [[ -n $s ]] && ssh_auth_sock_ok $s; then
+  candidates=($HOME/.ssh/ssh_auth_sock /tmp/ssh-*/agent.*(N=Uom))
+  # Compare resolved paths so retargeting the stable symlink counts as a change.
+  local key=${(j: :)${candidates:A}}
+
+  if [[ -z $SSH_AUTH_SOCK && -n $_ssh_auth_sock_miss && -n $EPOCHSECONDS ]] \
+     && (( EPOCHSECONDS - _ssh_auth_sock_miss_at < 30 )) \
+     && [[ $key == $_ssh_auth_sock_miss ]]; then
+    return
+  fi
+
+  if [[ -n $SSH_AUTH_SOCK ]]; then
+    ssh_auth_sock_ok $SSH_AUTH_SOCK && return
+    seen[${SSH_AUTH_SOCK:A}]=1
+  fi
+  for s in $candidates; do
+    # The stable symlink usually points at one of the /tmp sockets, and the
+    # inherited value is often one of them too. Probe each real socket once,
+    # so a hung one costs a single timeout rather than two or three.
+    (( $+seen[${s:A}] )) && continue
+    seen[${s:A}]=1
+    if ssh_auth_sock_ok $s; then
       # Keep the export attribute: assigning to an unset variable leaves it
       # shell-local, so children (git, ssh, ssh-keygen) would not see it.
       export SSH_AUTH_SOCK=$s
+      _ssh_auth_sock_miss=
       return
     fi
   done
@@ -80,6 +107,8 @@ ssh_auth_sock_pick() {
   # socket. git then fails with "user.signingKey needs to be set", which is
   # the honest answer under a zero-local-secrets design.
   unset SSH_AUTH_SOCK
+  _ssh_auth_sock_miss=$key
+  _ssh_auth_sock_miss_at=${EPOCHSECONDS:-0}
 }
 
 ssh_auth_sock_pick

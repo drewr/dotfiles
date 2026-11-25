@@ -108,6 +108,10 @@ update_auth_sock() {
   if [[ -n $TMUX ]]; then
     TMUX_SOCK=$(echo $TMUX|cut -d , -f 1)
     NEW_SSH_AUTH_SOCK=$(tmux -S $TMUX_SOCK showenv 2>/dev/null|grep ^SSH_AUTH_SOCK|cut -d = -f 2)
+    # ~/.ssh/rc points tmux at the stable symlink, which ssh_auth_sock_pick
+    # already tries first. Leave that one to it rather than probing it twice
+    # (a hung socket would cost two timeouts before every command).
+    [[ $NEW_SSH_AUTH_SOCK == $HOME/.ssh/ssh_auth_sock ]] && NEW_SSH_AUTH_SOCK=
     # Same usability rule as zshenv: a socket that exists but holds no
     # identities (gpg-agent, a dead forward) must not win over re-resolving.
     if [[ -n $NEW_SSH_AUTH_SOCK ]]; then
