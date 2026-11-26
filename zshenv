@@ -79,69 +79,108 @@ _zshenv_path=($path)
 
 # Every zsh reads this file, including non-interactive ones that never load
 # zshrc (cron, editors, agent harnesses), so agent-forwarded git signing must
-# resolve SSH_AUTH_SOCK here, not only in update_auth_sock. Forwarding is the
-# only source of signing keys: this machine keeps no local private keys, so
-# the goal is to bind to a LIVE forwarded agent holding at least one key,
-# never to a dead path or to a keyless socket. Priority:
-#   1. an inherited SSH_AUTH_SOCK that is usable -- leave it alone
+# resolve SSH_AUTH_SOCK here, not only in update_auth_sock. The goal is to
+# bind to a LIVE agent, never to a dead path, and to prefer an agent that
+# holds keys over one that is merely reachable.
+#
+# Pass 1 takes the first candidate holding at least one identity:
+#   1. an inherited SSH_AUTH_SOCK -- leave it alone
 #   2. the stable ~/.ssh/ssh_auth_sock symlink, which ~/.ssh/rc refreshes on
 #      every inbound SSH connection that brings a forwarded agent
 #   3. the newest /tmp/ssh-*/agent.<pid> socket owned by us, for the windows
 #      where ~/.ssh/rc hasn't refreshed the symlink: chains through the box,
 #      mosh reconnects, and anything opened while sshd was already gone
+# Pass 2, when none has keys, takes the first of those that answers but is
+# empty, then (macOS) the launchd per-user agent. An empty agent is still
+# worth binding to: it is the one keys get loaded into later (ssh-add, or
+# macOS's launchd ssh-agent, which starts empty at every boot). But it must
+# not win over a forwarded agent with keys -- e.g. gpg-agent's
+# S.gpg-agent.ssh, which the systemd user environment advertises at boot even
+# when it holds nothing, or the launchd agent a new Terminal window inherits
+# while a device is forwarding into this Mac.
 # update_auth_sock (zsh.d/20-fns) reuses ssh_auth_sock_pick so long-lived
 # interactive shells re-resolve before every command.
-# gpg-agent's S.gpg-agent.ssh is deliberately not a candidate: the systemd
-# user environment advertises it at boot even when it holds no identities,
-# and an empty agent cannot sign anything.
 
-# True when ssh can reach an agent at $1 that holds at least one identity.
-# ssh-add -l exits 0 with identities, 1 when the agent is reachable but
-# empty, and 2 when there is no agent (or the socket is dead). Only 0 is
-# usable. Setting SSH_AUTH_SOCK explicitly reuses this for any candidate.
-ssh_auth_sock_has_keys() {
-  [[ -n $1 ]] || return 1
-  # A forwarded socket whose ssh connection is half-dead accepts connections
-  # but never answers, so ssh-add -l would block every shell start forever.
-  # Bound it where a timeout command exists (coreutils, or gtimeout on macOS).
-  local t
-  for t in timeout gtimeout; do
-    (( $+commands[$t] )) && { SSH_AUTH_SOCK=$1 $t 3 ssh-add -l >/dev/null 2>&1 </dev/null; return; }
-  done
-  SSH_AUTH_SOCK=$1 ssh-add -l >/dev/null 2>&1 </dev/null
-}
-
-ssh_auth_sock_ok() {
+# Classify the agent socket $1 by return status:
+#   0  live, holds at least one identity
+#   1  live, but holds no identities
+#   2  unusable: not a socket, a dead sshd session's leftover, no agent
+#      answering, or a half-dead forward that never answers
+# These match ssh-add -l's own exit codes, except that a timeout counts as 2.
+ssh_auth_sock_state() {
   # A /tmp/ssh-*/agent.<pid> socket names the sshd session that created it.
   # If that session is gone its socket file can linger; nothing listens on
   # it, so reject it instead of handing shells a dead path. /proc only
   # exists on Linux; elsewhere the glob never matches forwarded sockets.
-  [[ -S $1 ]] || return 1
-  [[ -d /proc ]] && [[ $1 == /tmp/ssh-*/agent.* ]] && [[ ! -e /proc/${1##*.} ]] && return 1
-  ssh_auth_sock_has_keys $1
+  [[ -S $1 ]] || return 2
+  [[ -d /proc ]] && [[ $1 == /tmp/ssh-*/agent.* ]] && [[ ! -e /proc/${1##*.} ]] && return 2
+  # A forwarded socket whose ssh connection is half-dead accepts connections
+  # but never answers, so ssh-add -l would block every shell start forever.
+  # Bound it where a timeout command exists (coreutils, or gtimeout on macOS).
+  local t st
+  local -a bound
+  for t in timeout gtimeout; do
+    (( $+commands[$t] )) && { bound=($t 3); break; }
+  done
+  SSH_AUTH_SOCK=$1 $bound ssh-add -l >/dev/null 2>&1 </dev/null
+  st=$?
+  (( st <= 1 )) && return st
+  return 2
+}
+
+# True when $1 is a live agent, with or without keys.
+ssh_auth_sock_ok() {
+  ssh_auth_sock_state $1
+  (( $? <= 1 ))
+}
+
+# macOS only. The launchd agent's socket lives in a directory whose name is
+# random per agent start (/var/run/com.apple.launchd.XXXXXX/Listeners), so the
+# path cannot be hardcoded or cached -- a stale one is exactly how the symlink
+# in ~/.ssh ends up dangling. launchd publishes it in the Aqua domain's
+# environment only, so ssh sessions (launchctl managername: Background) never
+# inherit it. Ask launchd, which is the only authority.
+ssh_auth_sock_launchd() {
+  [[ $OS == Darwin ]] || return 1
+  launchctl print gui/$UID 2>/dev/null |
+    sed -n 's/.*SSH_AUTH_SOCK => \(.*\)$/\1/p' | head -1
 }
 
 ssh_auth_sock_pick() {
-  if ssh_auth_sock_ok $SSH_AUTH_SOCK; then
-    return
-  fi
-  local s
+  local s st empty
   # Glob only where sshd puts agent sockets instead of walking all of /tmp,
   # which holds hundreds of thousands of Nix build files and took seconds.
   # Qualifiers: N no match is fine, = sockets, U owned by us, om newest first.
-  for s in $HOME/.ssh/ssh_auth_sock \
+  # Each candidate is probed once; the first live-but-empty one is remembered
+  # for pass 2 so it never needs a second ssh-add round trip.
+  for s in "$SSH_AUTH_SOCK" \
+           $HOME/.ssh/ssh_auth_sock \
            /tmp/ssh-*/agent.*(N=Uom)
   do
-    if [[ -n $s ]] && ssh_auth_sock_ok $s; then
+    [[ -n $s ]] || continue
+    ssh_auth_sock_state $s
+    st=$?
+    if (( st == 0 )); then
       # Keep the export attribute: assigning to an unset variable leaves it
       # shell-local, so children (git, ssh, ssh-keygen) would not see it.
       export SSH_AUTH_SOCK=$s
       return
     fi
+    (( st == 1 )) && [[ -z $empty ]] && empty=$s
   done
-  # No device is connected: leave nothing behind rather than a misleading
-  # socket. git then fails with "user.signingKey needs to be set", which is
-  # the honest answer under a zero-local-secrets design.
+  if [[ -n $empty ]]; then
+    export SSH_AUTH_SOCK=$empty
+    return
+  fi
+  # Last resort on macOS, and only after the cheap checks: update_auth_sock
+  # runs this before every command.
+  s=$(ssh_auth_sock_launchd)
+  if [[ -n $s ]] && ssh_auth_sock_ok $s; then
+    export SSH_AUTH_SOCK=$s
+    return
+  fi
+  # Nothing answers: leave nothing behind rather than a misleading socket.
+  # Signing then fails visibly (ssh-signing-key reports no reachable agent).
   unset SSH_AUTH_SOCK
 }
 
