@@ -13,10 +13,9 @@ gitize() {
 }
 
 versionize() {
-  local file=$1
-  local ver=$(git log --pretty=format:"%ai %h" -1 | perl -pe 's,(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d) [^ ]+ ([a-z0-9]+),\1\2\3\4\5\6+\7,')
-  local versionedfile=$(echo $file | perl -pe "s,(.*)\.([^.]+)\$,\$1-${ver}.\$2,")
-  cp $file $versionedfile
+  local file=$1 ext=${1:e} ver
+  ver=$(git log -1 --date=format:%Y%m%d%H%M%S --format=%ad+%h) || return
+  cp $file ${file:r}-$ver${ext:+.$ext}
 }
 
 autoload -Uz vcs_info
