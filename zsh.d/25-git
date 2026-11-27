@@ -20,27 +20,37 @@ versionize() {
 
 autoload -Uz vcs_info
 
-# No color escapes in dumb terminals (Emacs shell).
-if [[ $TERM == dumb ]]; then
-  _c_red= _c_green= _c_yellow= _c_blue= _c_off=
-else
-  _c_red=%F{red} _c_green=%F{green} _c_yellow=%F{yellow} _c_blue=%F{blue} _c_off=%f
-fi
+# Plain markers in dumb terminals (Emacs shell); zsh emits colors anyway.
+() {
+  local red green yellow off
+  if [[ $TERM != dumb ]]; then
+    red=%F{red} green=%F{green} yellow=%F{yellow} off=%f
+  fi
+  zstyle ':vcs_info:*' enable git
+  zstyle ':vcs_info:*' check-for-changes true
+  zstyle ':vcs_info:*' stagedstr "$green●"
+  zstyle ':vcs_info:*' unstagedstr "$yellow●"
+  zstyle ':vcs_info:*' untrackedstr "$red●"
+  zstyle ':vcs_info:*' formats "[%b%c%u$off]"
+  zstyle ':vcs_info:git*+set-message:*' hooks untracked
+}
 
-zstyle ":vcs_info:*" check-for-changes true
-zstyle ":vcs_info:*" stagedstr "${_c_green}●"
-zstyle ":vcs_info:*" unstagedstr "${_c_yellow}●"
-zstyle ":vcs_info:(sv[nk]|bzr):*" branchformat "%b${_c_red}:${_c_yellow}%r${_c_off}"
-zstyle ":vcs_info:*" enable git svn bzr hg
+# Append the untracked marker to %u.
++vi-untracked() {
+  git ls-files --others --exclude-standard 2>/dev/null | read -r || return 0
+  local mark
+  zstyle -s ':vcs_info:git' untrackedstr mark
+  hook_com[unstaged]+=$mark
+}
 
 update_prompt_info() {
   local nix_info=$(zsh-nix-env)
-  nix_prompt=${nix_info:+"[${_c_blue}${nix_info}${_c_off}]"}
-
-  if [[ -z $(git ls-files --other --exclude-standard 2>/dev/null) ]]; then
-    zstyle ":vcs_info:*" formats "[%b%c%u${_c_off}]"
+  if [[ -z $nix_info ]]; then
+    nix_prompt=
+  elif [[ $TERM == dumb ]]; then
+    nix_prompt="[$nix_info]"
   else
-    zstyle ":vcs_info:*" formats "[%b%c%u${_c_red}●${_c_off}]"
+    nix_prompt="[%F{blue}$nix_info%f]"
   fi
   vcs_info
 }
