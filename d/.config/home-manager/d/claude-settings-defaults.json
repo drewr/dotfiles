@@ -1,6 +1,7 @@
 {
   "model": "sonnet[1m]",
   "theme": "light",
+  "preferredNotifChannel": "terminal_bell",
   "attribution": {
     "commit": "",
     "pr": "",
