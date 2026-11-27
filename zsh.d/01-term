@@ -1,12 +1,8 @@
 # -*- sh -*-
 
-if [[ $TERM == "dumb" ]]; then
-  ## To help with the ^[[?2004h business in emacs-shell
-  ## http://zmwangx.github.io/blog/2015-09-21-zsh-51-and-bracketed-paste.html
+if [[ $TERM == dumb ]]; then
+  # Emacs shell and Tramp: no line editor or bracketed-paste escapes.
   unset zle_bracketed_paste
-
-  ## With Emacs 23, I've found this needs to go in ~root/.zshrc too to
-  ## help with Tramp hangs.
   unsetopt zle
   PAGER=cat; export PAGER
 elif ! infocmp $TERM >/dev/null 2>&1; then

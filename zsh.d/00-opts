@@ -2,11 +2,15 @@
 
 typeset -U cdpath fpath
 
-typeset -a preexec_functions
-typeset -a precmd_functions
-typeset -a chpwd_functions
+# Arrays, so `hooks+=fn` in zsh.d appends an element, not a string.
+typeset -a preexec_functions precmd_functions
 
-ulimit -n 1024
+# Raise a low open-file limit (macOS defaults to 256) without lowering a
+# higher one.
+() {
+  local n=$(ulimit -n)
+  [[ $n == <-> ]] && (( n < 1024 )) && ulimit -n 1024
+}
 
 setopt AUTO_CD
 setopt HIST_IGNORE_DUPS

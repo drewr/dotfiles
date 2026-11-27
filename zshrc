@@ -1,5 +1,5 @@
 # -*- sh -*-
-echo "+++Reading .zshrc."
+[[ -n $ZSHDEBUG ]] && echo "+++Reading .zshrc."
 
 autoload -U compinit zrecompile
 

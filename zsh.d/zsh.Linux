@@ -1,5 +1,3 @@
 # -*- sh -*-
 
-if [[ ! $TERM == "dumb" ]]; then
-  alias ls="ls --color=auto"
-fi
+[[ $TERM != dumb ]] && alias ls="ls --color=auto"

@@ -1,5 +1,5 @@
 # -*- sh -*-
-[[ -o interactive ]] && echo "+++Reading .zshenv."
+[[ -o interactive && -n $ZSHDEBUG ]] && echo "+++Reading .zshenv."
 
 case $OSTYPE in
   darwin*) OS=Darwin ;;
