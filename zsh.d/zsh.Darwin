@@ -1,7 +1,6 @@
 # -*- sh -*-
 
 alias ls="ls -G"
-PATH=/opt/local/bin:/opt/local/sbin:$PATH
 
 active-utun() {
   ifconfig | awk '/^[a-z0-9]+:/{iface=$1; sub(/:/, "", iface)} /10\.171\./{print iface; exit}'

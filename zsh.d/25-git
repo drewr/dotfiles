@@ -1,8 +1,5 @@
 # -*- sh -*-
 
-autoload colors
-colors
-
 ## export GIT_AUTHOR_NAME="${FULLNAME}"
 ## export GIT_AUTHOR_EMAIL="${EMAIL}"
 ## export GIT_COMMITTER_NAME="${FULLNAME}"
@@ -32,50 +29,30 @@ git_branch() {
   # $pipestatus[1] for the git exit code
 }
 
-if not_in_cloud; then
-  autoload -Uz vcs_info
-  
-  if [[ ! $TERM = "dumb" ]]; then
-    zstyle ":vcs_info:*" check-for-changes true
-    zstyle ":vcs_info:*" stagedstr "%F{green}●"
-    zstyle ":vcs_info:*" unstagedstr "%F{yellow}●"
-    zstyle ":vcs_info:(sv[nk]|bzr):*" branchformat "%b%F{1}:%F{yellow}%r%{$reset_color%}"
-    zstyle ":vcs_info:*" enable git svn bzr hg
-    precmd () {
-      nix_info=$(zsh-nix-env)
-      if [[ -n $nix_info ]]; then
-        nix_prompt="[%F{blue}${nix_info}%{$reset_color%}]"
-      else
-        nix_prompt=""
-      fi
+autoload -Uz vcs_info
 
-      if [[ -z $(git ls-files --other --exclude-standard 2> /dev/null) ]] {
-        zstyle ":vcs_info:*" formats "[%b%c%u%{$reset_color%}]"
-      } else {
-        zstyle ":vcs_info:*" formats "[%b%c%u%F{red}●%{$reset_color%}]"
-      }
-      vcs_info
-    }
-  else
-    zstyle ":vcs_info:*" check-for-changes true
-    zstyle ":vcs_info:*" stagedstr "●"
-    zstyle ":vcs_info:*" unstagedstr "●"
-    zstyle ":vcs_info:(sv[nk]|bzr):*" branchformat "%b:%r"
-    zstyle ":vcs_info:*" enable git svn bzr hg
-    precmd () {
-      nix_info=$(zsh-nix-env)
-      if [[ -n $nix_info ]]; then
-        nix_prompt="[${nix_info}]"
-      else
-        nix_prompt=""
-      fi
-
-      if [[ -z $(git ls-files --other --exclude-standard 2> /dev/null) ]] {
-        zstyle ":vcs_info:*" formats "[%b%c%u]"
-      } else {
-        zstyle ":vcs_info:*" formats "[%b%c%u●]"
-      }
-      vcs_info
-    }
-  fi
+# No color escapes in dumb terminals (Emacs shell).
+if [[ $TERM == dumb ]]; then
+  _c_red= _c_green= _c_yellow= _c_blue= _c_off=
+else
+  _c_red=%F{red} _c_green=%F{green} _c_yellow=%F{yellow} _c_blue=%F{blue} _c_off=%f
 fi
+
+zstyle ":vcs_info:*" check-for-changes true
+zstyle ":vcs_info:*" stagedstr "${_c_green}●"
+zstyle ":vcs_info:*" unstagedstr "${_c_yellow}●"
+zstyle ":vcs_info:(sv[nk]|bzr):*" branchformat "%b${_c_red}:${_c_yellow}%r${_c_off}"
+zstyle ":vcs_info:*" enable git svn bzr hg
+
+update_prompt_info() {
+  local nix_info=$(zsh-nix-env)
+  nix_prompt=${nix_info:+"[${_c_blue}${nix_info}${_c_off}]"}
+
+  if [[ -z $(git ls-files --other --exclude-standard 2>/dev/null) ]]; then
+    zstyle ":vcs_info:*" formats "[%b%c%u${_c_off}]"
+  else
+    zstyle ":vcs_info:*" formats "[%b%c%u${_c_red}●${_c_off}]"
+  fi
+  vcs_info
+}
+precmd_functions+=update_prompt_info

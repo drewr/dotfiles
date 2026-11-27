@@ -36,10 +36,6 @@ not_in_emacs() {
   [[ ! -n $EMACS ]]
 }
 
-not_in_cloud() {
-  ! fgrep -q ami_id /etc/motd 2>/dev/null
-}
-
 tun() {
   ssh -NCf -R 10000:localhost:22 valve
 }
@@ -96,31 +92,9 @@ gitcb() {
   git checkout -b $(basename $b) $b
 }
 
-# ~/.ssh/rc (run by sshd before the shell starts) creates ~/.ssh/ssh_auth_sock
-# as a stable symlink to the real agent socket and updates tmux's session
-# environment. This function reads that state into the current shell: tmux
-# sessions prefer tmux's own environment, everything else falls back to
-# ssh_auth_sock_pick (zshenv). It runs at shell startup (called from zshrc)
-# and before every command (preexec), so shells that were open before a new
-# SSH connection landed, and shells whose inherited socket died in between,
-# both re-resolve to a live agent.
-update_auth_sock() {
-  if [[ -n $TMUX ]]; then
-    TMUX_SOCK=$(echo $TMUX|cut -d , -f 1)
-    NEW_SSH_AUTH_SOCK=$(tmux -S $TMUX_SOCK showenv 2>/dev/null|grep ^SSH_AUTH_SOCK|cut -d = -f 2)
-    # Treat tmux's value as the inherited candidate and let zshenv's resolver
-    # judge it: kept when it holds keys, otherwise a forwarded agent with
-    # keys wins and tmux's value is the fallback. A dead one is skipped.
-    [[ -S $NEW_SSH_AUTH_SOCK ]] && export SSH_AUTH_SOCK=$NEW_SSH_AUTH_SOCK
-  fi
-  # ssh_auth_sock_pick verifies live sockets, preferring ones with identities:
-  # the current value, the stable symlink, sshd's per-session
-  # /tmp/ssh-*/agent.* sockets, then launchd's agent on macOS. It never leaves
-  # a dead value behind. It comes from ~/.zshenv, which every zsh runs before
-  # this file is loaded; guard for direct sourcing (zsh -f) where it wouldn't be.
-  (( $+functions[ssh_auth_sock_pick] )) && ssh_auth_sock_pick
-}
-preexec_functions+=update_auth_sock
+# Re-resolve the agent before every command, so long-lived shells follow a
+# new forwarded connection or drop a dead one.
+preexec_functions+=ssh_auth_sock_pick
 
 # Whatever drops a session (ssh, mosh, autossh, a dead pty) can't tell the
 # terminal to stop reporting the mouse, so every pointer move arrives as
@@ -211,21 +185,14 @@ count() {
   curl -s localhost:9200/$1/_count\?q=\*:\*; echo
 }
 
-mib() {
-  s=0
-  while read n; do
-    s=$((s+$n))
-  done
-  printf "%0.2f\n" $((s/(1024*1024.0)))
+_sum_div() {
+  local s=0 n
+  while read n; do (( s += n )); done
+  printf "%0.2f\n" $(( s / $1 ))
 }
 
-gib() {
-  s=0
-  while read n; do
-    s=$((s+$n))
-  done
-  printf "%0.2f\n" $((s/(1024*1024*1024.0)))
-}
+mib() { _sum_div 1048576.0 }
+gib() { _sum_div 1073741824.0 }
 
 avg() {
   s=0
@@ -255,10 +222,6 @@ min() {
     fi
   done
   printf "$min\n"
-}
-
-j() {
-  python -mjson.tool
 }
 
 p() {
@@ -291,17 +254,6 @@ localip() {
 
 publicip() {
   ssh $1 fgrep public_ip /etc/motd
-}
-
-fix-agent() {
-  if [[ $DISPLAY == ":0.0" ]]; then
-    # X
-    export SSH_AUTH_SOCK=$(find /run/. -uid $UID -path \*keyring\* -type s -name ssh 2>/dev/null | xargs ls -rt | tail -1)
-  else
-    # ssh
-    export SSH_AUTH_SOCK=`/bin/ls -t1 $(find /tmp/. -uid $UID -path \\*ssh\\* -type s 2> /dev/null) | head -1`
-  fi
-  export GPG_AGENT_INFO=`/bin/ls -t1 $(find /tmp/. -uid $UID -name S.gpg-agent -type s 2>/dev/null) | head -1`:0:1
 }
 
 # Cross-platform k8s-style random strings. Default to 12 bytes

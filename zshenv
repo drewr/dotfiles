@@ -79,7 +79,7 @@ _zshenv_path=($path)
 
 # Every zsh reads this file, including non-interactive ones that never load
 # zshrc (cron, editors, agent harnesses), so agent-forwarded git signing must
-# resolve SSH_AUTH_SOCK here, not only in update_auth_sock. The goal is to
+# resolve SSH_AUTH_SOCK here, not only in a preexec hook. The goal is to
 # bind to a LIVE agent, never to a dead path, and to prefer an agent that
 # holds keys over one that is merely reachable.
 #
@@ -98,8 +98,8 @@ _zshenv_path=($path)
 # S.gpg-agent.ssh, which the systemd user environment advertises at boot even
 # when it holds nothing, or the launchd agent a new Terminal window inherits
 # while a device is forwarding into this Mac.
-# update_auth_sock (zsh.d/20-fns) reuses ssh_auth_sock_pick so long-lived
-# interactive shells re-resolve before every command.
+# zsh.d/20-fns also runs ssh_auth_sock_pick before every command, so
+# long-lived interactive shells re-resolve.
 
 # Classify the agent socket $1 by return status:
 #   0  live, holds at least one identity
@@ -126,12 +126,6 @@ ssh_auth_sock_state() {
   st=$?
   (( st <= 1 )) && return st
   return 2
-}
-
-# True when $1 is a live agent, with or without keys.
-ssh_auth_sock_ok() {
-  ssh_auth_sock_state $1
-  (( $? <= 1 ))
 }
 
 # macOS only. The launchd agent's socket lives in a directory whose name is
@@ -172,10 +166,10 @@ ssh_auth_sock_pick() {
     export SSH_AUTH_SOCK=$empty
     return
   fi
-  # Last resort on macOS, and only after the cheap checks: update_auth_sock
+  # Last resort on macOS, and only after the cheap checks: preexec
   # runs this before every command.
   s=$(ssh_auth_sock_launchd)
-  if [[ -n $s ]] && ssh_auth_sock_ok $s; then
+  if [[ -n $s ]] && { ssh_auth_sock_state $s; (( $? <= 1 )) }; then
     export SSH_AUTH_SOCK=$s
     return
   fi

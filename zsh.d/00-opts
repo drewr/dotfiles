@@ -1,6 +1,6 @@
 # -*- sh -*-
 
-typeset -U path cdpath manpath fpath
+typeset -U cdpath fpath
 
 typeset -a preexec_functions
 typeset -a precmd_functions
