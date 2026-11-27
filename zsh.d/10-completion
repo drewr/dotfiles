@@ -2,5 +2,3 @@
 
 ## case-insensitive (uppercase from lowercase) completion
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-
-[[ -r $HOME/.gcloud/completion.zsh.inc ]] && source $HOME/.gcloud/completion.zsh.inc

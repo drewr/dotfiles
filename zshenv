@@ -7,7 +7,7 @@ case $OSTYPE in
   *)       OS=$(uname -s) ;;
 esac
 export OS
-MANPATH=/opt/local/man:/usr/local/man:$MANPATH
+MANPATH=/usr/local/man:$MANPATH
 LEDGER_FILE=$HOME/.ledger; export LEDGER_FILE
 EDITOR=vi; export EDITOR
 EMAIL="andrew@raines.me"; export EMAIL
@@ -27,20 +27,7 @@ _zshenv_prepend() {
 }
 
 _zshenv_prepend /usr/local/sbin /usr/local/bin
-_zshenv_prepend $HOME/.rbenv/shims $HOME/.rbenv/bin
 _zshenv_prepend $HOME/.cabal/bin $HOME/.local/bin $HOME/.cargo/bin
-
-[[ -s $HOME/.gvm/scripts/gvm ]] && . $HOME/.gvm/scripts/gvm
-
-VOLTA_HOME=$HOME/.volta; export VOLTA_HOME
-_zshenv_prepend $VOLTA_HOME/bin
-
-[[ -r $HOME/perl5/perlbrew/etc/bashrc ]] && . $HOME/perl5/perlbrew/etc/bashrc
-
-CLOJURESCRIPT_HOME=$HOME/src/clojure/clojurescript; export CLOJURESCRIPT_HOME
-_zshenv_prepend $CLOJURESCRIPT_HOME/bin
-
-[[ -r $HOME/.gcloud/path.zsh.inc ]] && . $HOME/.gcloud/path.zsh.inc
 
 GOPATH=$HOME/go; export GOPATH
 _zshenv_prepend $GOPATH/bin
@@ -57,12 +44,7 @@ if [[ -d $HOME/.nix-profile/lib/locale ]]; then
   export LOCALE_ARCHIVE
 fi
 
-_zshenv_prepend $HOME/.nimble/bin $HOME/bin
-
-[[ -r $HOME/.opam/opam-init/init.zsh ]] && . $HOME/.opam/opam-init/init.zsh
-
-_zshenv_prepend $HOME/.janet/bin $HOME/.npm/bin
-[[ $OS == Darwin ]] && _zshenv_prepend /opt/local/sbin /opt/local/bin
+_zshenv_prepend $HOME/bin $HOME/.janet/bin $HOME/.npm/bin
 
 unfunction _zshenv_prepend
 export PATH
