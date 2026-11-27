@@ -26,20 +26,6 @@ tmux_running() {
   [[ -n $TMUX ]]
 }
 
-es_running() {
-  if tmux_running; then
-    tmux list-windows | fgrep -q ' esrun ['
-  fi
-}
-
-tun() {
-  ssh -NCf -R 10000:localhost:22 valve
-}
-
-killtun() {
-  pkill -f '10000:localhost:22'
-}
-
 sshs() {
   h=$1
   t=${2:-$1}
@@ -50,37 +36,6 @@ sshs() {
   else
     ssh $h
   fi
-}
-
-start-es() {
-  if tmux_running; then
-    if es_running; then
-      echo elasticsearch already running
-    else
-      tmux neww -n "esrun" "cd ~/tmp/es-3; bin/elasticsearch -f"
-      tmux splitw -d "cd ~/tmp/es-1; bin/elasticsearch -f"
-      tmux splitw -d "cd ~/tmp/es-2; bin/elasticsearch -f"
-    fi
-  fi
-}
-
-esmon() {                               
-  local name=$1
-  local host=$2
-  tmux neww \
-    "exec ssh $host fgrep role /etc/motd\; curl -s p.draines.com/health.sh \| zsh"
-  tmux split-window -h \
-    "exec ssh $host fgrep role /etc/motd\; curl -s p.draines.com/heap.sh \| zsh"
-  tmux resize-pane -L 10
-  tmux rename-window $name-$host
-}
-
-esmaster() {
-  local clus=$1
-  local q=$2
-  ENV=$clus knife ssh $q -x drew -a ec2.public_ipv4 \
-   "curl -s p.draines.com/cluster.sh | zsh | fgrep \*" \
-   | sort -uk12
 }
 
 gitcb() {
@@ -116,28 +71,6 @@ enumerate_ssh() {
     'BEGIN{c=1};{printf(pat, c++, $1)}'
 }
 
-s3cfg() {
-  l=~/.s3cfg
-  targ=.s3cfg-$1
-  if [[ -e $HOME/$targ ]]; then
-    [[ -e $l ]] && rm $l
-    ln -s $targ $l
-  else
-    basename `readlink ~/.s3cfg` | sed 's/.s3cfg-\(.*\)/\1/'
-  fi
-}
-
-chef-me() {
-  export OPSCODE_USER=sonian_developer
-  . ~/.rvm/scripts/rvm && rvm use 1.9.2
-}
-
-knife-delete() {
-  knife node delete $*
-  knife client delete $*
-  knife ec2 server delete $*
-}
-
 lset() {
   local profile=$1
   if [[ -z $profile ]]; then
@@ -168,10 +101,6 @@ snapdir() {
 
   mkdir "$snapdir"
   tar cf - . | ( cd ${snapdir}; tar xf - )
-}
-
-count() {
-  curl -s localhost:9200/$1/_count\?q=\*:\*; echo
 }
 
 _sum_div() {
@@ -211,38 +140,6 @@ min() {
     fi
   done
   printf "$min\n"
-}
-
-p() {
-  zsh <(curl -s p.draines.com/sh)
-}
-
-draines() {
-  curl -s p.draines.com/$1 | zsh
-}
-
-cluster() {
-  draines cluster.sh
-}
-
-shards() {
-  draines shards.sh
-}
-
-indices() {
-  curl -s p.draines.com/indices.sh | zsh -s $*
-}
-
-health() {
-  curl -s p.draines.com/health.py | python -
-}
-
-localip() {
-  ssh $1 fgrep local_ip /etc/motd
-}
-
-publicip() {
-  ssh $1 fgrep public_ip /etc/motd
 }
 
 # Cross-platform k8s-style random strings. Default to 12 bytes
