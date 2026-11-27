@@ -1,8 +1,5 @@
 # -*- sh -*-
 
-# Terminal settings for interactive shells. PATH and the rest of the
-# environment are set in zshenv so non-interactive shells get them too.
-
 if [[ $TERM == "dumb" ]]; then
   ## To help with the ^[[?2004h business in emacs-shell
   ## http://zmwangx.github.io/blog/2015-09-21-zsh-51-and-bracketed-paste.html
@@ -13,8 +10,6 @@ if [[ $TERM == "dumb" ]]; then
   unsetopt zle
   PAGER=cat; export PAGER
 elif ! infocmp $TERM >/dev/null 2>&1; then
-  # Fall back only when this host has no terminfo entry for the terminal
-  # (xterm-ghostty over ssh, say). Forcing it unconditionally clobbers
-  # tmux-256color/screen inside multiplexers and the terminal's own entry.
+  # No terminfo entry here for this terminal (e.g. xterm-ghostty over ssh).
   TERM=xterm-256color
 fi

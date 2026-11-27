@@ -47,12 +47,9 @@ gitcb() {
 # new forwarded connection or drop a dead one.
 preexec_functions+=ssh_auth_sock_pick
 
-# Whatever drops a session (ssh, mosh, autossh, a dead pty) can't tell the
-# terminal to stop reporting the mouse, so every pointer move arrives as
-# ^[[<35;80;20M text. Nothing should hold mouse or focus reporting at a
-# prompt, so turn it all off before each one. Reports sent while the
-# connection hung are already queued on the tty, so also discard those,
-# handing any real typeahead back to the line editor.
+# A dropped session can leave the terminal reporting mouse and focus events
+# as text. Turn reporting off at each prompt and discard queued reports,
+# keeping any real typeahead.
 reset_mouse_reporting() {
   [[ -t 0 && -t 1 ]] || return
   setopt local_options extendedglob
