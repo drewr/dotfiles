@@ -1,6 +1,3 @@
 # -*- sh -*-
 
-### PROMPT='%n@%m/%!/%?:%B%3~%b%# '; export PROMPT
-### RPROMPT='[%T]'
-
-PROMPT='%n@%m %w %* %! %? %B%3~%b${nix_prompt}${vcs_info_msg_0_}%# '; export PROMPT
+PROMPT='%n@%m %w %* %! %? %B%3~%b${nix_prompt}${vcs_info_msg_0_}%# '

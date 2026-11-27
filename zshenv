@@ -1,16 +1,18 @@
 # -*- sh -*-
 [[ -o interactive ]] && echo "+++Reading .zshenv."
 
-OS=$(uname -s); export OS
+case $OSTYPE in
+  darwin*) OS=Darwin ;;
+  linux*)  OS=Linux ;;
+  *)       OS=$(uname -s) ;;
+esac
+export OS
 MANPATH=/opt/local/man:/usr/local/man:$MANPATH
-WORDCHARS='*?_[]~=&;!#$%^(){}'
-WORDCHARS=${WORDCHARS:s,/,,}
 LEDGER_FILE=$HOME/.ledger; export LEDGER_FILE
 EDITOR=vi; export EDITOR
 EMAIL="andrew@raines.me"; export EMAIL
 FULLNAME="Andrew Raines"; export FULLNAME
 
-LC_CTYPE=en_US.UTF-8; export LC_CTYPE
 LC_ALL=en_US.UTF-8; export LC_ALL
 LANG=en_US.UTF-8; export LANG
 
@@ -101,6 +103,13 @@ _zshenv_path=($path)
 # zsh.d/20-fns also runs ssh_auth_sock_pick before every command, so
 # long-lived interactive shells re-resolve.
 
+_ssh_add_bound=()
+if (( $+commands[timeout] )); then
+  _ssh_add_bound=(timeout 3)
+elif (( $+commands[gtimeout] )); then
+  _ssh_add_bound=(gtimeout 3)
+fi
+
 # Classify the agent socket $1 by return status:
 #   0  live, holds at least one identity
 #   1  live, but holds no identities
@@ -117,12 +126,8 @@ ssh_auth_sock_state() {
   # A forwarded socket whose ssh connection is half-dead accepts connections
   # but never answers, so ssh-add -l would block every shell start forever.
   # Bound it where a timeout command exists (coreutils, or gtimeout on macOS).
-  local t st
-  local -a bound
-  for t in timeout gtimeout; do
-    (( $+commands[$t] )) && { bound=($t 3); break; }
-  done
-  SSH_AUTH_SOCK=$1 $bound ssh-add -l >/dev/null 2>&1 </dev/null
+  local st
+  SSH_AUTH_SOCK=$1 $_ssh_add_bound ssh-add -l >/dev/null 2>&1 </dev/null
   st=$?
   (( st <= 1 )) && return st
   return 2

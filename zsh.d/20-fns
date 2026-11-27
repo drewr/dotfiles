@@ -32,10 +32,6 @@ es_running() {
   fi
 }
 
-not_in_emacs() {
-  [[ ! -n $EMACS ]]
-}
-
 tun() {
   ssh -NCf -R 10000:localhost:22 valve
 }
@@ -114,13 +110,6 @@ reset_mouse_reporting() {
   return 0
 }
 precmd_functions+=reset_mouse_reporting
-
-enumerate_huh() {
-  # This *should* be the same as the following function.  But it
-  # doesn't work right.
-  awk -v a=$1 -v b=$2 \
-    'BEGIN{c=1};{printf("host %s%02d.%s\n  hostname %s\n\n", $a, c++, $b, $1)}'
-}
 
 enumerate_ssh() {
   sort | awk -v pat="host $1%02d.$2\n  hostname %s\n\n" \

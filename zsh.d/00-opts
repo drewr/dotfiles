@@ -18,6 +18,8 @@ setopt PROMPT_SUBST
 setopt AUTO_PUSHD
 setopt ZLE emacs
 
+WORDCHARS='*?_[]~=&;!#$%^(){}'
+
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.history

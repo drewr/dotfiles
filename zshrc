@@ -1,7 +1,5 @@
 # -*- sh -*-
-echo -n "+++Reading .zshrc"
-[[ -o interactive ]] && echo -n " (for interactive use)"
-echo .
+echo "+++Reading .zshrc."
 
 autoload -U compinit zrecompile
 
@@ -18,13 +16,9 @@ else
   done
 fi
 
-setopt EXTENDED_GLOB
-for zshrc in ~/.zsh.d/[0-9][0-9]*[^~] ; do
-  if [[ ! -z $ZSHDEBUG ]]; then
-    echo +++ $(basename $zshrc)
-  fi
+for zshrc in ~/.zsh.d/[0-9][0-9]*[^~]; do
+  [[ -n $ZSHDEBUG ]] && echo +++ ${zshrc:t}
   source $zshrc
 done
-unsetopt EXTENDED_GLOB
 
 [[ -f ~/.zsh.d/zsh.${OS} ]] && source ~/.zsh.d/zsh.${OS}

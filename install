@@ -1,7 +1,5 @@
 #!/usr/bin/env zsh
 
-os=$(uname -s)
-
 echo install: user
 cp zprofile $HOME/.zprofile
 cp zshrc $HOME/.zshrc
