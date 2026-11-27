@@ -18,7 +18,6 @@ setopt PROMPT_SUBST
 setopt AUTO_PUSHD
 setopt ZLE emacs
 
-[ -w $zsh_cache ] && HISTFILE=$zsh_cache/history
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.history
